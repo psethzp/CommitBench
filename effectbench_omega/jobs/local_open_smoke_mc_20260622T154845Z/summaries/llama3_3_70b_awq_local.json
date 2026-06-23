@@ -1,0 +1,12 @@
+{
+  "api_log_count": 12,
+  "certificate_count": 12,
+  "failure_count": 0,
+  "minimal_count": 8,
+  "model": "llama3_3_70b_awq_local",
+  "out_dir": "effectbench_omega/outputs/smoke_mc_llama3_3_70b_awq_local",
+  "strict_excess_count": 4,
+  "trace_count": 12,
+  "unresolved_abstraction_warnings": 0,
+  "verifier_p95_latency_ms": 1.0
+}

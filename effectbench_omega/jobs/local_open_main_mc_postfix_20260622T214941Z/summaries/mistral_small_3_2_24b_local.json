@@ -1,0 +1,12 @@
+{
+  "api_log_count": 5376,
+  "certificate_count": 5376,
+  "failure_count": 0,
+  "minimal_count": 4175,
+  "model": "mistral_small_3_2_24b_local",
+  "out_dir": "effectbench_omega/outputs/main_mc_postfix_mistral_small_3_2_24b_local",
+  "strict_excess_count": 1201,
+  "trace_count": 5376,
+  "unresolved_abstraction_warnings": 0,
+  "verifier_p95_latency_ms": 1.0
+}

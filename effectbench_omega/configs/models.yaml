@@ -1,0 +1,103 @@
+models:
+  qwen3_14b_awq_local:
+    provider: vllm_openai_compatible
+    model: Qwen/Qwen3-14B-AWQ
+    cache_snapshot: /home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-14B-AWQ/snapshots/31c69efc29464b6bb0aee1398b5a7b50a99340c3
+    endpoint: http://localhost:8001/v1
+    served_model_name: qwen3_14b_awq_local
+    tensor_parallel_size: 1
+    dtype: auto
+    quantization: awq
+    max_model_len: 32768
+    role: small_open_weight_control
+
+  mistral_small_3_2_24b_local:
+    provider: vllm_openai_compatible
+    model: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+    cache_snapshot: /home/ubuntu/.cache/huggingface/hub/models--mistralai--Mistral-Small-3.2-24B-Instruct-2506/snapshots/95a6d26c4bfb886c58daf9d3f7332c857cb27b43
+    endpoint: http://localhost:8001/v1
+    served_model_name: mistral_small_3_2_24b_local
+    tensor_parallel_size: 4
+    dtype: auto
+    max_model_len: 32768
+    role: non_qwen_tool_calling_control
+    serving_defaults:
+      tokenizer_mode: mistral
+      config_format: mistral
+      load_format: auto
+      tool_call_parser: mistral
+      enable_auto_tool_choice: true
+      limit_mm_per_prompt:
+        image: 10
+      disable_flashinfer_sampler: true
+      forbidden_args:
+        - --language-model-only
+        - --chat-template effectbench_omega/configs/chat_templates/mistral_small.jinja
+        - --load-format mistral
+
+  qwen3_30b_a3b_local:
+    provider: vllm_openai_compatible
+    model: Qwen/Qwen3-30B-A3B-Instruct-2507
+    cache_snapshot: /home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B-Instruct-2507/snapshots/0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe
+    endpoint: http://localhost:8001/v1
+    served_model_name: qwen3_30b_a3b_local
+    tensor_parallel_size: 4
+    dtype: auto
+    max_model_len: 32768
+    role: main_strong_local_model
+
+  qwen3_6_35b_a3b_local:
+    provider: vllm_openai_compatible
+    model: Qwen/Qwen3.6-35B-A3B
+    cache_snapshot: /home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3.6-35B-A3B/snapshots/995ad96eacd98c81ed38be0c5b274b04031597b0
+    endpoint: http://localhost:8001/v1
+    served_model_name: qwen3_6_35b_a3b_local
+    tensor_parallel_size: 4
+    dtype: auto
+    max_model_len: 32768
+    role: larger_local_qwen_stress
+
+optional_ready:
+  llama3_3_70b_awq_local:
+    provider: vllm_openai_compatible
+    model: casperhansen/llama-3.3-70b-instruct-awq
+    cache_snapshot: /home/ubuntu/.cache/huggingface/hub/models--casperhansen--llama-3.3-70b-instruct-awq/snapshots/64d255621f40b42adaf6d1f32a47e1d4534c0f14
+    endpoint: http://localhost:8001/v1
+    served_model_name: llama3_3_70b_awq_local
+    tensor_parallel_size: 4
+    dtype: auto
+    quantization: awq
+    max_model_len: 32768
+    role: optional_large_non_qwen_control
+
+  gemma3_27b_it_local:
+    provider: vllm_openai_compatible
+    model: google/gemma-3-27b-it
+    cache_snapshot: /home/ubuntu/.cache/huggingface/hub/models--google--gemma-3-27b-it/snapshots/005ad3404e59d6023443cb575daa05336842228a
+    endpoint: http://localhost:8001/v1
+    served_model_name: gemma3_27b_it_local
+    tensor_parallel_size: 4
+    dtype: auto
+    max_model_len: 32768
+    role: optional_gemma_control
+
+optional_not_ready:
+  llama3_3_70b_full_local:
+    provider: vllm_openai_compatible
+    model: meta-llama/Llama-3.3-70B-Instruct
+    cache_snapshot: null
+    status: gated_full_precision_not_cached_awq_substitute_ready
+    tensor_parallel_size: 4
+    role: full_precision_large_non_qwen_control_if_needed
+
+archived_bedrock:
+  status: disabled_no_api_budget
+
+model_control_prompt_policy:
+  proposal_mode: actions
+  transport:
+    mistral_small_3_2_24b_local: openai_tool_call_emit_plan
+    qwen3_6_35b_a3b_local: openai_response_format_json_schema
+    llama3_3_70b_awq_local: openai_response_format_json_schema
+    gemma3_27b_it_local: openai_response_format_json_schema
+  fairness_invariant: "All local models receive the same system instruction, task context, user-turn rendering, action enum, terminal_action requirement, temperature, and max token budget; only the structured-output transport differs to match serving support."

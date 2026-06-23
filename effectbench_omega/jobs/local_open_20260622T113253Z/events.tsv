@@ -1,0 +1,71 @@
+timestamp	model	status	detail
+2026-06-22T11:32:56Z	queue	started	ordered run: mistral_small_3_2_24b_local qwen3_6_35b_a3b_local llama3_3_70b_awq_local gemma3_27b_it_local
+2026-06-22T11:33:02Z	mistral_small_3_2_24b_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_20260622T113253Z/logs/mistral_small_3_2_24b_local_vllm.log
+2026-06-22T11:33:12Z	mistral_small_3_2_24b_local	loading	waited 10s for vLLM
+2026-06-22T11:33:22Z	mistral_small_3_2_24b_local	loading	waited 20s for vLLM
+2026-06-22T11:33:32Z	mistral_small_3_2_24b_local	loading	waited 30s for vLLM
+2026-06-22T11:33:42Z	mistral_small_3_2_24b_local	loading	waited 40s for vLLM
+2026-06-22T11:33:52Z	mistral_small_3_2_24b_local	loading	waited 50s for vLLM
+2026-06-22T11:34:02Z	mistral_small_3_2_24b_local	loading	waited 60s for vLLM
+2026-06-22T11:34:02Z	mistral_small_3_2_24b_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
+2026-06-22T11:34:02Z	mistral_small_3_2_24b_local	endpoint_smoke	health smoke against http://localhost:8001/v1
+2026-06-22T11:34:06Z	mistral_small_3_2_24b_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_mistral_small_3_2_24b_local
+2026-06-22T11:49:34Z	mistral_small_3_2_24b_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-22T11:50:16Z	mistral_small_3_2_24b_local	done	slice complete; summary effectbench_omega/jobs/local_open_20260622T113253Z/summaries/mistral_small_3_2_24b_local.json
+2026-06-22T11:50:16Z	mistral_small_3_2_24b_local	stopping_server	stopping vLLM before next model
+2026-06-22T11:50:21Z	qwen3_6_35b_a3b_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_20260622T113253Z/logs/qwen3_6_35b_a3b_local_vllm.log
+2026-06-22T11:50:31Z	qwen3_6_35b_a3b_local	loading	waited 10s for vLLM
+2026-06-22T11:50:41Z	qwen3_6_35b_a3b_local	loading	waited 20s for vLLM
+2026-06-22T11:50:51Z	qwen3_6_35b_a3b_local	loading	waited 30s for vLLM
+2026-06-22T11:51:01Z	qwen3_6_35b_a3b_local	loading	waited 40s for vLLM
+2026-06-22T11:51:11Z	qwen3_6_35b_a3b_local	loading	waited 50s for vLLM
+2026-06-22T11:51:21Z	qwen3_6_35b_a3b_local	loading	waited 60s for vLLM
+2026-06-22T11:51:31Z	qwen3_6_35b_a3b_local	loading	waited 70s for vLLM
+2026-06-22T11:51:41Z	qwen3_6_35b_a3b_local	loading	waited 80s for vLLM
+2026-06-22T11:51:51Z	qwen3_6_35b_a3b_local	loading	waited 90s for vLLM
+2026-06-22T11:52:01Z	qwen3_6_35b_a3b_local	loading	waited 100s for vLLM
+2026-06-22T11:52:11Z	qwen3_6_35b_a3b_local	loading	waited 110s for vLLM
+2026-06-22T11:52:11Z	qwen3_6_35b_a3b_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
+2026-06-22T11:52:11Z	qwen3_6_35b_a3b_local	endpoint_smoke	health smoke against http://localhost:8001/v1
+2026-06-22T11:52:16Z	qwen3_6_35b_a3b_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_qwen3_6_35b_a3b_local
+2026-06-22T12:00:28Z	qwen3_6_35b_a3b_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-22T12:01:10Z	qwen3_6_35b_a3b_local	done	slice complete; summary effectbench_omega/jobs/local_open_20260622T113253Z/summaries/qwen3_6_35b_a3b_local.json
+2026-06-22T12:01:10Z	qwen3_6_35b_a3b_local	stopping_server	stopping vLLM before next model
+2026-06-22T12:01:16Z	llama3_3_70b_awq_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_20260622T113253Z/logs/llama3_3_70b_awq_local_vllm.log
+2026-06-22T12:01:26Z	llama3_3_70b_awq_local	loading	waited 10s for vLLM
+2026-06-22T12:01:36Z	llama3_3_70b_awq_local	loading	waited 20s for vLLM
+2026-06-22T12:01:46Z	llama3_3_70b_awq_local	loading	waited 30s for vLLM
+2026-06-22T12:01:56Z	llama3_3_70b_awq_local	loading	waited 40s for vLLM
+2026-06-22T12:02:06Z	llama3_3_70b_awq_local	loading	waited 50s for vLLM
+2026-06-22T12:02:16Z	llama3_3_70b_awq_local	loading	waited 60s for vLLM
+2026-06-22T12:02:26Z	llama3_3_70b_awq_local	loading	waited 70s for vLLM
+2026-06-22T12:02:36Z	llama3_3_70b_awq_local	loading	waited 80s for vLLM
+2026-06-22T12:02:46Z	llama3_3_70b_awq_local	loading	waited 90s for vLLM
+2026-06-22T12:02:56Z	llama3_3_70b_awq_local	loading	waited 100s for vLLM
+2026-06-22T12:02:56Z	llama3_3_70b_awq_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
+2026-06-22T12:02:56Z	llama3_3_70b_awq_local	endpoint_smoke	health smoke against http://localhost:8001/v1
+2026-06-22T12:03:00Z	llama3_3_70b_awq_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_llama3_3_70b_awq_local
+2026-06-22T12:38:52Z	llama3_3_70b_awq_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-22T12:39:34Z	llama3_3_70b_awq_local	done	slice complete; summary effectbench_omega/jobs/local_open_20260622T113253Z/summaries/llama3_3_70b_awq_local.json
+2026-06-22T12:39:34Z	llama3_3_70b_awq_local	stopping_server	stopping vLLM before next model
+2026-06-22T12:39:40Z	gemma3_27b_it_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_20260622T113253Z/logs/gemma3_27b_it_local_vllm.log
+2026-06-22T12:39:50Z	gemma3_27b_it_local	loading	waited 10s for vLLM
+2026-06-22T12:40:00Z	gemma3_27b_it_local	loading	waited 20s for vLLM
+2026-06-22T12:40:10Z	gemma3_27b_it_local	loading	waited 30s for vLLM
+2026-06-22T12:40:20Z	gemma3_27b_it_local	loading	waited 40s for vLLM
+2026-06-22T12:40:30Z	gemma3_27b_it_local	loading	waited 50s for vLLM
+2026-06-22T12:40:40Z	gemma3_27b_it_local	loading	waited 60s for vLLM
+2026-06-22T12:40:50Z	gemma3_27b_it_local	loading	waited 70s for vLLM
+2026-06-22T12:41:00Z	gemma3_27b_it_local	loading	waited 80s for vLLM
+2026-06-22T12:41:10Z	gemma3_27b_it_local	loading	waited 90s for vLLM
+2026-06-22T12:41:20Z	gemma3_27b_it_local	loading	waited 100s for vLLM
+2026-06-22T12:41:30Z	gemma3_27b_it_local	loading	waited 110s for vLLM
+2026-06-22T12:41:40Z	gemma3_27b_it_local	loading	waited 120s for vLLM
+2026-06-22T12:41:50Z	gemma3_27b_it_local	loading	waited 130s for vLLM
+2026-06-22T12:42:00Z	gemma3_27b_it_local	loading	waited 140s for vLLM
+2026-06-22T12:42:00Z	gemma3_27b_it_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
+2026-06-22T12:42:00Z	gemma3_27b_it_local	endpoint_smoke	health smoke against http://localhost:8001/v1
+2026-06-22T12:42:04Z	gemma3_27b_it_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_gemma3_27b_it_local
+2026-06-22T12:47:25Z	gemma3_27b_it_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-22T12:47:55Z	gemma3_27b_it_local	failed	slice recorded 2304 failures; see effectbench_omega/outputs/main_gemma3_27b_it_local/failures.jsonl
+2026-06-22T12:47:55Z	gemma3_27b_it_local	failed	queue supervisor exited rc=1

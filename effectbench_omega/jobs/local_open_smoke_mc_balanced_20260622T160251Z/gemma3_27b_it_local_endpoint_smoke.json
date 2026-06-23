@@ -1,0 +1,7 @@
+{
+  "content": "LOW",
+  "latency_s": 0.578,
+  "model": "gemma3_27b_it_local",
+  "response_id": "chatcmpl-a1cce79cd378ba1d",
+  "status": "ok"
+}

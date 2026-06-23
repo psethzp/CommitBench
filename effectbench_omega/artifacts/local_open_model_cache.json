@@ -1,0 +1,90 @@
+{
+  "cache_root": "/home/ubuntu/.cache/huggingface/hub",
+  "models": [
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "qwen3_14b_awq_local",
+      "note": "cached but not in the locked headline grid",
+      "ready": true,
+      "repo": "Qwen/Qwen3-14B-AWQ",
+      "required": false,
+      "safetensor_count": 2,
+      "safetensor_gb": 9.977,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-14B-AWQ/snapshots/31c69efc29464b6bb0aee1398b5a7b50a99340c3"
+    },
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "mistral_small_3_2_24b_local",
+      "note": "",
+      "ready": true,
+      "repo": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+      "required": true,
+      "safetensor_count": 10,
+      "safetensor_gb": 48.023,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--mistralai--Mistral-Small-3.2-24B-Instruct-2506/snapshots/95a6d26c4bfb886c58daf9d3f7332c857cb27b43"
+    },
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "qwen3_30b_a3b_local",
+      "note": "cached but not in the locked headline grid",
+      "ready": true,
+      "repo": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+      "required": false,
+      "safetensor_count": 16,
+      "safetensor_gb": 61.067,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B-Instruct-2507/snapshots/0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe"
+    },
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "qwen3_6_35b_a3b_local",
+      "note": "",
+      "ready": true,
+      "repo": "Qwen/Qwen3.6-35B-A3B",
+      "required": true,
+      "safetensor_count": 26,
+      "safetensor_gb": 71.904,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3.6-35B-A3B/snapshots/995ad96eacd98c81ed38be0c5b274b04031597b0"
+    },
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "llama3_3_70b_awq_local",
+      "note": "active headline AWQ INT4 substitute for full Llama 3.3 70B Instruct",
+      "ready": true,
+      "repo": "casperhansen/llama-3.3-70b-instruct-awq",
+      "required": true,
+      "safetensor_count": 9,
+      "safetensor_gb": 39.768,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--casperhansen--llama-3.3-70b-instruct-awq/snapshots/64d255621f40b42adaf6d1f32a47e1d4534c0f14"
+    },
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "gemma3_27b_it_local",
+      "note": "active headline Gemma 3 27B instruction model",
+      "ready": true,
+      "repo": "google/gemma-3-27b-it",
+      "required": true,
+      "safetensor_count": 12,
+      "safetensor_gb": 54.865,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--google--gemma-3-27b-it/snapshots/005ad3404e59d6023443cb575daa05336842228a"
+    },
+    {
+      "incomplete_blob_count": 0,
+      "missing_core_files": [],
+      "model": "llama3_3_70b_full_local",
+      "note": "full precision gated/not cached; AWQ substitute is ready",
+      "ready": false,
+      "repo": "meta-llama/Llama-3.3-70B-Instruct",
+      "required": false,
+      "safetensor_count": 0,
+      "safetensor_gb": 0.0,
+      "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--meta-llama--Llama-3.3-70B-Instruct"
+    }
+  ],
+  "required_ready": true
+}

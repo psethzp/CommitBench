@@ -1,0 +1,59 @@
+experiment_name: effectbench_local_open_2026
+mode: local_open_only
+headline_denominator:
+  base_tasks_total: 128
+  task_families:
+    tau_retail: 32
+    tau_airline: 32
+    telecom: 32
+    delegated_docs: 16
+    toolsandbox_contract: 16
+  regimes:
+    - FULL
+    - CONCAT
+    - SHARDED
+    - SNOWBALL
+    - REVISE
+    - MEMORY_REVISE
+    - ADV_EFFECT
+  scenario_seeds: [13, 47]
+  models:
+    - mistral_small_3_2_24b_local
+    - qwen3_6_35b_a3b_local
+    - gemma3_27b_it_local
+    - llama3_3_70b_awq_local
+  online_systems:
+    - BASE
+    - PROJ_GUARD
+    - EFFECTGUARD
+  formula: "128 tasks × 7 regimes × 2 seeds × 4 models × 3 systems"
+  online_episode_count: 21504
+  paid_api_episode_count: 0
+claim_boundary:
+  allowed: "reproducible open-weight evidence over source-backed deterministic adapters"
+  forbidden:
+    - frontier model coverage
+    - commercial model comparison
+    - Bedrock/API headline claims
+optional_if_hf_token_available:
+  full_precision_llama3_3_70b_local:
+    model: meta-llama/Llama-3.3-70B-Instruct
+    use: "not part of the locked local denominator; AWQ substitute is cached and active"
+default_execution:
+  queue_script: effectbench_omega/scripts/run_local_open_queue.sh
+  output_prefix: main_mc_postfix
+  tensor_parallel_size: 4
+  cuda_visible_devices: "0,1,2,3"
+  model_controls_policy: true
+  model_proposal_mode: actions
+  row_selection_strategy: first
+  proposal_smoke_gate:
+    job_id: local_open_smoke_mc_default_20260622T204613Z
+    output_prefix: smoke_mc_default
+    rows_per_model: 21
+    required_failures: 0
+    required_no_oracle_pass_rate: 1.0
+    required_parse_status: json
+    required_empty_repair_log: true
+    required_structured_output_fallback_errors: 0
+  prompt_fairness_invariant: "Every local model receives the same system prompt, task context, user-turn rendering, action enum, terminal_action requirement, temperature, and max token budget. Mistral uses tool-call transport because that is its official vLLM structured-output path; Qwen/Llama/Gemma use response_format=json_schema."

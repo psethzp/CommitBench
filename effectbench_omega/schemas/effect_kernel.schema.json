@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EffectBench verifier certificate",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "trace_id",
+    "task_id",
+    "regime",
+    "model",
+    "system",
+    "terminal_success",
+    "terminal_equivalence_class",
+    "effect_vector",
+    "verdict",
+    "dominance_relation",
+    "abstract_state_hash_chain",
+    "verifier_version"
+  ],
+  "properties": {
+    "trace_id": {"type": "string"},
+    "task_id": {"type": "string"},
+    "regime": {"type": "string"},
+    "model": {"type": "string"},
+    "system": {"type": "string"},
+    "terminal_success": {"type": "boolean"},
+    "terminal_equivalence_class": {"type": "string"},
+    "effect_vector": {"type": "string"},
+    "verdict": {
+      "type": "string",
+      "enum": ["minimal", "minimal_with_incomparables", "strict_excess"]
+    },
+    "witness_trace_id": {"type": "string"},
+    "witness_effect_vector": {"type": "string"},
+    "dominance_relation": {"type": "string"},
+    "incomparability_reason": {"type": "string"},
+    "necessary_high_reason": {"type": "string"},
+    "abstract_state_hash_chain": {"type": "string"},
+    "verifier_version": {"type": "string"}
+  }
+}
+

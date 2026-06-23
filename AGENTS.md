@@ -1,5 +1,68 @@
 # AGENTS.md — EffectBench-Ω† minimal-plus experiment handoff
 
+## 0A. Active local-only override
+
+This section overrides any older Bedrock/frontier instructions later in this
+file. The active plan is local/open-weight only.
+
+```text
+headline denominator: 128 tasks × 7 regimes × 2 seeds × 4 local models × 3 systems = 21,504 trajectories
+models: mistral_small_3_2_24b_local, qwen3_6_35b_a3b_local, llama3_3_70b_awq_local, gemma3_27b_it_local
+systems: BASE, PROJ_GUARD, EFFECTGUARD
+regimes: FULL, CONCAT, SHARDED, SNOWBALL, REVISE, MEMORY_REVISE, ADV_EFFECT
+Bedrock/API: archived; do not use for headline claims
+```
+
+Default queue behavior is the hardened Step 2b path:
+
+```text
+script: effectbench_omega/scripts/run_local_open_queue.sh
+output_prefix: main_mc_postfix
+model_controls_policy: enabled
+model_proposal_mode: actions
+tensor_parallelism: TP=4 on CUDA_VISIBLE_DEVICES=0,1,2,3
+model_order: Mistral, Qwen, Llama, Gemma
+```
+
+Mistral serving defaults are mandatory:
+
+```text
+use --tokenizer-mode mistral
+use --config-format mistral
+use --tool-call-parser mistral
+use --enable-auto-tool-choice
+use --limit-mm-per-prompt '{"image":10}'
+use load_format=auto with the cached HF sharded safetensors
+keep VLLM_USE_FLASHINFER_SAMPLER=0
+do not use --language-model-only
+do not use the old custom Mistral chat template
+do not use --load-format mistral unless consolidated duplicate weights are intentionally cached
+```
+
+Prompt fairness invariant:
+
+```text
+All four local models receive the same semantic proposal prompt: same system
+instruction, task context, user-turn rendering, action enum, terminal_action
+requirement, temperature, and max token budget. Mistral uses official tool-call
+transport; Qwen/Llama/Gemma use response_format=json_schema. This transport
+difference is serving compatibility, not a different task prompt.
+```
+
+Accepted smoke before full Step 2b:
+
+```text
+job_id: local_open_smoke_mc_default_20260622T204613Z
+rows: 21/model
+failures: 0/model
+parse_status: json 21/21 for every model
+repair_log: empty 21/21 for every model
+no_oracle_sentinel_pass_rate: 100% for every model
+local_cost_usd: 0
+proposal_diversity: all pairwise signatures unequal
+queue_defaults_exercised: model_controls_policy=1, model_proposal_mode=actions
+```
+
 ## 0. Mission
 
 Run the smallest *acceptance-grade* experiment suite that still supports the paper's central claims after 2026-06-22. Do not try to reproduce the original 204,800-episode placeholder paper. Do not claim guaranteed acceptance. The target is a credible EACL/AAAI-class main-track submission with no red placeholders, no hidden oracle access, and machine-replayable certificates.

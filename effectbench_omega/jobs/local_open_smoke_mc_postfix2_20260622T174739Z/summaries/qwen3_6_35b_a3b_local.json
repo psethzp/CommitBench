@@ -1,0 +1,12 @@
+{
+  "api_log_count": 21,
+  "certificate_count": 21,
+  "failure_count": 0,
+  "minimal_count": 18,
+  "model": "qwen3_6_35b_a3b_local",
+  "out_dir": "effectbench_omega/outputs/smoke_mc_postfix2_qwen3_6_35b_a3b_local",
+  "strict_excess_count": 3,
+  "trace_count": 21,
+  "unresolved_abstraction_warnings": 0,
+  "verifier_p95_latency_ms": 1.0
+}
