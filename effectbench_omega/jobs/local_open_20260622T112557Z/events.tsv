@@ -1,0 +1,2 @@
+timestamp	model	status	detail
+2026-06-22T11:26:00Z	queue	started	ordered run: mistral_small_3_2_24b_local qwen3_6_35b_a3b_local llama3_3_70b_awq_local gemma3_27b_it_local

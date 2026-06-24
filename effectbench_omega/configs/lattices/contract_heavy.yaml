@@ -1,0 +1,5 @@
+inherits: primary
+weights:
+  contract_fragility: 2
+  write_scope: 2
+

@@ -1,0 +1,23 @@
+timestamp	model	status	detail
+2026-06-22T14:28:54Z	queue	started	ordered run: gemma3_27b_it_local
+2026-06-22T14:28:59Z	gemma3_27b_it_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_gemma_repair_20260622T142850Z/logs/gemma3_27b_it_local_vllm.log
+2026-06-22T14:29:09Z	gemma3_27b_it_local	loading	waited 10s for vLLM
+2026-06-22T14:29:19Z	gemma3_27b_it_local	loading	waited 20s for vLLM
+2026-06-22T14:29:29Z	gemma3_27b_it_local	loading	waited 30s for vLLM
+2026-06-22T14:29:39Z	gemma3_27b_it_local	loading	waited 40s for vLLM
+2026-06-22T14:29:49Z	gemma3_27b_it_local	loading	waited 50s for vLLM
+2026-06-22T14:29:59Z	gemma3_27b_it_local	loading	waited 60s for vLLM
+2026-06-22T14:30:09Z	gemma3_27b_it_local	loading	waited 70s for vLLM
+2026-06-22T14:30:19Z	gemma3_27b_it_local	loading	waited 80s for vLLM
+2026-06-22T14:30:29Z	gemma3_27b_it_local	loading	waited 90s for vLLM
+2026-06-22T14:30:39Z	gemma3_27b_it_local	loading	waited 100s for vLLM
+2026-06-22T14:30:49Z	gemma3_27b_it_local	loading	waited 110s for vLLM
+2026-06-22T14:30:59Z	gemma3_27b_it_local	loading	waited 120s for vLLM
+2026-06-22T14:31:09Z	gemma3_27b_it_local	loading	waited 130s for vLLM
+2026-06-22T14:31:09Z	gemma3_27b_it_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
+2026-06-22T14:31:09Z	gemma3_27b_it_local	endpoint_smoke	health smoke against http://localhost:8001/v1
+2026-06-22T14:31:14Z	gemma3_27b_it_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_gemma3_27b_it_local
+2026-06-22T14:38:41Z	gemma3_27b_it_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-22T14:39:23Z	gemma3_27b_it_local	done	slice complete; summary effectbench_omega/jobs/local_open_gemma_repair_20260622T142850Z/summaries/gemma3_27b_it_local.json
+2026-06-22T14:39:23Z	gemma3_27b_it_local	stopping_server	stopping vLLM before next model
+2026-06-22T14:39:28Z	queue	done	all model slices complete

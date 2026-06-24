@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EffectBench effect signature",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "data_scope",
+    "write_scope",
+    "reversibility",
+    "observability",
+    "compensation_cost",
+    "user_burden",
+    "contract_fragility"
+  ],
+  "properties": {
+    "data_scope": {"type": "integer", "minimum": 0, "maximum": 3},
+    "write_scope": {"type": "integer", "minimum": 0, "maximum": 4},
+    "reversibility": {"type": "integer", "minimum": 0, "maximum": 3},
+    "observability": {"type": "integer", "minimum": 0, "maximum": 3},
+    "compensation_cost": {"type": "integer", "minimum": 0, "maximum": 3},
+    "user_burden": {"type": "integer", "minimum": 0, "maximum": 3},
+    "contract_fragility": {"type": "integer", "minimum": 0, "maximum": 3}
+  }
+}
+

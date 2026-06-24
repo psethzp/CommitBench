@@ -1,0 +1,3 @@
+claim_id,value,source,status
+local_smoke_trace_count,90,effectbench_omega/outputs/local_qwen_pilot/kernel/certificates.parquet,computed
+local_smoke_strict_excess_count,24,effectbench_omega/outputs/local_qwen_pilot/kernel/certificates.parquet,computed

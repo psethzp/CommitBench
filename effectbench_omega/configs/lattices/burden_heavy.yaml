@@ -1,0 +1,4 @@
+inherits: primary
+weights:
+  user_burden: 2
+

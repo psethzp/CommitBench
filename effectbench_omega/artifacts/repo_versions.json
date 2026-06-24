@@ -1,0 +1,33 @@
+{
+  "commitbench": {
+    "commit": "03f10896f42ee807e1c42c8c6e19d948b70ca47b",
+    "path": "/home/ubuntu/nachiket/CommitBench",
+    "status": "working_tree_may_have_uncommitted_setup_changes"
+  },
+  "qwen3_30b_a3b_local": {
+    "model_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+    "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B-Instruct-2507/snapshots/0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+    "snapshot_commit": "0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+    "status": "present_and_local_load_verified"
+  },
+  "upstreams": {
+    "ToolSandbox": {
+      "commit": "165848b9a78cead7ca7fe7c89c688b58e6501219",
+      "path": "effectbench_omega/upstreams/ToolSandbox",
+      "status": "cloned_and_pinned",
+      "url": "https://github.com/apple/ToolSandbox"
+    },
+    "tau-bench": {
+      "commit": "59a200c6d575d595120f1cb70fea53cef0632f6b",
+      "path": "effectbench_omega/upstreams/tau-bench",
+      "status": "cloned_and_pinned",
+      "url": "https://github.com/sierra-research/tau-bench"
+    },
+    "tau2-bench": {
+      "commit": "5ebebbe827b455b3ed04fcb9294235c6ef4e5fd6",
+      "path": "effectbench_omega/upstreams/tau2-bench",
+      "status": "cloned_and_pinned",
+      "url": "https://github.com/sierra-research/tau2-bench"
+    }
+  }
+}

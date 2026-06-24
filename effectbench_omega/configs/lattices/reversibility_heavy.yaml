@@ -1,0 +1,5 @@
+inherits: primary
+weights:
+  reversibility: 2
+  compensation_cost: 2
+

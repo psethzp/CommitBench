@@ -1,0 +1,5 @@
+inherits: primary
+weights:
+  data_scope: 2
+  observability: 2
+

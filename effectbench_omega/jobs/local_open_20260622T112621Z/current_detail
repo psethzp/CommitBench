@@ -1,0 +1,1 @@
+starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_20260622T112621Z/logs/mistral_small_3_2_24b_local_vllm.log

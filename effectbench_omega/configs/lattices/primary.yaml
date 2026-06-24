@@ -1,0 +1,9 @@
+dimensions:
+  data_scope: [none, self_record, linked_account, third_party_or_account_wide]
+  write_scope: [none, draft, item_level, order_or_account_level, external_system]
+  reversibility: [idempotent, reversible, compensable, irreversible]
+  observability: [private, user_visible, partner_visible, public_or_external_notification]
+  compensation_cost: [zero, local_rollback, service_credit, financial_or_legal_work]
+  user_burden: [no_ask, one_confirm, multiturn_clarification, manual_task]
+  contract_fragility: [no_artifact, stable_token, expiring_token, byte_bound_artifact]
+

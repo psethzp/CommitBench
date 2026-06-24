@@ -1,0 +1,12 @@
+{
+  "api_log_count": 21,
+  "certificate_count": 21,
+  "failure_count": 0,
+  "minimal_count": 16,
+  "model": "mistral_small_3_2_24b_local",
+  "out_dir": "effectbench_omega/outputs/smoke_mc_balanced_mistral_small_3_2_24b_local",
+  "strict_excess_count": 5,
+  "trace_count": 21,
+  "unresolved_abstraction_warnings": 0,
+  "verifier_p95_latency_ms": 1.0
+}

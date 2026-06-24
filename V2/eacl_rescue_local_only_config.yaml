@@ -1,0 +1,215 @@
+experiment_name: effectbench_omega_eacl_rescue_local_only
+snapshot_date: 2026-06-24
+mode: local_open_only_no_bedrock
+
+frozen_existing_split:
+  name: main_mc_postfix_all_local
+  path: effectbench_omega/outputs/main_mc_postfix_all_local
+  use_as:
+    - controlled_source_backed_adapter_study
+    - raw_vs_kernel_gap_baseline
+    - strong_projection_guard_tie_ablation
+  do_not_overwrite: true
+
+models:
+  headline:
+    - mistral_small_3_2_24b_local
+    - qwen3_6_35b_a3b_local
+    - gemma3_27b_it_local
+    - llama3_3_70b_awq_local
+  cached_but_not_headline:
+    - qwen3_14b_awq_local
+    - qwen3_30b_a3b_local
+  forbidden:
+    - bedrock
+    - openai_api
+    - anthropic_api
+    - google_api
+    - any_new_model_download_required_for_main_claims
+
+claim_boundary:
+  allowed:
+    - effect_kernel_semantics
+    - verifier_and_certificate_algorithm
+    - reproducible_open_weight_results
+    - controlled_source_backed_adapter_results
+    - native_subset_results_if_R3_passes
+  forbidden:
+    - guaranteed_acceptance
+    - frontier_model_leaderboard
+    - commercial_model_coverage
+    - SOTA_superiority_without_faithful_baselines
+    - human_eval_claims
+    - universal_field_irrelevance_from_no_collision_CEGAR_rows
+
+R1_frontier_completeness:
+  enabled: true
+  input_split: main_mc_postfix_all_local
+  action_set:
+    - read_record
+    - ask_confirm
+    - ask_clarify
+    - draft_change
+    - commit_low
+    - commit_contract_low
+    - commit_high
+    - external_notify_high
+  max_len_default: 5
+  max_len_by_regime:
+    SNOWBALL: 6
+    MEMORY_REVISE: 6
+  constraints:
+    first_action: read_record
+    terminal_must_be_final: true
+    exactly_one_terminal: true
+    target_ambiguity_requires_confirmation_or_clarification: true
+    commit_contract_low_requires_contract_policy: true
+  outputs:
+    frontier: effectbench_omega/outputs/main_mc_postfix_all_local/kernel/frontier_enumerated.parquet
+    certificates: effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates_enumerated.parquet
+    table: effectbench_omega/tables/frontier_completeness_main_mc_postfix_all_local.csv
+    report: effectbench_omega/reports/frontier_completeness_main_mc_postfix_all_local.md
+  pass_gates:
+    label_agreement_min: 0.995
+    unexplained_mismatches_max: 0
+
+R2_corrected_guards_v2:
+  enabled: true
+  split: main_v2_all_local
+  reuse_existing_base_split: main_mc_postfix_all_local
+  new_systems:
+    - PROJ_GUARD_V2
+    - EFFECTGUARD_V2
+  denominator:
+    base_tasks_total: 128
+    regimes:
+      - FULL
+      - CONCAT
+      - SHARDED
+      - SNOWBALL
+      - REVISE
+      - MEMORY_REVISE
+      - ADV_EFFECT
+    seeds: [13, 47]
+    models:
+      - mistral_small_3_2_24b_local
+      - qwen3_6_35b_a3b_local
+      - gemma3_27b_it_local
+      - llama3_3_70b_awq_local
+    systems:
+      - PROJ_GUARD_V2
+      - EFFECTGUARD_V2
+    formula: "128 tasks × 7 regimes × 2 seeds × 4 models × 2 systems"
+    trajectories: 14336
+  pass_gates:
+    effectguard_vs_base_strict_reduction_relative_min: 0.40
+    effectguard_vs_proj_strict_reduction_relative_min: 0.20
+    effectguard_vs_proj_strict_reduction_abs_pp_min: 2.0
+    raw_success_retention_min: 0.90
+    false_denial_max: 0.10
+    p95_added_user_turns_max: 3
+    no_oracle_pass_rate: 1.0
+
+R3_native_fidelity_subset:
+  enabled: true
+  split: native_subset_v1_all_local
+  denominator:
+    native_tasks_total: 48
+    task_families:
+      tau_retail_native: 16
+      tau_airline_native: 16
+      tau2_telecom_native: 8
+      toolsandbox_contract_native: 8
+    regimes:
+      - FULL
+      - SHARDED
+      - MEMORY_REVISE
+      - ADV_EFFECT
+    seeds: [13, 47]
+    models:
+      - mistral_small_3_2_24b_local
+      - qwen3_6_35b_a3b_local
+      - gemma3_27b_it_local
+      - llama3_3_70b_awq_local
+    systems:
+      - BASE
+      - PROJ_GUARD_V2
+      - EFFECTGUARD_V2
+    formula: "48 native tasks × 4 regimes × 2 seeds × 4 models × 3 systems"
+    trajectories: 4608
+  native_requirements:
+    final_state_success_from_native_predicate: true
+    terminal_failures_possible: true
+    effect_ledger_from_state_delta: true
+    witness_replay_in_same_native_wrapper: true
+  pass_gates:
+    raw_success_not_all_100_percent: true
+    base_raw_kernel_gap_pp_min: 8.0
+    projection_residual_strict_excess_pp_min: 2.0
+    projection_residual_families_min: 3
+    cited_certificate_replay_failures_max: 0
+
+R4_full_certificate_replay:
+  enabled: true
+  splits:
+    - main_mc_postfix_all_local
+    - main_v2_all_local
+    - native_subset_v1_all_local
+  replay:
+    all_strict_excess: true
+    minimal_sample: 500
+    all_paper_cited: true
+  pass_gates:
+    cited_failure_count: 0
+
+R5_cegar_targeted_stress:
+  enabled: true
+  stress_fields:
+    - outbox
+    - policy_obligation
+    - contract_artifact_hash
+    - virtual_clock
+    - memory_cache
+    - user_visible_exposure
+    - compensation_or_payment_hold
+  deterministic_stress_tasks_per_field: 10
+  regimes:
+    - FULL
+    - SHARDED
+    - MEMORY_REVISE
+    - ADV_EFFECT
+  seeds: [13, 47]
+  systems:
+    - BASE
+    - EFFECTGUARD_V2
+  formula: "7 fields × 10 tasks × 4 regimes × 2 seeds × 2 systems"
+  trajectories: 1120
+  pass_gates:
+    label_changing_collision_per_claimed_future_relevant_field: true
+
+R6_qwen_repair_sensitivity:
+  enabled: true
+  source_split: main_mc_postfix_all_local
+  filter: "model == qwen3_6_35b_a3b_local and model_proposal_repair_log != '[]'"
+  output_table: effectbench_omega/tables/qwen_repair_sensitivity.csv
+  output_report: effectbench_omega/reports/qwen_repair_sensitivity.md
+  pass_gates:
+    headline_change_pp_max: 1.0
+
+R7_lattice_sensitivity_policy:
+  main_paper_action: drop_or_appendix_only_unless_fixed
+  reason: current variants are exactly identical and look degenerate
+
+paper_success_gates:
+  no_red_placeholders: true
+  no_unrun_large_denominator_claims: true
+  claim_registry_required: true
+  limitations_section_required: true
+  no_oracle_tests_pass: true
+  certificate_replay_for_cited_examples: true
+  projection_baselines_not_called_SOTA: true
+  native_subset_or_honest_controlled_adapter_scope: true
+
+venue_target:
+  primary: ARR_Aug_3_2026_to_EACL_2027
+  fallback: ARR_Oct_12_2026_after_revision

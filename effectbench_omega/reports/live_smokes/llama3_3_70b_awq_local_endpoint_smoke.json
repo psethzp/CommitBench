@@ -1,0 +1,7 @@
+{
+  "content": "OK",
+  "latency_s": 1.045,
+  "model": "llama3_3_70b_awq_local",
+  "response_id": "chatcmpl-b5123a4cacf39308",
+  "status": "ok"
+}

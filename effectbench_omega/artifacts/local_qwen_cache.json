@@ -1,0 +1,14 @@
+{
+  "cache_dir": "/home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B-Instruct-2507",
+  "config_model_type": "qwen3_moe",
+  "error": null,
+  "incomplete_file_count": 0,
+  "missing_required_files": [],
+  "model_id": "Qwen/Qwen3-30B-A3B-Instruct-2507",
+  "safetensor_shard_count": 16,
+  "snapshot": "/home/ubuntu/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B-Instruct-2507/snapshots/0d7cf23991f47feeb3a57ecb4c9cee8ea4a17bfe",
+  "snapshot_exists": true,
+  "tokenizer_class": "Qwen2Tokenizer",
+  "tokenizer_vocab_size": 151643,
+  "transformers_local_load_ok": true
+}

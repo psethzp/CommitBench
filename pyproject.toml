@@ -1,0 +1,12 @@
+[project]
+name = "effectbench-omega-local"
+version = "0.1.0"
+description = "Local minimal-plus EffectBench experiment scaffold"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+package-dir = {"" = "effectbench_omega"}
+
+[tool.setuptools.packages.find]
+where = ["effectbench_omega"]
+

@@ -1,0 +1,3 @@
+claim_id,value,source,status
+local_smoke_trace_count,15,effectbench_omega/outputs/workflow_smoke_dry/kernel/certificates.parquet,computed
+local_smoke_strict_excess_count,5,effectbench_omega/outputs/workflow_smoke_dry/kernel/certificates.parquet,computed
