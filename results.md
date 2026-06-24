@@ -76,6 +76,40 @@ enumerated-frontier labels or a repaired verifier/certificate path.
 | Audit table | `effectbench_omega/tables/frontier_completeness_main_mc_postfix_all_local.csv` |
 | Audit report | `effectbench_omega/reports/frontier_completeness_main_mc_postfix_all_local.md` |
 
+## V2 Rescue Stage 2
+
+Stage 2 corrected-guard implementation completed on branch `eacl-rescue-v2` on
+2026-06-24 UTC.
+
+| Check | Status | Result |
+|---|---:|---|
+| V2 guard systems | Complete | `PROJ_GUARD_V2`, `EFFECTGUARD_V2` |
+| Unit/no-oracle/frontier tests | Pass | `17 passed, 1 warning` |
+| V2 guard manifest | Complete | 14,336 rows |
+| Dry online smoke | Pass | 14 traces, 41 ledger rows, 0 failures |
+| Dry no-oracle audit | Pass | 14 rows checked, 0 failures, pass rate 1.0 |
+| Bedrock/API usage | Pass | None |
+| GPU/model usage | Pass | None in Stage 2 |
+
+Dry smoke action-pattern check:
+
+| Regime pattern | `PROJ_GUARD_V2` | `EFFECTGUARD_V2` |
+|---|---|---|
+| Non-ambiguous high proposal | Passes `commit_high` when projected predicates accept it | Substitutes `draft_change > commit_low` |
+| Ambiguous target | Adds `ask_confirm`, then keeps accepted high terminal | Adds `ask_confirm`, then substitutes `draft_change > commit_low` |
+| `ADV_EFFECT` external proposal | Blocks external irreversible terminal to `commit_high` | Substitutes `draft_change > commit_low` |
+| Contract preservation | Uses `commit_contract_low` | Uses `commit_contract_low` |
+
+Stage 2 interpretation: the V2 systems now separate a projection-only baseline
+from an effect-aware substitution controller. Full model-call evidence is still
+pending Stage 3/4.
+
+| Artifact | Path |
+|---|---|
+| V2 guard manifest | `effectbench_omega/manifests/tasks_guard_v2_local.csv` |
+| V2 dry smoke output | `effectbench_omega/outputs/guard_v2_dry_smoke/` |
+| V2 no-oracle smoke table | `effectbench_omega/tables/no_oracle_guard_v2_dry_smoke.csv` |
+
 ## Run Artifacts
 
 | Artifact | Path |

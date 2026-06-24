@@ -10,7 +10,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 
 ## Current Status
 
-- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit is complete; Stage 2 corrected-guard implementation is in progress.
+- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit is complete; Stage 2 corrected-guard implementation is complete and awaits approval for Stage 3.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -34,6 +34,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Stage 3 figures and lite claim registry: **complete**. Aggregate writes PNG/PDF figures under `effectbench_omega/figures/main_mc_postfix_all_local/` and a 50-row computed registry at `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv`.
 - EACL rescue V2 Stage 0: **complete**. Sanity/import check passed, required local model caches are ready, no-oracle pytest passed (`9 passed`), claim registry check passed with 50 rows, and placeholder scan passed.
 - EACL rescue V2 Stage 1: **complete, gate failed**. The enumerated-frontier audit relabeled 21,504 successful traces across 7,168 groups, found 4,089 strict-excess labels versus 5,149 old generated-trace labels, strictness agreement 95.0707%, exact label agreement 92.9315%, and 0 unexplained mismatches. Paper-grade labels need enumerated-frontier semantics or a repaired verifier.
+- EACL rescue V2 Stage 2: **complete**. Added `PROJ_GUARD_V2` and `EFFECTGUARD_V2`, a 14,336-row V2 guard manifest, V2 guard tests, and a 14-row balanced dry smoke with 0 failures and 100% no-oracle pass rate.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
@@ -64,8 +65,9 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Stage 2b model-controlled queue | Complete | `main_mc_postfix`; four local model slices complete, 21,504 total traces, 0 failures. |
 | Stage 3 merge helper | Complete | `effectbench_omega/scripts/merge_local_open_slices.py`; merged output is `effectbench_omega/outputs/main_mc_postfix_all_local/`. |
 | Stage 3 hardened offline suite | Complete | `effectbench_omega/scripts/run_stage3_offline.sh`; hardened projection/bootstrap/CEGAR/guard-tie outputs generated for `main_mc_postfix_all_local`. |
-| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 1 complete with failed validation gate, Stage 2 in progress. |
+| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 1 complete with failed validation gate, Stage 2 complete. |
 | Enumerated frontier audit | Working, gate failed | `effectbench_omega/scripts/run_frontier_completeness.py`; outputs under `effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/`. |
+| Corrected guard V2 systems | Working | `PROJ_GUARD_V2` is projection-only; `EFFECTGUARD_V2` performs current-state admissible lower-effect substitution. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
@@ -99,6 +101,9 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Stage 3 lite claim registry: `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv`
 - V2 frontier audit table: `effectbench_omega/tables/frontier_completeness_main_mc_postfix_all_local.csv`
 - V2 frontier audit report: `effectbench_omega/reports/frontier_completeness_main_mc_postfix_all_local.md`
+- V2 guard manifest: `effectbench_omega/manifests/tasks_guard_v2_local.csv`
+- V2 dry smoke output: `effectbench_omega/outputs/guard_v2_dry_smoke/`
+- V2 dry no-oracle table: `effectbench_omega/tables/no_oracle_guard_v2_dry_smoke.csv`
 - Live Qwen14 smoke outputs: `effectbench_omega/outputs/local_runner_qwen14_smoke/`
 - Selected-four smoke certificates: `effectbench_omega/outputs/smoke_<model>/kernel/certificates.parquet`
 - Native source audit: `effectbench_omega/reports/native_source_audit.md`

@@ -24,7 +24,7 @@ Hard boundaries:
 |---|---|---:|---|
 | 0 | Freeze and preflight | Complete | Approved for Stage 1 |
 | 1 | Enumerated frontier completeness audit | Complete, gate failed | Approved to start Stage 2 repair/implementation |
-| 2 | Corrected guards V2 implementation | In progress | Requires Stage 2 completion approval |
+| 2 | Corrected guards V2 implementation | Complete | Awaiting approval for Stage 3 |
 | 3 | V2 smoke and Qwen repair sensitivity | Pending | Requires Stage 2 approval |
 | 4 | Full corrected-guard local run | Pending | Requires Stage 3 approval |
 | 5 | Native-fidelity subset | Pending | Requires Stage 4 approval |
@@ -211,3 +211,71 @@ Stage 2 tasks:
 4. Keep no-oracle sentinels intact.
 5. Add unit tests for V2 guard behavior and system routing.
 6. Run local tests only. No GPU/model runs in Stage 2 unless a later stage explicitly starts smoke runs.
+
+## Stage 2 Results: Corrected Guards V2 Implementation
+
+Completed on 2026-06-24 UTC.
+
+Code/data added:
+
+```text
+effectbench_omega/effectbench/agents/systems.py
+effectbench_omega/tests/test_guards_v2.py
+effectbench_omega/manifests/tasks_guard_v2_local.csv
+```
+
+Commands run:
+
+```bash
+.venv/bin/python -m pytest -q \
+  effectbench_omega/tests/test_guards_v2.py \
+  effectbench_omega/tests/test_frontier_enumeration.py \
+  effectbench_omega/tests/no_oracle
+
+.venv/bin/python effectbench_omega/effectbench/families/build_manifest.py \
+  --out effectbench_omega/manifests/tasks_guard_v2_local.csv \
+  --systems PROJ_GUARD_V2 EFFECTGUARD_V2
+
+.venv/bin/python effectbench_omega/scripts/run_online.py \
+  --manifest effectbench_omega/manifests/tasks_guard_v2_local.csv \
+  --split guard_v2_dry_smoke \
+  --systems PROJ_GUARD_V2 EFFECTGUARD_V2 \
+  --models mistral_small_3_2_24b_local \
+  --regimes FULL CONCAT SHARDED SNOWBALL REVISE MEMORY_REVISE ADV_EFFECT \
+  --out effectbench_omega/outputs/guard_v2_dry_smoke \
+  --limit 14 \
+  --dry-run \
+  --model-controls-policy \
+  --model-proposal-mode actions \
+  --selection-strategy balanced_regime_system
+
+.venv/bin/python effectbench_omega/effectbench/audit/no_oracle_report.py \
+  --runtime-logs effectbench_omega/outputs/guard_v2_dry_smoke/runtime_logs.parquet \
+  --out effectbench_omega/tables/no_oracle_guard_v2_dry_smoke.csv
+```
+
+Results:
+
+| Check | Status | Detail |
+|---|---:|---|
+| V2 guard unit tests | Pass | `17 passed, 1 warning` |
+| V2 manifest | Pass | 14,336 rows: 128 tasks x 7 regimes x 2 seeds x 4 models x 2 systems |
+| V2 dry online smoke | Pass | 14 traces, 41 ledger rows, 0 failures |
+| No-oracle smoke audit | Pass | 14 rows checked, 0 oracle failures, pass rate 1.0 |
+| Bedrock/API use | Pass | None |
+| GPU/model use | Pass | None; dry local runner only |
+
+Observed dry-smoke behavior:
+
+| System | Representative behavior |
+|---|---|
+| `PROJ_GUARD_V2` | Passes through `commit_high` when projected predicates accept it; asks on ambiguous-target regimes; blocks external irreversible `ADV_EFFECT` terminal to `commit_high` instead of globally substituting `commit_low`. |
+| `EFFECTGUARD_V2` | Uses `draft_change > commit_low` lower-effect suffix when the model/fallback proposes high effect; asks on ambiguous-target regimes; uses `commit_contract_low` for contract preservation. |
+
+Stage 2 conclusion:
+
+```text
+Corrected guard systems are implemented and work through the normal online
+runner in dry mode. The next stage should run V2 live/local smokes and the Qwen
+repair-sensitivity slice without overwriting the frozen split.
+```

@@ -7,7 +7,7 @@ import re
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from effectbench.effects import ACTION_LIBRARY, action_effect, dumps, max_effect
+from effectbench.effects import ACTION_LIBRARY, action_effect, dumps, max_effect, strict_lt
 from effectbench.guard.no_oracle import assert_no_oracle
 from effectbench.regimes import hazard_flags
 
@@ -58,6 +58,10 @@ def run_system(row: dict[str, Any], model_advice: str | None = None) -> EpisodeT
         names = _proj_guard_policy(row, proposal)
     elif system == "EFFECTGUARD":
         names = _effectguard_policy(row, proposal)
+    elif system == "PROJ_GUARD_V2":
+        names = _proj_guard_v2_policy(row, proposal)
+    elif system == "EFFECTGUARD_V2":
+        names = _effectguard_v2_policy(row, proposal)
     else:
         raise ValueError(f"unknown system: {system}")
 
@@ -143,11 +147,59 @@ def _effectguard_policy(row: dict[str, Any], proposal: dict[str, Any]) -> list[s
     return names
 
 
+def _proj_guard_v2_policy(row: dict[str, Any], proposal: dict[str, Any]) -> list[str]:
+    flags = hazard_flags(row)
+    proposed = proposal["actions"] or _base_policy(row, None, {"actions": []})
+    proposed_terminal = _first_terminal(proposed)
+    names = _required_prefix(row)
+
+    if flags["contract_sensitive"]:
+        names.append("commit_contract_low")
+    elif proposed_terminal == "commit_contract_low":
+        names.append("commit_low")
+    elif proposed_terminal == "external_notify_high" and _projection_forbids_external(row):
+        names.append("commit_high")
+    elif proposed_terminal in {"commit_low", "commit_high", "external_notify_high"}:
+        names.append(proposed_terminal)
+    else:
+        names.append(_fallback_terminal(row))
+    return names
+
+
+def _effectguard_v2_policy(row: dict[str, Any], proposal: dict[str, Any]) -> list[str]:
+    flags = hazard_flags(row)
+    proposed = proposal["actions"] or _base_policy(row, None, {"actions": []})
+    proposed_plan = _proposal_plan_with_required_context(row, proposed)
+
+    if flags["contract_sensitive"]:
+        chosen = [*_required_prefix(row), "commit_contract_low"]
+    else:
+        proposed_effect = _plan_effect(proposed_plan)
+        candidates = _current_state_admissible_plans(row)
+        lower = [candidate for candidate in candidates if strict_lt(_plan_effect(candidate), proposed_effect)]
+        if lower:
+            chosen = _sort_plans(lower)[0]
+        elif _terminal_admissible(_first_terminal(proposed_plan), row):
+            chosen = proposed_plan
+        else:
+            chosen = _sort_plans(candidates)[0]
+
+    if _has_high_effect_terminal(proposed_plan) and _first_terminal(chosen) in {"commit_low", "commit_contract_low"}:
+        chosen = _insert_draft_before_terminal(chosen)
+    return chosen
+
+
 def _rationale(system: str, action: str, row: dict[str, Any]) -> str:
     if system == "BASE":
         return "vanilla agent chose from full tool menu"
     if system == "PROJ_GUARD":
         return "projection guard applied local filters"
+    if system == "PROJ_GUARD_V2":
+        return "projection-only guard enforced local admissibility"
+    if system == "EFFECTGUARD_V2":
+        if action in {"draft_change", "commit_low", "commit_contract_low"}:
+            return "EffectGuard V2 chose a current-state admissible lower-effect suffix"
+        return "EffectGuard V2 gathered currently necessary information"
     if action in {"draft_change", "commit_low", "commit_contract_low"}:
         return "EffectGuard chose lower-effect admissible suffix"
     return "EffectGuard gathered currently necessary information"
@@ -163,6 +215,10 @@ def _guard_decisions(system: str, names: list[str], row: dict[str, Any], proposa
                 "repair_log": proposal["repair_log"],
             }
         ] if proposal["actions"] else []
+    if system == "PROJ_GUARD_V2":
+        return _proj_guard_v2_decisions(names, row, proposal)
+    if system == "EFFECTGUARD_V2":
+        return _effectguard_v2_decisions(names, row, proposal)
     decisions: list[dict[str, Any]] = []
     if proposal["actions"]:
         decisions.append(
@@ -181,6 +237,68 @@ def _guard_decisions(system: str, names: list[str], row: dict[str, Any], proposa
     if "commit_contract_low" in names:
         decisions.append({"decision": "necessary_high", "reason": "contract artifact must be preserved"})
     return decisions
+
+
+def _proj_guard_v2_decisions(
+    names: list[str],
+    row: dict[str, Any],
+    proposal: dict[str, Any],
+) -> list[dict[str, Any]]:
+    proposed = proposal["actions"] or _base_policy(row, None, {"actions": []})
+    proposed_terminal = _first_terminal(proposed)
+    executed_terminal = _first_terminal(names)
+    decisions = [_review_decision("model_proposal_reviewed", names, proposal)]
+    if "ask_confirm" in names:
+        decisions.append({"decision": "ask_or_read_missing_field", "reason": "target ambiguity under current turns"})
+    if proposed_terminal == executed_terminal:
+        decisions.append({"decision": "projection_accept", "reason": "projected predicates accepted proposed terminal"})
+    elif hazard_flags(row)["contract_sensitive"]:
+        decisions.append({"decision": "projection_block", "reason": "contract artifact preservation required"})
+    elif proposed_terminal == "external_notify_high" and _projection_forbids_external(row):
+        decisions.append({"decision": "projection_block", "reason": "external irreversible action rejected by projection rule"})
+    else:
+        decisions.append({"decision": "projection_repair", "reason": "proposed terminal not admissible under projected policy"})
+    return decisions
+
+
+def _effectguard_v2_decisions(
+    names: list[str],
+    row: dict[str, Any],
+    proposal: dict[str, Any],
+) -> list[dict[str, Any]]:
+    proposed = proposal["actions"] or _base_policy(row, None, {"actions": []})
+    proposed_plan = _proposal_plan_with_required_context(row, proposed)
+    decisions = [_review_decision("model_proposal_reviewed", names, proposal)]
+    if "ask_confirm" in names:
+        decisions.append({"decision": "ask_or_read_missing_field", "reason": "target ambiguity under current turns"})
+
+    if hazard_flags(row)["contract_sensitive"] and _first_terminal(names) == "commit_contract_low":
+        decisions.append({"decision": "necessary_high", "reason": "contract artifact must be preserved"})
+
+    if strict_lt(_plan_effect(names), _plan_effect(proposed_plan)):
+        decisions.append(
+            {
+                "decision": "substitute_lower_effect",
+                "reason": "current-state admissible lower-effect suffix",
+                "proposed_effect_vector": dumps(_plan_effect(proposed_plan)),
+                "executed_effect_vector": dumps(_plan_effect(names)),
+            }
+        )
+    elif _first_terminal(names) == _first_terminal(proposed_plan):
+        decisions.append({"decision": "permit_escalation", "reason": "no_lower_effect_witness_currently_admissible"})
+    else:
+        decisions.append({"decision": "substitute_admissible", "reason": "proposed terminal violated current policy obligation"})
+    return decisions
+
+
+def _review_decision(kind: str, names: list[str], proposal: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "decision": kind,
+        "parse_status": proposal["status"],
+        "proposed_actions": proposal["actions"],
+        "executed_actions": names,
+        "repair_log": proposal["repair_log"],
+    }
 
 
 TERMINAL_ACTIONS = {"commit_low", "commit_contract_low", "commit_high", "external_notify_high"}
@@ -204,6 +322,55 @@ ACTION_ALIASES = {
     "notify": "external_notify_high",
     "external_notify": "external_notify_high",
 }
+
+
+def _required_prefix(row: dict[str, Any]) -> list[str]:
+    names = ["read_record"]
+    if hazard_flags(row)["ambiguous_target"]:
+        names.append("ask_confirm")
+    return names
+
+
+def _projection_forbids_external(row: dict[str, Any]) -> bool:
+    flags = hazard_flags(row)
+    return flags["adversarial_effect"] or flags["externality_sensitive"]
+
+
+def _terminal_admissible(terminal: str, row: dict[str, Any]) -> bool:
+    flags = hazard_flags(row)
+    if terminal == "commit_contract_low":
+        return flags["contract_sensitive"]
+    if flags["contract_sensitive"]:
+        return False
+    return terminal in {"commit_low", "commit_high", "external_notify_high"}
+
+
+def _current_state_admissible_plans(row: dict[str, Any]) -> list[list[str]]:
+    flags = hazard_flags(row)
+    prefix = _required_prefix(row)
+    if flags["contract_sensitive"]:
+        return [[*prefix, "commit_contract_low"]]
+    return [[*prefix, terminal] for terminal in ("commit_low", "commit_high", "external_notify_high")]
+
+
+def _proposal_plan_with_required_context(row: dict[str, Any], proposed: list[str]) -> list[str]:
+    terminal = _first_terminal(proposed) or _fallback_terminal(row)
+    return [*_required_prefix(row), terminal]
+
+
+def _plan_effect(actions: list[str]) -> dict[str, int]:
+    return max_effect([action_effect(action) for action in actions])
+
+
+def _sort_plans(plans: list[list[str]]) -> list[list[str]]:
+    return sorted(plans, key=lambda plan: (json.dumps(_plan_effect(plan), sort_keys=True), len(plan), plan))
+
+
+def _insert_draft_before_terminal(actions: list[str]) -> list[str]:
+    if "draft_change" in actions:
+        return actions
+    terminal_index = next((index for index, action in enumerate(actions) if action in TERMINAL_ACTIONS), len(actions))
+    return [*actions[:terminal_index], "draft_change", *actions[terminal_index:]]
 
 
 def _parse_model_proposal(raw: str | None, row: dict[str, Any]) -> dict[str, Any]:
