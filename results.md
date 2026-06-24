@@ -1,6 +1,6 @@
 # EffectBench-Omega Local Results
 
-Last updated: 2026-06-23 UTC
+Last updated: 2026-06-24 UTC
 
 ## Executive Summary
 
@@ -31,6 +31,50 @@ Stage 0 preflight completed on branch `eacl-rescue-v2` on 2026-06-24 UTC.
 | Frozen split status | Preserved | No Stage 0 experiment reruns |
 
 Next approved stage should be the offline enumerated-frontier completeness audit.
+
+## V2 Rescue Stage 1
+
+Stage 1 enumerated-frontier completeness audit completed on branch
+`eacl-rescue-v2` on 2026-06-24 UTC.
+
+| Metric | Value |
+|---|---:|
+| Tests | `12 passed, 1 warning` |
+| Groups audited | 7,168 |
+| Observed successful traces relabeled | 21,504 |
+| Enumerated admissible candidates | 1,205,248 |
+| Nondominated frontier candidates | 7,168 |
+| Old generated-trace strict-excess labels | 5,149 |
+| Enumerated-frontier strict-excess labels | 4,089 |
+| Exact label agreement | 92.9315% |
+| Strictness agreement | 95.0707% |
+| Strictness disagreements | 1,060 |
+| Unexplained mismatches | 0 |
+| Acceptance gate | Failed |
+
+Disagreement breakdown:
+
+| Slice | Count |
+|---|---:|
+| Old strict-excess now enumerated minimal | 1,060 |
+| Reason: old witness not admissible under enumerated rules | 1,060 |
+| `PROJ_GUARD` affected rows | 530 |
+| `EFFECTGUARD` affected rows | 530 |
+| Qwen affected rows | 824 |
+| Gemma affected rows | 224 |
+| Llama affected rows | 12 |
+
+Stage 1 interpretation: the audit found no unexplained mismatches, but it did
+not validate the old verifier labels. Paper-grade results should use
+enumerated-frontier labels or a repaired verifier/certificate path.
+
+| Artifact | Path |
+|---|---|
+| Enumerated frontier certificates | `effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/certificates_enumerated.parquet` |
+| Enumerated nondominated frontier | `effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/frontier_enumerated.parquet` |
+| Frontier group summary | `effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/frontier_group_summary.parquet` |
+| Audit table | `effectbench_omega/tables/frontier_completeness_main_mc_postfix_all_local.csv` |
+| Audit report | `effectbench_omega/reports/frontier_completeness_main_mc_postfix_all_local.md` |
 
 ## Run Artifacts
 

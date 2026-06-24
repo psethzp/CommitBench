@@ -22,9 +22,9 @@ Hard boundaries:
 
 | Stage | Name | Status | Approval Gate |
 |---|---|---:|---|
-| 0 | Freeze and preflight | Complete | Awaiting approval for Stage 1 |
-| 1 | Enumerated frontier completeness audit | Pending | Requires Stage 0 approval |
-| 2 | Corrected guards V2 implementation | Pending | Requires Stage 1 approval |
+| 0 | Freeze and preflight | Complete | Approved for Stage 1 |
+| 1 | Enumerated frontier completeness audit | Complete, gate failed | Approved to start Stage 2 repair/implementation |
+| 2 | Corrected guards V2 implementation | In progress | Requires Stage 2 completion approval |
 | 3 | V2 smoke and Qwen repair sensitivity | Pending | Requires Stage 2 approval |
 | 4 | Full corrected-guard local run | Pending | Requires Stage 3 approval |
 | 5 | Native-fidelity subset | Pending | Requires Stage 4 approval |
@@ -112,3 +112,102 @@ label_agreement >= 0.995
 unexplained_mismatches = 0
 ```
 
+## Stage 1 Results: Enumerated Frontier Completeness Audit
+
+Completed on 2026-06-24 UTC.
+
+Code added:
+
+```text
+effectbench_omega/effectbench/kernel/enumerate_frontier.py
+effectbench_omega/scripts/run_frontier_completeness.py
+effectbench_omega/tests/test_frontier_enumeration.py
+```
+
+Commands run:
+
+```bash
+.venv/bin/python -m pytest -q \
+  effectbench_omega/tests/test_frontier_enumeration.py \
+  effectbench_omega/tests/no_oracle
+
+.venv/bin/python effectbench_omega/scripts/run_frontier_completeness.py \
+  --split main_mc_postfix_all_local
+```
+
+Outputs:
+
+```text
+effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/frontier_enumerated.parquet
+effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/certificates_enumerated.parquet
+effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/frontier_group_summary.parquet
+effectbench_omega/tables/frontier_completeness_main_mc_postfix_all_local.csv
+effectbench_omega/reports/frontier_completeness_main_mc_postfix_all_local.md
+```
+
+Results:
+
+| Metric | Value |
+|---|---:|
+| Frontier enumeration tests | `12 passed, 1 warning` |
+| Groups audited | 7,168 |
+| Observed successful traces relabeled | 21,504 |
+| Enumerated admissible candidates | 1,205,248 |
+| Nondominated frontier candidates | 7,168 |
+| Old strict-excess labels | 5,149 |
+| Enumerated strict-excess labels | 4,089 |
+| Exact label agreement | 92.9315% |
+| Strictness agreement | 95.0707% |
+| Strictness disagreements | 1,060 |
+| Unexplained mismatches | 0 |
+| Gate result | Failed |
+
+Disagreement diagnosis:
+
+| Slice | Count |
+|---|---:|
+| `observed_trace_witness_not_admissible_under_enumerated_rules` | 1,060 |
+| `PROJ_GUARD` old strict-excess now enumerated minimal | 530 |
+| `EFFECTGUARD` old strict-excess now enumerated minimal | 530 |
+| Qwen affected rows | 824 |
+| Gemma affected rows | 224 |
+| Llama affected rows | 12 |
+
+Interpretation:
+
+```text
+Stage 1 is scientifically useful but does not validate the old generated-trace
+verifier labels. The enumerated audit found no unexplained mismatches, but it
+also found 1,060 old strict-excess labels whose old witness traces are not
+admissible under the enumerated rules. Paper-grade results must use the
+enumerated labels or an explicitly repaired verifier, not the old strict-excess
+counts alone.
+```
+
+Stage 1 conclusion:
+
+```text
+Do not treat the frozen split's original strict-excess labels as final paper
+labels. Stage 2 should implement corrected V2 guards and align downstream
+comparison/metrics with enumerated-frontier certificate semantics.
+```
+
+## Stage 2 Plan: Corrected Guards V2 Implementation
+
+Operator approval received via "Ok, next Stge".
+
+Implementation target:
+
+```text
+PROJ_GUARD_V2
+EFFECTGUARD_V2
+```
+
+Stage 2 tasks:
+
+1. Add system names and guard behavior without changing `BASE`, `PROJ_GUARD`, or `EFFECTGUARD`.
+2. Make `PROJ_GUARD_V2` projection-only: ask/block for target ambiguity, permission, contract, and explicit irreversible/external projection violations; do not perform global lower-effect substitution.
+3. Make `EFFECTGUARD_V2` kernel-aware: substitute lower-effect admissible actions only when justified by current-state admissible alternatives; log substitution, necessary-high, or incomparable reasons.
+4. Keep no-oracle sentinels intact.
+5. Add unit tests for V2 guard behavior and system routing.
+6. Run local tests only. No GPU/model runs in Stage 2 unless a later stage explicitly starts smoke runs.

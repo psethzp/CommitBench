@@ -10,7 +10,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 
 ## Current Status
 
-- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 0 preflight is complete; Stage 1 must wait for operator approval.
+- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit is complete; Stage 2 corrected-guard implementation is in progress.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -33,12 +33,14 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Hardened metrics: **complete**. Projection baselines are data-derived, bootstrap uses paired/task-cluster/hierarchical resampling with 2,000 draws, CEGAR uses reduced abstract-state collision checks, and `guard_tie` explains PROJ_GUARD vs EFFECTGUARD.
 - Stage 3 figures and lite claim registry: **complete**. Aggregate writes PNG/PDF figures under `effectbench_omega/figures/main_mc_postfix_all_local/` and a 50-row computed registry at `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv`.
 - EACL rescue V2 Stage 0: **complete**. Sanity/import check passed, required local model caches are ready, no-oracle pytest passed (`9 passed`), claim registry check passed with 50 rows, and placeholder scan passed.
+- EACL rescue V2 Stage 1: **complete, gate failed**. The enumerated-frontier audit relabeled 21,504 successful traces across 7,168 groups, found 4,089 strict-excess labels versus 5,149 old generated-trace labels, strictness agreement 95.0707%, exact label agreement 92.9315%, and 0 unexplained mismatches. Paper-grade labels need enumerated-frontier semantics or a repaired verifier.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
 ## Current Caveats
 
 - Qwen full slice has `42/5,376` audited repaired-fallback proposals. The primary run remains frozen; any same-prompt rerun of those rows should be reported as a sensitivity/ablation, not silently substituted.
+- V2 Stage 1 found 1,060 old strict-excess labels whose old generated-trace witness is not admissible under enumerated-frontier rules. This is a validation blocker for old strict-excess counts, not a model-run failure.
 - Stage 3 projection/bootstrap/CEGAR are now replayable data-derived local audits. They are still simulator-local, not external human audits. CEGAR no-collision fields are a conservative-audit strength: the checker does not reject omissions without observed label-changing collisions; that means "not exercised by this scaffold," not "never future-relevant."
 - PROJ_GUARD and EFFECTGUARD are effectively tied in this local implementation: only `3/7,168` paired units differ in verifier verdict, all Mistral telecom confirm-target cases.
 - Active claims are local/open-weight only. Do not claim Bedrock/frontier leaderboard coverage from this run.
@@ -62,7 +64,8 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Stage 2b model-controlled queue | Complete | `main_mc_postfix`; four local model slices complete, 21,504 total traces, 0 failures. |
 | Stage 3 merge helper | Complete | `effectbench_omega/scripts/merge_local_open_slices.py`; merged output is `effectbench_omega/outputs/main_mc_postfix_all_local/`. |
 | Stage 3 hardened offline suite | Complete | `effectbench_omega/scripts/run_stage3_offline.sh`; hardened projection/bootstrap/CEGAR/guard-tie outputs generated for `main_mc_postfix_all_local`. |
-| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 0 complete, Stage 1 pending approval. |
+| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 1 complete with failed validation gate, Stage 2 in progress. |
+| Enumerated frontier audit | Working, gate failed | `effectbench_omega/scripts/run_frontier_completeness.py`; outputs under `effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/`. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
@@ -94,6 +97,8 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Stage 3 figures: `effectbench_omega/figures/main_mc_postfix_all_local/`
 - Stage 3 witness bundles: `effectbench_omega/witness_bundles/main_mc_postfix_all_local/`
 - Stage 3 lite claim registry: `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv`
+- V2 frontier audit table: `effectbench_omega/tables/frontier_completeness_main_mc_postfix_all_local.csv`
+- V2 frontier audit report: `effectbench_omega/reports/frontier_completeness_main_mc_postfix_all_local.md`
 - Live Qwen14 smoke outputs: `effectbench_omega/outputs/local_runner_qwen14_smoke/`
 - Selected-four smoke certificates: `effectbench_omega/outputs/smoke_<model>/kernel/certificates.parquet`
 - Native source audit: `effectbench_omega/reports/native_source_audit.md`
