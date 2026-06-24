@@ -34,6 +34,22 @@ def _add_claim(
     )
 
 
+def _system_order(systems: list[str]) -> list[str]:
+    preferred = ["BASE", "PROJ_GUARD", "EFFECTGUARD", "PROJ_GUARD_V2", "EFFECTGUARD_V2"]
+    ordered = [system for system in preferred if system in systems]
+    ordered.extend(sorted(system for system in systems if system not in ordered))
+    return ordered
+
+
+def _comparison_systems(systems: list[str]) -> tuple[str, str, str] | None:
+    observed = set(systems)
+    if {"BASE", "PROJ_GUARD_V2", "EFFECTGUARD_V2"}.issubset(observed):
+        return "BASE", "PROJ_GUARD_V2", "EFFECTGUARD_V2"
+    if {"BASE", "PROJ_GUARD", "EFFECTGUARD"}.issubset(observed):
+        return "BASE", "PROJ_GUARD", "EFFECTGUARD"
+    return None
+
+
 def _read_cost_logs(paths: list[str] | None) -> tuple[int, float, int]:
     request_count = 0
     total_cost = 0.0
@@ -80,7 +96,7 @@ def _write_figures(
         }
     )
 
-    system_order = ["BASE", "PROJ_GUARD", "EFFECTGUARD"]
+    system_order = _system_order([str(system) for system in online["system"].dropna().unique()])
     online_plot = online.set_index("system").reindex(system_order).reset_index()
     x = np.arange(len(online_plot))
     width = 0.26
@@ -206,38 +222,40 @@ def main() -> int:
         _add_claim(claims, f"{prefix}_strict_excess_rate", float(row["strict_excess_rate"]), cert_source)
         _add_claim(claims, f"{prefix}_kernel_success", float(row["kernel_success"]), cert_source)
 
-    if {"BASE", "PROJ_GUARD", "EFFECTGUARD"}.issubset(online_by_system.index):
-        base = online_by_system.loc["BASE"]
-        proj = online_by_system.loc["PROJ_GUARD"]
-        effect = online_by_system.loc["EFFECTGUARD"]
+    comparison_systems = _comparison_systems([str(system) for system in online_by_system.index])
+    if comparison_systems is not None:
+        base_name, proj_name, effect_name = comparison_systems
+        base = online_by_system.loc[base_name]
+        proj = online_by_system.loc[proj_name]
+        effect = online_by_system.loc[effect_name]
         _add_claim(
             claims,
-            "base_raw_minus_kernel_success_gap",
+            f"{base_name.lower()}_raw_minus_kernel_success_gap",
             float(base["raw_success"] - base["kernel_success"]),
             cert_source,
         )
         _add_claim(
             claims,
-            "base_strict_minus_proj_guard_strict",
+            f"{base_name.lower()}_strict_minus_{proj_name.lower()}_strict",
             float(base["strict_excess_rate"] - proj["strict_excess_rate"]),
             cert_source,
         )
         _add_claim(
             claims,
-            "proj_guard_strict_minus_effectguard_strict",
+            f"{proj_name.lower()}_strict_minus_{effect_name.lower()}_strict",
             float(proj["strict_excess_rate"] - effect["strict_excess_rate"]),
             cert_source,
             notes="Tiny difference; use as tie/near-tie evidence, not a strong superiority claim.",
         )
         _add_claim(
             claims,
-            "effectguard_kernel_minus_base_kernel",
+            f"{effect_name.lower()}_kernel_minus_{base_name.lower()}_kernel",
             float(effect["kernel_success"] - base["kernel_success"]),
             cert_source,
         )
         _add_claim(
             claims,
-            "effectguard_raw_minus_base_raw",
+            f"{effect_name.lower()}_raw_minus_{base_name.lower()}_raw",
             float(effect["raw_success"] - base["raw_success"]),
             cert_source,
         )

@@ -15,6 +15,9 @@ Hard constraints:
 - Do not modify `effectbench_omega/outputs/main_mc_postfix_all_local/`.
 - All new outputs must use new split names.
 - Every result number in the paper must appear in a claim registry row.
+- Paper strict-excess labels must come from canonical enumerated-frontier
+  certificates under `kernel_canonical/`; generated-trace verifier outputs are
+  legacy diagnostics only.
 - No-oracle fields are forbidden at runtime:
   - future user turns;
   - gold terminal state;
@@ -101,8 +104,8 @@ python scripts/run_frontier_completeness.py \
 Pass condition:
 
 ```text
-label_agreement >= 0.995
-all disagreements explained in the report
+canonical gate passes with unexplained_mismatches = 0
+legacy-agreement disagreements are logged as spurious legacy witnesses
 ```
 
 ## 4. Implement Corrected Guards

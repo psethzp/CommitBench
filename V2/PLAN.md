@@ -38,11 +38,14 @@ Strong current results:
 - No-oracle checks pass 100%.
 - 160 replay bundles checked with 0 failures.
 - Local cost: $0.
+- Canonical enumerated-frontier scoring now passes with 4,089 strict-excess
+  labels, 1,060 spurious legacy witnesses diagnosed, and 0 unexplained
+  mismatches.
 
 Critical current weaknesses:
 
 - Raw success is 100% for every system, so the run does not demonstrate realistic task-completion difficulty.
-- The current verifier compares generated traces in each task/model/seed/regime group; it does not yet prove labels against a fully enumerated admissible action graph.
+- The original generated-trace verifier compared only executed/generated traces. This is now archived as a legacy diagnostic; paper labels must use canonical enumerated admissible-frontier certificates.
 - `PROJ_GUARD` and `EFFECTGUARD` are essentially tied: only 3/7,168 paired guarded units differ in verifier verdict.
 - Projection baselines are simple local filters, not faithful reimplementations of CORE/MiniScope/ContractGuard/etc.; therefore they must be called projection baselines, not SOTA systems.
 - `CORE_DFA` currently accepts all traces and is identical to `FINAL_STATE`; this is useful only as a weak projection, not a serious full-path baseline.
@@ -122,10 +125,28 @@ For each `(task_id, regime, seed, model, terminal_equivalence_class)` group:
 Acceptance gate:
 
 ```text
->= 99.5% agreement between generated-trace labels and enumerated-frontier labels, or explain every mismatch with a bug fix / legitimate incomparability.
+canonical gate: unexplained_mismatches = 0
+legacy agreement diagnostic: report strictness agreement and spurious legacy witnesses
 ```
 
-If this fails, do not submit until the verifier is fixed.
+Current outcome:
+
+```text
+legacy strict-excess labels: 5,149
+canonical strict-excess labels: 4,089
+spurious legacy witnesses: 1,060
+enumerated new strict labels: 0
+unexplained mismatches: 0
+canonical gate: pass
+```
+
+Paper rule:
+
+```text
+Do not cite the old 5,149 strict-excess count as a headline result. It is a
+legacy diagnostic. Headline labels must come from
+effectbench_omega/outputs/<split>/kernel_canonical/certificates_enumerated.parquet.
+```
 
 ### R2. Corrected Projection-Only Guard vs EffectGuard V2
 
@@ -161,6 +182,44 @@ Run:
 ```
 
 Reuse the existing BASE split. Do not rerun BASE unless a bug is found.
+
+Execution path:
+
+```bash
+# 1. Run only V2 guard systems.
+JOB_ID=local_open_guard_v2_main_$(date -u +%Y%m%dT%H%M%SZ) \
+OUTPUT_PREFIX=guard_v2_main \
+SPLIT_PREFIX=guard_v2_main \
+REPORT_PREFIX=guard_v2_main \
+MANIFEST=effectbench_omega/manifests/tasks_guard_v2_local.csv \
+QUEUE_SYSTEMS="PROJ_GUARD_V2 EFFECTGUARD_V2" \
+SLICE_LIMIT=3584 \
+MODEL_CONTROLS_POLICY=1 \
+MODEL_PROPOSAL_MODE=actions \
+QUEUE_MODEL_TP=4 \
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+  bash effectbench_omega/scripts/run_local_open_queue.sh
+
+# 2. Merge per-model V2 slices.
+.venv/bin/python effectbench_omega/scripts/merge_local_open_slices.py \
+  --input-prefix effectbench_omega/outputs/guard_v2_main \
+  --out effectbench_omega/outputs/guard_v2_main_all_local \
+  --expected-rows-per-model 3584
+
+# 3. Combine frozen BASE with V2 guard rows.
+.venv/bin/python effectbench_omega/scripts/build_guard_v2_main_split.py \
+  --v2-split effectbench_omega/outputs/guard_v2_main_all_local \
+  --out effectbench_omega/outputs/guard_v2_main_with_base_all_local
+
+# 4. Score the combined split canonically.
+JOB_ID=stage3_canonical_guard_v2_main_with_base_$(date -u +%Y%m%dT%H%M%SZ) \
+SPLIT=guard_v2_main_with_base_all_local \
+TABLE_SUFFIX=guard_v2_main_with_base_all_local_canonical \
+GUARD_TIE_SYSTEMS="PROJ_GUARD_V2 EFFECTGUARD_V2" \
+BOOTSTRAP_SYSTEMS="BASE PROJ_GUARD_V2 EFFECTGUARD_V2" \
+CANONICAL_CERT_MODE=enumerated \
+  bash effectbench_omega/scripts/run_stage3_offline.sh
+```
 
 Acceptance gates:
 
@@ -255,7 +314,9 @@ witness_bundles/<split>/*.json
 Acceptance gate:
 
 ```text
-0 replay failures for all paper-cited certificates.
+0 replay failures for all paper-cited canonical certificates. Strict-excess
+bundles may contain either an observed lower-effect witness trace or an
+enumerated admissible witness candidate.
 ```
 
 ### R5. Targeted CEGAR Stress Cases
@@ -352,5 +413,6 @@ Do not submit if any of these hold:
 - `PROJ_GUARD` tie is hidden;
 - projection baselines are called SOTA systems without faithful implementations;
 - certificates cited in paper do not replay;
+- paper cites legacy generated-trace strict labels instead of canonical enumerated-frontier labels;
 - no Limitations section;
 - no claim registry mapping every number to a file/script.

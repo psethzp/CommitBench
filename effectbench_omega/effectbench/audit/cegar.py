@@ -115,6 +115,7 @@ def _prepare(traces: pd.DataFrame) -> pd.DataFrame:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--traces", required=True)
+    parser.add_argument("--certificates")
     parser.add_argument("--schemas")
     parser.add_argument("--omit-fields", nargs="+", required=True)
     parser.add_argument("--out", required=True)
@@ -123,9 +124,19 @@ def main() -> int:
 
     traces = pd.read_parquet(args.traces)
     if "verdict" not in traces.columns:
-        kernel = Path(args.traces).parent / "kernel" / "certificates.parquet"
-        if kernel.exists():
-            certs = pd.read_parquet(kernel)[["trace_id", "verdict"]]
+        candidate_paths = []
+        if args.certificates:
+            candidate_paths.append(Path(args.certificates))
+        trace_parent = Path(args.traces).parent
+        candidate_paths.extend(
+            [
+                trace_parent / "kernel_canonical" / "certificates_enumerated.parquet",
+                trace_parent / "kernel" / "certificates.parquet",
+            ]
+        )
+        cert_path = next((path for path in candidate_paths if path.exists()), None)
+        if cert_path:
+            certs = pd.read_parquet(cert_path)[["trace_id", "verdict"]]
             traces = traces.merge(certs, on="trace_id", how="left", validate="one_to_one")
         else:
             traces["verdict"] = ""

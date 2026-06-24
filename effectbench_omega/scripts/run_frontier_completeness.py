@@ -17,6 +17,7 @@ def main() -> int:
     parser.add_argument("--out")
     parser.add_argument("--tables-out")
     parser.add_argument("--report-out")
+    parser.add_argument("--gate", choices=["legacy_agreement", "canonical"], default="legacy_agreement")
     args = parser.parse_args()
 
     split = args.split
@@ -43,10 +44,11 @@ def main() -> int:
         tables_out,
         "--report-out",
         report_out,
+        "--gate",
+        args.gate,
     ]
     return subprocess.call(command)
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -42,19 +42,30 @@ def main() -> int:
     for record in selected:
         trace = traces.loc[record["trace_id"]].to_dict()
         bundle_path = out / f"{record['trace_id']}.json"
+        witness_trace = None
+        witness_candidate = None
+        witness_trace_id = record.get("witness_trace_id")
+        if witness_trace_id in traces.index:
+            witness_trace = traces.loc[witness_trace_id].to_dict()
+        elif record.get("witness_actions"):
+            witness_candidate = {
+                "candidate_id": record.get("witness_candidate_id") or witness_trace_id,
+                "actions": str(record.get("witness_actions", "")).split("|"),
+                "effect_vector": record.get("witness_effect_vector", ""),
+                "admissibility_proof": record.get("admissibility_proof", ""),
+            }
         payload = {
             "certificate": record,
             "model_trace": trace,
-            "lower_effect_witness_trace": traces.loc[record["witness_trace_id"]].to_dict()
-            if record.get("witness_trace_id") in traces.index
-            else None,
+            "lower_effect_witness_trace": witness_trace,
+            "lower_effect_witness_candidate": witness_candidate,
             "terminal_equivalence_proof": record["terminal_equivalence_class"],
             "effect_vectors": {
                 "trace": record["effect_vector"],
                 "witness": record.get("witness_effect_vector", ""),
             },
             "dominance_relation": record["dominance_relation"],
-            "verifier_log": "minimal_plus_v1",
+            "verifier_log": record.get("verifier_version", "minimal_plus_v1"),
         }
         bundle_path.write_text(json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n")
         index_rows.append({"trace_id": record["trace_id"], "bundle": str(bundle_path), "verdict": record["verdict"]})
@@ -66,4 +77,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

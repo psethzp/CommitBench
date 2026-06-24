@@ -13,6 +13,16 @@ regimes: FULL, CONCAT, SHARDED, SNOWBALL, REVISE, MEMORY_REVISE, ADV_EFFECT
 Bedrock/API: archived; do not use for headline claims
 ```
 
+Canonical verifier override:
+
+```text
+Paper-grade strict-excess labels must use enumerated admissible-frontier
+certificates from effectbench_omega/outputs/<split>/kernel_canonical/
+certificates_enumerated.parquet. The generated-trace verifier is a legacy
+diagnostic only. Legacy disagreements are logged as spurious_legacy_witness
+CEGAR/audit rows when the enumerated verifier has unexplained_mismatches=0.
+```
+
 Default queue behavior is the hardened Step 2b path:
 
 ```text

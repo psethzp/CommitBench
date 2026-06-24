@@ -11,14 +11,26 @@ import numpy as np
 import pandas as pd
 
 
-SYSTEMS = ["BASE", "PROJ_GUARD", "EFFECTGUARD"]
+DEFAULT_SYSTEMS = ["BASE", "PROJ_GUARD", "EFFECTGUARD"]
+V2_SYSTEMS = ["BASE", "PROJ_GUARD_V2", "EFFECTGUARD_V2"]
 
 
 def _base_task_id(task_id: str) -> str:
     return str(task_id).split(":", 1)[0]
 
 
-def _unit_table(certs: pd.DataFrame) -> pd.DataFrame:
+def _resolve_systems(certs: pd.DataFrame, requested: list[str] | None) -> list[str]:
+    if requested:
+        if len(requested) != 3:
+            raise ValueError("--systems must contain exactly three systems: BASE PROJ EFFECT")
+        return requested
+    observed = set(certs["system"].astype(str).unique())
+    if set(V2_SYSTEMS).issubset(observed):
+        return V2_SYSTEMS
+    return DEFAULT_SYSTEMS
+
+
+def _unit_table(certs: pd.DataFrame, systems: list[str]) -> pd.DataFrame:
     df = certs.copy()
     df["strict"] = df["verdict"].eq("strict_excess").astype(float)
     df["raw_success"] = df["terminal_success"].astype(float)
@@ -33,34 +45,35 @@ def _unit_table(certs: pd.DataFrame) -> pd.DataFrame:
     )
     pivot.columns = [f"{metric}_{system}" for metric, system in pivot.columns]
     pivot = pivot.reset_index()
-    required = [f"strict_{system}" for system in SYSTEMS]
+    required = [f"strict_{system}" for system in systems]
     missing = [col for col in required if col not in pivot]
     if missing:
         raise ValueError(f"missing required system columns: {missing}")
     return pivot.dropna(subset=required)
 
 
-def _comparisons() -> dict[str, tuple[str, Callable[[pd.DataFrame], np.ndarray]]]:
+def _comparisons(systems: list[str]) -> dict[str, tuple[str, Callable[[pd.DataFrame], np.ndarray]]]:
+    base, proj, effect = systems
     return {
-        "BASE_raw_minus_kernel_success": (
+        f"{base}_raw_minus_kernel_success": (
             "raw_success_gap",
-            lambda df: (df["raw_success_BASE"] - df["kernel_success_BASE"]).to_numpy(float),
+            lambda df: (df[f"raw_success_{base}"] - df[f"kernel_success_{base}"]).to_numpy(float),
         ),
-        "BASE_strict_minus_PROJ_GUARD_strict": (
+        f"{base}_strict_minus_{proj}_strict": (
             "strict_excess_reduction",
-            lambda df: (df["strict_BASE"] - df["strict_PROJ_GUARD"]).to_numpy(float),
+            lambda df: (df[f"strict_{base}"] - df[f"strict_{proj}"]).to_numpy(float),
         ),
-        "PROJ_GUARD_strict_minus_EFFECTGUARD_strict": (
+        f"{proj}_strict_minus_{effect}_strict": (
             "strict_excess_reduction",
-            lambda df: (df["strict_PROJ_GUARD"] - df["strict_EFFECTGUARD"]).to_numpy(float),
+            lambda df: (df[f"strict_{proj}"] - df[f"strict_{effect}"]).to_numpy(float),
         ),
-        "EFFECTGUARD_kernel_minus_BASE_kernel": (
+        f"{effect}_kernel_minus_{base}_kernel": (
             "kernel_success_gain",
-            lambda df: (df["kernel_success_EFFECTGUARD"] - df["kernel_success_BASE"]).to_numpy(float),
+            lambda df: (df[f"kernel_success_{effect}"] - df[f"kernel_success_{base}"]).to_numpy(float),
         ),
-        "EFFECTGUARD_raw_minus_BASE_raw": (
+        f"{effect}_raw_minus_{base}_raw": (
             "raw_success_retention_delta",
-            lambda df: (df["raw_success_EFFECTGUARD"] - df["raw_success_BASE"]).to_numpy(float),
+            lambda df: (df[f"raw_success_{effect}"] - df[f"raw_success_{base}"]).to_numpy(float),
         ),
     }
 
@@ -148,14 +161,16 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--n-bootstrap", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=13)
+    parser.add_argument("--systems", nargs="+")
     args = parser.parse_args()
 
     certs = pd.read_parquet(args.certificates)
-    units = _unit_table(certs)
+    systems = _resolve_systems(certs, args.systems)
+    units = _unit_table(certs, systems)
     methods = args.methods or ["paired_bootstrap", "task_cluster", "hierarchical"]
     rng = np.random.default_rng(args.seed)
     rows = []
-    for comparison, (metric, value_fn) in _comparisons().items():
+    for comparison, (metric, value_fn) in _comparisons(systems).items():
         values = value_fn(units)
         estimate = float(values.mean()) if len(values) else 0.0
         for method in methods:

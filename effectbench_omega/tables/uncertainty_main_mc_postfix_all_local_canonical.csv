@@ -1,0 +1,16 @@
+comparison,metric,method,estimate,ci_low,ci_high,standard_error,p_value_le_zero,n_units,n_clusters,cluster_col,n_bootstrap,seed
+BASE_raw_minus_kernel_success,raw_success_gap,paired_bootstrap,0.5700334821428571,0.55859375,0.5814732142857143,0.005785214703446076,0.0,7168,7168,unit,2000,13
+BASE_raw_minus_kernel_success,raw_success_gap,task_cluster,0.5700334821428571,0.5514753069196429,0.5872000558035715,0.00925773094074178,0.0,7168,128,base_task_id,2000,13
+BASE_raw_minus_kernel_success,raw_success_gap,hierarchical,0.5700334821428571,0.48232421875000003,0.618306671626984,0.035895678242531266,0.0,7168,128,family/base_task_id,2000,13
+BASE_strict_minus_PROJ_GUARD_strict,strict_excess_reduction,paired_bootstrap,0.5696149553571429,0.5583147321428571,0.5811976841517856,0.005913829662136203,0.0,7168,7168,unit,2000,13
+BASE_strict_minus_PROJ_GUARD_strict,strict_excess_reduction,task_cluster,0.5696149553571429,0.5511997767857143,0.5873360770089285,0.008987641058766012,0.0,7168,128,base_task_id,2000,13
+BASE_strict_minus_PROJ_GUARD_strict,strict_excess_reduction,hierarchical,0.5696149553571429,0.48549107142857145,0.6181640625,0.0347139481869009,0.0,7168,128,family/base_task_id,2000,13
+PROJ_GUARD_strict_minus_EFFECTGUARD_strict,strict_excess_reduction,paired_bootstrap,0.0004185267857142857,0.0,0.0009765625,0.00023995792148234484,0.0395,7168,7168,unit,2000,13
+PROJ_GUARD_strict_minus_EFFECTGUARD_strict,strict_excess_reduction,task_cluster,0.0004185267857142857,0.0,0.0011160714285714285,0.0003230774762170775,0.1275,7168,128,base_task_id,2000,13
+PROJ_GUARD_strict_minus_EFFECTGUARD_strict,strict_excess_reduction,hierarchical,0.0004185267857142857,0.0,0.0014353475765306102,0.00043830699838708667,0.374,7168,128,family/base_task_id,2000,13
+EFFECTGUARD_kernel_minus_BASE_kernel,kernel_success_gain,paired_bootstrap,0.5700334821428571,0.5590122767857143,0.5814732142857143,0.005696808001020763,0.0,7168,7168,unit,2000,13
+EFFECTGUARD_kernel_minus_BASE_kernel,kernel_success_gain,task_cluster,0.5700334821428571,0.5514753069196429,0.587890625,0.009334673712091577,0.0,7168,128,base_task_id,2000,13
+EFFECTGUARD_kernel_minus_BASE_kernel,kernel_success_gain,hierarchical,0.5700334821428571,0.48939134247448984,0.617578125,0.03321471967425805,0.0,7168,128,family/base_task_id,2000,13
+EFFECTGUARD_raw_minus_BASE_raw,raw_success_retention_delta,paired_bootstrap,0.0,0.0,0.0,0.0,1.0,7168,7168,unit,2000,13
+EFFECTGUARD_raw_minus_BASE_raw,raw_success_retention_delta,task_cluster,0.0,0.0,0.0,0.0,1.0,7168,128,base_task_id,2000,13
+EFFECTGUARD_raw_minus_BASE_raw,raw_success_retention_delta,hierarchical,0.0,0.0,0.0,0.0,1.0,7168,128,family/base_task_id,2000,13

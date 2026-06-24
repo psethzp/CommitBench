@@ -55,6 +55,45 @@ proposal_diversity: all pairwise signatures unequal
 queue_defaults_exercised: model_controls_policy=1, model_proposal_mode=actions
 ```
 
+## Canonical verifier default after V2 hardening
+
+The old generated-trace verifier is now a legacy diagnostic only. Paper-grade
+strict-excess labels must use the enumerated admissible-frontier verifier:
+
+```text
+legacy diagnostic:
+  effectbench_omega/outputs/<split>/kernel_legacy_generated_trace/certificates.parquet
+
+canonical paper labels:
+  effectbench_omega/outputs/<split>/kernel_canonical/certificates_enumerated.parquet
+```
+
+The canonical gate is:
+
+```text
+unexplained_mismatches = 0
+certificate replay = 100%
+no-oracle tests = 100%
+```
+
+Agreement with the old generated-trace verifier is no longer required. When
+the old verifier marks a trace strict-excess using a witness that is not
+admissible under the enumerated action graph, that row is logged as a
+`spurious_legacy_witness` CEGAR/audit finding, not as a canonical failure.
+
+Current frozen split canonical audit:
+
+```text
+groups: 7,168
+successful traces scored: 21,504
+enumerated candidates: 1,205,248
+canonical strict-excess labels: 4,089
+legacy strict-excess labels: 5,149
+spurious legacy witnesses: 1,060
+unexplained mismatches: 0
+canonical gate: pass
+```
+
 ## Best plan
 
 **Do not chase GPT/Claude/DeepSeek frontier comparisons.** With no Bedrock, the strongest acceptable story is:
@@ -260,7 +299,7 @@ For every strict-excess label, store:
 
 ```text
 model trace
-lower-effect witness trace
+lower-effect witness trace or enumerated admissible witness candidate
 terminal equivalence proof
 effect vectors
 dominance relation

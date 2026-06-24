@@ -26,7 +26,8 @@ Hard boundaries:
 | 1 | Enumerated frontier completeness audit | Complete, gate failed | Approved to start Stage 2 repair/implementation |
 | 2 | Corrected guards V2 implementation | Complete | Approved for Stage 3 |
 | 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
-| 4 | Full corrected-guard local run | Pending | Requires Stage 3 approval |
+| 3.5 | Canonical verifier hardening | Complete | Stage 4 ready |
+| 4 | Full corrected-guard local run | Ready, not launched | Requires operator approval |
 | 5 | Native-fidelity subset | Pending | Requires Stage 4 approval |
 | 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 approval |
 | 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 approval |
@@ -376,4 +377,164 @@ Stage 4 should run the full corrected-guard local split:
 128 tasks x 7 regimes x 2 seeds x 4 models x 2 V2 systems = 14,336
 trajectories. Reuse the frozen BASE split; do not rerun BASE unless a code bug
 requires it.
+```
+
+## Stage 3.5: Canonical Verifier Hardening
+
+Completed on 2026-06-24 UTC.
+
+Purpose:
+
+```text
+Resolve the Stage 1 caveat by making enumerated admissible-frontier
+certificates the canonical source for paper strict-excess labels. The old
+generated-trace verifier is retained only as a legacy diagnostic.
+```
+
+Code changes:
+
+```text
+effectbench_omega/effectbench/kernel/enumerate_frontier.py
+effectbench_omega/effectbench/audit/replay_bundles.py
+effectbench_omega/effectbench/audit/replay_certificates.py
+effectbench_omega/effectbench/audit/cegar.py
+effectbench_omega/effectbench/audit/guard_tie.py
+effectbench_omega/effectbench/metrics/bootstrap.py
+effectbench_omega/effectbench/metrics/aggregate.py
+effectbench_omega/scripts/run_stage3_offline.sh
+effectbench_omega/scripts/run_local_open_queue.sh
+effectbench_omega/scripts/build_guard_v2_main_split.py
+```
+
+Canonical rule:
+
+```text
+Paper strict-excess labels must come from:
+effectbench_omega/outputs/<split>/kernel_canonical/certificates_enumerated.parquet
+
+Legacy generated-trace labels may be reported only as an audit/diagnostic.
+```
+
+Commands run:
+
+```bash
+bash -n effectbench_omega/scripts/run_stage3_offline.sh
+bash -n effectbench_omega/scripts/run_local_open_queue.sh
+.venv/bin/python -m py_compile \
+  effectbench_omega/effectbench/kernel/enumerate_frontier.py \
+  effectbench_omega/effectbench/audit/replay_bundles.py \
+  effectbench_omega/effectbench/audit/replay_certificates.py \
+  effectbench_omega/effectbench/audit/cegar.py \
+  effectbench_omega/effectbench/audit/guard_tie.py \
+  effectbench_omega/effectbench/metrics/bootstrap.py \
+  effectbench_omega/effectbench/metrics/aggregate.py \
+  effectbench_omega/scripts/build_guard_v2_main_split.py
+.venv/bin/python -m pytest -q \
+  effectbench_omega/tests/test_frontier_enumeration.py \
+  effectbench_omega/tests/test_guards_v2.py \
+  effectbench_omega/tests/no_oracle
+
+JOB_ID=stage3_canonical_main_mc_postfix_all_local_20260624T162051Z \
+TABLE_SUFFIX=main_mc_postfix_all_local_canonical \
+CANONICAL_CERT_MODE=enumerated \
+  bash effectbench_omega/scripts/run_stage3_offline.sh
+```
+
+Canonical output:
+
+```text
+effectbench_omega/outputs/main_mc_postfix_all_local/kernel_legacy_generated_trace/
+effectbench_omega/outputs/main_mc_postfix_all_local/kernel_canonical/
+effectbench_omega/jobs/stage3_canonical_main_mc_postfix_all_local_20260624T162051Z/
+effectbench_omega/tables/main_mc_postfix_all_local_canonical/
+effectbench_omega/figures/main_mc_postfix_all_local_canonical/
+effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local_canonical.csv
+```
+
+Results:
+
+| Metric | Value |
+|---|---:|
+| Tests | `18 passed, 1 warning` |
+| Canonical gate | Pass |
+| Groups | 7,168 |
+| Successful traces scored | 21,504 |
+| Enumerated candidates | 1,205,248 |
+| Frontier candidates | 7,168 |
+| Legacy strict-excess labels | 5,149 |
+| Canonical strict-excess labels | 4,089 |
+| Spurious legacy witnesses | 1,060 |
+| Enumerated new strict labels | 0 |
+| Unexplained mismatches | 0 |
+| Replay bundles checked | 160 |
+| Replay failures | 0 |
+
+Canonical online-control results for the frozen split:
+
+| System | Raw success | Canonical strict excess | Canonical kernel success |
+|---|---:|---:|---:|
+| `BASE` | 100.0000% | 57.0033% | 42.9967% |
+| `PROJ_GUARD` | 100.0000% | 0.0419% | 99.9581% |
+| `EFFECTGUARD` | 100.0000% | 0.0000% | 100.0000% |
+
+Interpretation:
+
+```text
+The Stage 1 caveat is fixed operationally: old generated-trace witnesses are
+not used for paper labels. The 1,060 disagreements are now recorded as
+spurious legacy witnesses. Canonical scoring requires zero unexplained
+mismatches, not agreement with the legacy verifier.
+```
+
+## Stage 4 Ready Commands
+
+Do not launch until operator approval.
+
+Run the full V2 guard-only queue:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+JOB_ID=local_open_guard_v2_main_$(date -u +%Y%m%dT%H%M%SZ) \
+OUTPUT_PREFIX=guard_v2_main \
+SPLIT_PREFIX=guard_v2_main \
+REPORT_PREFIX=guard_v2_main \
+MANIFEST=effectbench_omega/manifests/tasks_guard_v2_local.csv \
+QUEUE_SYSTEMS="PROJ_GUARD_V2 EFFECTGUARD_V2" \
+SLICE_LIMIT=3584 \
+MODEL_CONTROLS_POLICY=1 \
+MODEL_PROPOSAL_MODE=actions \
+QUEUE_MODEL_TP=4 \
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+  bash effectbench_omega/scripts/run_local_open_queue.sh
+```
+
+Monitor:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+tail -f effectbench_omega/jobs/local_open_latest/events.tsv
+bash effectbench_omega/scripts/show_local_open_queue_status.sh
+nvidia-smi dmon -s pucm -d 5
+```
+
+After all four model slices complete:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+.venv/bin/python effectbench_omega/scripts/merge_local_open_slices.py \
+  --input-prefix effectbench_omega/outputs/guard_v2_main \
+  --out effectbench_omega/outputs/guard_v2_main_all_local \
+  --expected-rows-per-model 3584
+
+.venv/bin/python effectbench_omega/scripts/build_guard_v2_main_split.py \
+  --v2-split effectbench_omega/outputs/guard_v2_main_all_local \
+  --out effectbench_omega/outputs/guard_v2_main_with_base_all_local
+
+JOB_ID=stage3_canonical_guard_v2_main_with_base_$(date -u +%Y%m%dT%H%M%SZ) \
+SPLIT=guard_v2_main_with_base_all_local \
+TABLE_SUFFIX=guard_v2_main_with_base_all_local_canonical \
+GUARD_TIE_SYSTEMS="PROJ_GUARD_V2 EFFECTGUARD_V2" \
+BOOTSTRAP_SYSTEMS="BASE PROJ_GUARD_V2 EFFECTGUARD_V2" \
+CANONICAL_CERT_MODE=enumerated \
+  bash effectbench_omega/scripts/run_stage3_offline.sh
 ```

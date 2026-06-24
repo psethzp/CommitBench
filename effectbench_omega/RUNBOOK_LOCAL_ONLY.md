@@ -63,6 +63,7 @@ Full-precision `meta-llama/Llama-3.3-70B-Instruct` remains not cached. The AWQ m
 | Stage 2b model-controlled queue | Done | `local_open_main_mc_postfix_20260622T214941Z`; all four slices complete, 21,504 traces, 0 failures |
 | Stage 3 merge | Done | `outputs/main_mc_postfix_all_local/`; 21,504 traces, 21,504 API rows, 0 failures |
 | Stage 3 hardened offline suite | Done | `jobs/stage3_hardened_main_mc_postfix_all_local_20260623T220316Z`; verifier, no-oracle, data-derived projection, CEGAR collision audit, paired/bootstrap CIs, guard-tie audit, replay, cost, aggregate, pytest all exited 0 |
+| Canonical enumerated-frontier scoring | Done | `jobs/stage3_canonical_main_mc_postfix_all_local_20260624T162051Z`; canonical gate passed, 4,089 strict-excess labels, 1,060 spurious legacy witnesses, 0 unexplained mismatches |
 
 ## Cache Commands
 

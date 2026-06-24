@@ -14,6 +14,10 @@ REPORT_PREFIX="${REPORT_PREFIX:-${OUTPUT_PREFIX}}"
 MODEL_CONTROLS_POLICY="${MODEL_CONTROLS_POLICY:-1}"
 MODEL_PROPOSAL_MODE="${MODEL_PROPOSAL_MODE:-actions}"
 ROW_SELECTION_STRATEGY="${ROW_SELECTION_STRATEGY:-first}"
+MANIFEST="${MANIFEST:-effectbench_omega/manifests/tasks_local_open.csv}"
+CONFIG="${CONFIG:-effectbench_omega/configs/local_open.yaml}"
+QUEUE_SYSTEMS="${QUEUE_SYSTEMS:-BASE PROJ_GUARD EFFECTGUARD}"
+QUEUE_REGIMES="${QUEUE_REGIMES:-FULL CONCAT SHARDED SNOWBALL REVISE MEMORY_REVISE ADV_EFFECT}"
 JOB_ID="${JOB_ID:-local_open_$(date -u +%Y%m%dT%H%M%SZ)}"
 JOBS_DIR="effectbench_omega/jobs"
 JOB_DIR="${JOBS_DIR}/${JOB_ID}"
@@ -152,10 +156,14 @@ run_slice() {
   local cost_log="${LOG_DIR}/${model}_cost.log"
   local summary_json="${SUMMARY_DIR}/${model}.json"
   local extra_args=()
+  local systems=()
+  local regimes=()
 
   if [[ "${MODEL_CONTROLS_POLICY}" == "1" ]]; then
     extra_args+=(--model-controls-policy --model-proposal-mode "${MODEL_PROPOSAL_MODE}")
   fi
+  read -r -a systems <<<"${QUEUE_SYSTEMS}"
+  read -r -a regimes <<<"${QUEUE_REGIMES}"
 
   if [[ -e "${out_dir}" && "${OVERWRITE_OUTPUTS:-0}" != "1" ]]; then
     event "${model}" "failed" "${out_dir} already exists; set OVERWRITE_OUTPUTS=1 to rerun"
@@ -167,12 +175,12 @@ run_slice() {
 
   event "${model}" "running_slice" "writing ${SLICE_LIMIT} trajectories to ${out_dir}"
   .venv/bin/python effectbench_omega/scripts/run_online.py \
-    --config effectbench_omega/configs/local_open.yaml \
-    --manifest effectbench_omega/manifests/tasks_local_open.csv \
+    --config "${CONFIG}" \
+    --manifest "${MANIFEST}" \
     --split "${SPLIT_PREFIX}_${model}" \
-    --systems BASE PROJ_GUARD EFFECTGUARD \
+    --systems "${systems[@]}" \
     --models "${model}" \
-    --regimes FULL CONCAT SHARDED SNOWBALL REVISE MEMORY_REVISE ADV_EFFECT \
+    --regimes "${regimes[@]}" \
     --out "${out_dir}" \
     --limit "${SLICE_LIMIT}" \
     --selection-strategy "${ROW_SELECTION_STRATEGY}" \
@@ -245,6 +253,10 @@ main() {
     echo "output_prefix=${OUTPUT_PREFIX}"
     echo "split_prefix=${SPLIT_PREFIX}"
     echo "report_prefix=${REPORT_PREFIX}"
+    echo "config=${CONFIG}"
+    echo "manifest=${MANIFEST}"
+    echo "systems=${QUEUE_SYSTEMS}"
+    echo "regimes=${QUEUE_REGIMES}"
     echo "model_controls_policy=${MODEL_CONTROLS_POLICY}"
     echo "model_proposal_mode=${MODEL_PROPOSAL_MODE}"
     echo "row_selection_strategy=${ROW_SELECTION_STRATEGY}"

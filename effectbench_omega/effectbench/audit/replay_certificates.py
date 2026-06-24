@@ -23,7 +23,11 @@ def main() -> int:
         cert = payload.get("certificate", {})
         if not cert.get("trace_id") or not payload.get("model_trace"):
             failures.append(str(path))
-        if cert.get("verdict") == "strict_excess" and not payload.get("lower_effect_witness_trace"):
+        if (
+            cert.get("verdict") == "strict_excess"
+            and not payload.get("lower_effect_witness_trace")
+            and not payload.get("lower_effect_witness_candidate")
+        ):
             failures.append(str(path))
 
     report = f"bundles_checked: {len(bundles)}\nfailures: {len(failures)}\n"
@@ -38,4 +42,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

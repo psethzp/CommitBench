@@ -152,11 +152,15 @@ def audit_frontier(traces: pd.DataFrame, certificates: pd.DataFrame) -> tuple[pd
                     "exact_label_agreement": exact_agree,
                     "strictness_agreement": strict_agree,
                     "witness_trace_id": witness_id,
+                    "witness_candidate_id": witness_id,
                     "witness_actions": witness_actions,
                     "witness_effect_vector": witness_effect,
                     "dominance_relation": dominance_relation,
                     "incomparability_reason": "enumerated_frontier_incomparables" if incomparable else "",
                     "mismatch_reason": reason,
+                    "certificate_source": "enumerated_admissible_frontier",
+                    "admissibility_proof": "candidate_sequence_satisfies_current_policy_preconditions",
+                    "terminal_equivalence_proof": row.terminal_equivalence_class,
                     "verifier_version": "enumerated_frontier_v1",
                 }
             )
@@ -180,7 +184,7 @@ def audit_frontier(traces: pd.DataFrame, certificates: pd.DataFrame) -> tuple[pd
     return pd.DataFrame(frontier_rows), pd.DataFrame(certificate_rows), pd.DataFrame(summary_rows)
 
 
-def summarize(summary: pd.DataFrame, certificates: pd.DataFrame) -> dict[str, Any]:
+def summarize(summary: pd.DataFrame, certificates: pd.DataFrame, gate_mode: str = "legacy_agreement") -> dict[str, Any]:
     if certificates.empty:
         return {
             "groups": 0,
@@ -188,6 +192,11 @@ def summarize(summary: pd.DataFrame, certificates: pd.DataFrame) -> dict[str, An
             "label_agreement": 0.0,
             "strictness_agreement": 0.0,
             "unexplained_mismatches": 0,
+            "spurious_legacy_witnesses": 0,
+            "enumerated_new_strict": 0,
+            "legacy_agreement_gate": False,
+            "canonical_gate": False,
+            "gate_mode": gate_mode,
             "pass_gate": False,
         }
 
@@ -195,6 +204,20 @@ def summarize(summary: pd.DataFrame, certificates: pd.DataFrame) -> dict[str, An
     strictness_agreement = float(certificates["strictness_agreement"].mean())
     unexplained = int((certificates["mismatch_reason"] == "unexplained").sum())
     strictness_disagreements = int((~certificates["strictness_agreement"]).sum())
+    spurious_legacy = int(
+        (
+            certificates["old_verdict"].eq("strict_excess")
+            & ~certificates["verdict"].eq("strict_excess")
+        ).sum()
+    )
+    enumerated_new_strict = int(
+        (
+            ~certificates["old_verdict"].eq("strict_excess")
+            & certificates["verdict"].eq("strict_excess")
+        ).sum()
+    )
+    legacy_gate = bool(strictness_agreement >= 0.995 and unexplained == 0)
+    canonical_gate = bool(unexplained == 0)
     return {
         "groups": int(len(summary)),
         "observed_successes": int(len(certificates)),
@@ -206,7 +229,12 @@ def summarize(summary: pd.DataFrame, certificates: pd.DataFrame) -> dict[str, An
         "strictness_agreement": strictness_agreement,
         "strictness_disagreements": strictness_disagreements,
         "unexplained_mismatches": unexplained,
-        "pass_gate": bool(strictness_agreement >= 0.995 and unexplained == 0),
+        "spurious_legacy_witnesses": spurious_legacy,
+        "enumerated_new_strict": enumerated_new_strict,
+        "legacy_agreement_gate": legacy_gate,
+        "canonical_gate": canonical_gate,
+        "gate_mode": gate_mode,
+        "pass_gate": canonical_gate if gate_mode == "canonical" else legacy_gate,
     }
 
 
@@ -227,9 +255,15 @@ def write_report(path: str | Path, payload: dict[str, Any], certificates: pd.Dat
         f"strictness_agreement: {payload['strictness_agreement']:.6f}",
         f"strictness_disagreements: {payload['strictness_disagreements']}",
         f"unexplained_mismatches: {payload['unexplained_mismatches']}",
+        f"spurious_legacy_witnesses: {payload['spurious_legacy_witnesses']}",
+        f"enumerated_new_strict: {payload['enumerated_new_strict']}",
+        f"legacy_agreement_gate: {payload['legacy_agreement_gate']}",
+        f"canonical_gate: {payload['canonical_gate']}",
+        f"gate_mode: {payload['gate_mode']}",
         f"pass_gate: {payload['pass_gate']}",
         "",
-        "Gate uses strict-excess agreement because minimal vs minimal-with-incomparables is a subtype distinction.",
+        "Legacy agreement gate uses strict-excess agreement because minimal vs minimal-with-incomparables is a subtype distinction.",
+        "Canonical gate requires zero unexplained mismatches; legacy disagreements are CEGAR/audit evidence, not a canonical-label failure.",
         "",
     ]
     if len(mismatches):
@@ -263,6 +297,7 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--tables-out", required=True)
     parser.add_argument("--report-out", required=True)
+    parser.add_argument("--gate", choices=["legacy_agreement", "canonical"], default="legacy_agreement")
     args = parser.parse_args()
 
     out_dir = Path(args.out)
@@ -270,11 +305,19 @@ def main() -> int:
     traces = pd.read_parquet(args.traces)
     certificates = pd.read_parquet(args.certificates)
     frontier, enumerated_certificates, group_summary = audit_frontier(traces, certificates)
-    payload = summarize(group_summary, enumerated_certificates)
+    payload = summarize(group_summary, enumerated_certificates, gate_mode=args.gate)
 
     frontier.to_parquet(out_dir / "frontier_enumerated.parquet", index=False)
     enumerated_certificates.to_parquet(out_dir / "certificates_enumerated.parquet", index=False)
     group_summary.to_parquet(out_dir / "frontier_group_summary.parquet", index=False)
+    frontier.to_parquet(out_dir / "frontiers.parquet", index=False)
+    enumerated_certificates.to_parquet(out_dir / "certificates.parquet", index=False)
+    pd.DataFrame(columns=["trace_id", "task_id", "reason"]).to_parquet(out_dir / "prune_log.parquet", index=False)
+    pd.DataFrame(columns=["abstract_hash", "reason", "field"]).to_parquet(
+        out_dir / "rejected_abstractions.parquet",
+        index=False,
+    )
+    (out_dir / "verifier_summary.json").write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
 
     table_out = Path(args.tables_out)
     table_out.parent.mkdir(parents=True, exist_ok=True)

@@ -11,9 +11,6 @@ from typing import Any
 import pandas as pd
 
 
-PAIR = ["PROJ_GUARD", "EFFECTGUARD"]
-
-
 def _action_names(payload: str) -> list[str]:
     try:
         return [str(item.get("action", "")) for item in json.loads(payload)]
@@ -45,19 +42,21 @@ def _join(traces: pd.DataFrame, certs: pd.DataFrame) -> pd.DataFrame:
     return merged
 
 
-def _unit_diff(merged: pd.DataFrame) -> pd.DataFrame:
-    subset = merged[merged["system"].isin(PAIR)].copy()
+def _unit_diff(merged: pd.DataFrame, pair: list[str]) -> pd.DataFrame:
+    subset = merged[merged["system"].isin(pair)].copy()
     index = ["task_id", "family", "regime", "seed", "model", "scenario", "policy_obligation"]
     rows: list[dict[str, Any]] = []
     for key, group in subset.groupby(index, dropna=False, sort=False):
         by_system = {row.system: row for row in group.itertuples(index=False)}
-        if not all(system in by_system for system in PAIR):
+        if not all(system in by_system for system in pair):
             continue
-        proj = by_system["PROJ_GUARD"]
-        effect = by_system["EFFECTGUARD"]
+        proj = by_system[pair[0]]
+        effect = by_system[pair[1]]
         rows.append(
             {
                 **dict(zip(index, key)),
+                "left_system": pair[0],
+                "right_system": pair[1],
                 "proj_trace_id": proj.trace_id,
                 "effect_trace_id": effect.trace_id,
                 "proj_verdict": proj.verdict,
@@ -121,6 +120,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--traces", required=True)
     parser.add_argument("--certificates", required=True)
+    parser.add_argument("--systems", nargs=2, default=["PROJ_GUARD", "EFFECTGUARD"])
     parser.add_argument("--out", required=True)
     parser.add_argument("--details-out")
     args = parser.parse_args()
@@ -128,7 +128,7 @@ def main() -> int:
     traces = pd.read_parquet(args.traces)
     certs = pd.read_parquet(args.certificates)
     merged = _join(traces, certs)
-    units = _unit_diff(merged)
+    units = _unit_diff(merged, args.systems)
     rates = pd.concat(
         [
             _rate_table(units),
@@ -152,7 +152,7 @@ def main() -> int:
     report_path.write_text(
         "\n".join(
             [
-                "# PROJ_GUARD vs EFFECTGUARD Tie Audit",
+                f"# {args.systems[0]} vs {args.systems[1]} Tie Audit",
                 "",
                 f"paired_units: {int(overall['units'])}",
                 f"proj_strict_rate: {overall['proj_strict_rate']:.6f}",

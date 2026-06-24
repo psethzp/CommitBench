@@ -161,6 +161,72 @@ caveat; it makes it auditable and non-sensitive for the current frozen split.
 | Qwen repair sensitivity table | `effectbench_omega/tables/qwen_repair_sensitivity.csv` |
 | Qwen repair sensitivity report | `effectbench_omega/reports/qwen_repair_sensitivity.md` |
 
+## Canonical Verifier Hardening
+
+Canonical enumerated-frontier scoring completed on branch `eacl-rescue-v2` on
+2026-06-24 UTC. The old generated-trace verifier is now a legacy diagnostic;
+headline strict-excess claims must use enumerated admissible-frontier
+certificates.
+
+| Metric | Legacy generated-trace verifier | Canonical enumerated frontier |
+|---|---:|---:|
+| Successful traces scored | 21,504 | 21,504 |
+| Groups | 7,168 | 7,168 |
+| Candidate action sequences | n/a | 1,205,248 |
+| Nondominated frontier candidates | n/a | 7,168 |
+| Strict-excess labels | 5,149 | 4,089 |
+| Minimal / kernel-success labels | 16,355 | 17,415 |
+| Spurious legacy witnesses | n/a | 1,060 |
+| Enumerated new strict labels | n/a | 0 |
+| Unexplained mismatches | n/a | 0 |
+| Gate used for paper scoring | Legacy only | Canonical pass |
+
+Canonical online-control table for the frozen split:
+
+| System | Trajectories | Raw success | Canonical strict excess | Canonical kernel success |
+|---|---:|---:|---:|---:|
+| `BASE` | 7,168 | 100.00% | 57.0033% | 42.9967% |
+| `PROJ_GUARD` | 7,168 | 100.00% | 0.0419% | 99.9581% |
+| `EFFECTGUARD` | 7,168 | 100.00% | 0.0000% | 100.0000% |
+
+Canonical projection-loss headline:
+
+| Baseline | Residual strict / accepted success | False denial |
+|---|---:|---:|
+| `FINAL_STATE` | 19.0151% | 0.0000% |
+| `CORE_DFA` | 19.0151% | 0.0000% |
+| `MINISCOPE_PERMISSION` | 16.1854% | 3.3761% |
+| `CONTRACT_MENU_CMTF` | 16.4895% | 5.0735% |
+| `REVISABILITY` | 16.1854% | 3.3761% |
+| `MODERNSTACK_PROJECTION` | 16.6023% | 7.2870% |
+| `KERNEL_FULL` | 0.0000% | 19.0151% |
+
+Canonical replay and audit checks:
+
+| Check | Result |
+|---|---:|
+| Canonical gate | Pass |
+| Replay bundles checked | 160 |
+| Replay failures | 0 |
+| No-oracle pytest | Pass |
+| Local/API cost | $0 |
+
+Interpretation: this resolves the Stage 1 paper-grade label caveat by making
+enumerated admissible-frontier certificates the canonical source of strict
+labels. It does not make the old `5,149` strict-excess count usable for
+headline claims; that count is now explicitly archived as the legacy diagnostic
+view.
+
+| Artifact | Path |
+|---|---|
+| Canonical job | `effectbench_omega/jobs/stage3_canonical_main_mc_postfix_all_local_20260624T162051Z/` |
+| Canonical certificates | `effectbench_omega/outputs/main_mc_postfix_all_local/kernel_canonical/certificates_enumerated.parquet` |
+| Canonical frontier report | `effectbench_omega/reports/frontier_canonical_main_mc_postfix_all_local_canonical.md` |
+| Canonical projection table | `effectbench_omega/tables/projection_loss_main_mc_postfix_all_local_canonical.csv` |
+| Canonical uncertainty table | `effectbench_omega/tables/uncertainty_main_mc_postfix_all_local_canonical.csv` |
+| Canonical aggregate tables | `effectbench_omega/tables/main_mc_postfix_all_local_canonical/` |
+| Canonical claim registry | `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local_canonical.csv` |
+
 ## Run Artifacts
 
 | Artifact | Path |
