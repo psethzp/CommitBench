@@ -44,3 +44,27 @@ timestamp	model	status	detail
 2026-06-23T00:48:15Z	llama3_3_70b_awq_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
 2026-06-23T00:48:15Z	llama3_3_70b_awq_local	endpoint_smoke	health smoke against http://localhost:8001/v1
 2026-06-23T00:48:23Z	llama3_3_70b_awq_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_mc_postfix_llama3_3_70b_awq_local
+2026-06-23T13:11:12Z	llama3_3_70b_awq_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-23T13:12:10Z	llama3_3_70b_awq_local	done	slice complete; summary effectbench_omega/jobs/local_open_main_mc_postfix_20260622T214941Z/summaries/llama3_3_70b_awq_local.json
+2026-06-23T13:12:10Z	llama3_3_70b_awq_local	stopping_server	stopping vLLM before next model
+2026-06-23T13:12:16Z	gemma3_27b_it_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_main_mc_postfix_20260622T214941Z/logs/gemma3_27b_it_local_vllm.log
+2026-06-23T13:12:26Z	gemma3_27b_it_local	loading	waited 10s for vLLM
+2026-06-23T13:12:36Z	gemma3_27b_it_local	loading	waited 20s for vLLM
+2026-06-23T13:12:46Z	gemma3_27b_it_local	loading	waited 30s for vLLM
+2026-06-23T13:12:56Z	gemma3_27b_it_local	loading	waited 40s for vLLM
+2026-06-23T13:13:06Z	gemma3_27b_it_local	loading	waited 50s for vLLM
+2026-06-23T13:13:16Z	gemma3_27b_it_local	loading	waited 60s for vLLM
+2026-06-23T13:13:26Z	gemma3_27b_it_local	loading	waited 70s for vLLM
+2026-06-23T13:13:36Z	gemma3_27b_it_local	loading	waited 80s for vLLM
+2026-06-23T13:13:46Z	gemma3_27b_it_local	loading	waited 90s for vLLM
+2026-06-23T13:13:56Z	gemma3_27b_it_local	loading	waited 100s for vLLM
+2026-06-23T13:14:06Z	gemma3_27b_it_local	loading	waited 110s for vLLM
+2026-06-23T13:14:16Z	gemma3_27b_it_local	loading	waited 120s for vLLM
+2026-06-23T13:14:26Z	gemma3_27b_it_local	loading	waited 130s for vLLM
+2026-06-23T13:14:26Z	gemma3_27b_it_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
+2026-06-23T13:14:26Z	gemma3_27b_it_local	endpoint_smoke	health smoke against http://localhost:8001/v1
+2026-06-23T13:14:34Z	gemma3_27b_it_local	running_slice	writing 5376 trajectories to effectbench_omega/outputs/main_mc_postfix_gemma3_27b_it_local
+2026-06-23T15:43:48Z	gemma3_27b_it_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-23T15:44:47Z	gemma3_27b_it_local	done	slice complete; summary effectbench_omega/jobs/local_open_main_mc_postfix_20260622T214941Z/summaries/gemma3_27b_it_local.json
+2026-06-23T15:44:47Z	gemma3_27b_it_local	stopping_server	stopping vLLM before next model
+2026-06-23T15:44:52Z	queue	done	all model slices complete

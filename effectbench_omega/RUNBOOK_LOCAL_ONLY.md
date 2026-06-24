@@ -60,7 +60,9 @@ Full-precision `meta-llama/Llama-3.3-70B-Instruct` remains not cached. The AWQ m
 | Stage 1 model-controlled balanced smoke | Superseded | Pre-fix smoke passed workflow but Mistral proposals were repaired fallback; do not use for paper-grade MC claims |
 | Default all-four model-controlled smoke | Done | `local_open_smoke_mc_default_20260622T204613Z`; 21 traces/model, 0 failures/model, no-oracle 100%, local cost $0 |
 | Model proposal diversity gate | Done | Post-fix proposal signatures differ across all four models |
-| Stage 2b model-controlled queue | Ready, not running | Old `local_open_main_mc_20260622T161747Z` was stopped before Qwen/Llama/Gemma; restart with the post-fix command below |
+| Stage 2b model-controlled queue | Done | `local_open_main_mc_postfix_20260622T214941Z`; all four slices complete, 21,504 traces, 0 failures |
+| Stage 3 merge | Done | `outputs/main_mc_postfix_all_local/`; 21,504 traces, 21,504 API rows, 0 failures |
+| Stage 3 hardened offline suite | Done | `jobs/stage3_hardened_main_mc_postfix_all_local_20260623T220316Z`; verifier, no-oracle, data-derived projection, CEGAR collision audit, paired/bootstrap CIs, guard-tie audit, replay, cost, aggregate, pytest all exited 0 |
 
 ## Cache Commands
 
@@ -394,13 +396,62 @@ model_controls_policy: enabled
 model_proposal_mode: actions
 row_selection_strategy: first
 tensor_parallelism: TP=4 on GPUs 0,1,2,3
-server_ready_utc: 2026-06-22T21:50:59Z
-current_model: mistral_small_3_2_24b_local
-current_status: running_slice
-current_output: effectbench_omega/outputs/main_mc_postfix_mistral_small_3_2_24b_local
-last_checked_utc: 2026-06-22T21:51:40Z
+current_model: queue
+current_status: done
+current_output: effectbench_omega/outputs/main_mc_postfix_all_local
+last_checked_utc: 2026-06-23T17:06:40Z
+completed_utc: 2026-06-23T15:44:52Z
+stage3_merge: done, 21,504 traces, 21,504 API log rows, 0 failures
 invalid_old_job_id: local_open_main_mc_20260622T161747Z, stopped before Qwen/Llama/Gemma due pre-fix Mistral serving
 ```
+
+Completed Stage 2b slices:
+
+| Model | Status | Load time | Slice time | Traces | Failures | Certificates | Strict excess | Proposal parse / repair note |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| `mistral_small_3_2_24b_local` | Done | 1.00 min | 137.57 min | 5,376 | 0 | 5,376 | 1,201 | `json`: 5,362, `text_scan`: 14; repair log empty 5,376/5,376 |
+| `qwen3_6_35b_a3b_local` | Done | 1.83 min | 33.98 min | 5,376 | 0 | 5,376 | 1,588 | `json`: 5,152, `text_scan`: 164, `low_high_legacy`: 18, `unparsed:repair_fallback`: 42; repair log empty 5,208/5,376 |
+| `llama3_3_70b_awq_local` | Done | 1.50 min | 742.82 min | 5,376 | 0 | 5,376 | 1,232 | `json`: 5,376; repair log empty 5,376/5,376 |
+| `gemma3_27b_it_local` | Done | 2.17 min | 149.23 min | 5,376 | 0 | 5,376 | 1,128 | `json`: 5,376; repair log empty 5,376/5,376 |
+
+Why Llama is slow:
+
+```text
+Llama is a dense 70B AWQ checkpoint; Qwen is MoE with much lower active
+parameters, while Mistral/Gemma are smaller. The runner is intentionally
+serial for clean replay, so vLLM logs show one running request and no queue
+backlog. TP=4 spreads that one dense model across all GPUs, but it does not
+create request-level batching. JSON-schema constrained decoding also adds
+guided-decoding overhead. Current GPU status confirms all 4 L40S GPUs at
+100 percent utilization with about 42.8 GB allocated per GPU.
+```
+
+Completed-slice integrity checks:
+
+```text
+Mistral no-oracle pass rate: 100 percent
+Qwen no-oracle pass rate: 100 percent
+Llama no-oracle pass rate: 100 percent
+Gemma no-oracle pass rate: 100 percent
+Mistral unresolved abstraction warnings: 0
+Qwen unresolved abstraction warnings: 0
+Llama unresolved abstraction warnings: 0
+Gemma unresolved abstraction warnings: 0
+Mistral local cost: $0
+Qwen local cost: $0
+Llama local cost: $0
+Gemma local cost: $0
+```
+
+Quality note: Mistral's post-fix full slice is parser-clean for the paper-grade
+criterion, with no repaired fallback. Qwen's full slice has zero episode
+failures but 42/5,376 audited repaired-fallback proposals. Keep this visible
+in the analysis. Spot checks show readable but truncated/verbose JSON that did
+not expose a parseable action field before the 192-token budget ended. Decide
+after all four slices finish whether to accept this small audited fallback rate
+or rerun Qwen under a new versioned config with a smaller schema or larger
+token budget. Do not change defaults mid-queue, because that would break equal
+treatment for the remaining models.
 
 Recommended Step 2b full restart command. These values are now the queue
 defaults, but they are shown explicitly for reproducibility and so old pre-fix
@@ -445,7 +496,249 @@ effectbench_omega/outputs/main_mc_postfix_gemma3_27b_it_local
 
 ## Stage 3: Offline Analyses
 
-After all four model slices finish, concatenate or aggregate their trace/certificate outputs, then run:
+All four Stage 2b slices finished and each per-slice verifier/no-oracle/cost
+check passed. Stage 3 merge completed:
+
+```text
+merged_output: effectbench_omega/outputs/main_mc_postfix_all_local
+trace_count: 21,504
+api_logs_lines: 21,504
+failure_count: 0
+models_merged: 4
+merge_summary: effectbench_omega/outputs/main_mc_postfix_all_local/merge_summary.json
+```
+
+Merge command used:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+.venv/bin/python effectbench_omega/scripts/merge_local_open_slices.py \
+  --input-prefix effectbench_omega/outputs/main_mc_postfix \
+  --out effectbench_omega/outputs/main_mc_postfix_all_local
+```
+
+Offline suite command used:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+SPLIT=main_mc_postfix_all_local bash effectbench_omega/scripts/run_stage3_offline.sh
+```
+
+Hardened Stage 3 offline suite completed:
+
+```text
+job_id: stage3_hardened_main_mc_postfix_all_local_20260623T220316Z
+completed_utc: 2026-06-23T22:07:56Z
+verifier_certificates: 21,504
+verifier_strict_excess: 5,149
+verifier_minimal: 16,355
+unresolved_abstraction_warnings: 0
+no_oracle_rows_checked: 21,504
+no_oracle_failures: 0
+certificate_replay_bundles_checked: 160
+certificate_replay_failures: 0
+local_request_count: 21,504
+local_cost_usd: 0.0
+figure_files: 6
+claim_registry_rows: 50
+no_oracle_pytest: passed
+```
+
+Hardened metric replacements:
+
+```text
+projection_loss: data-derived accept/reject predicates over action order,
+  permissions, contract/menu checks, revisability, target confirmation, and
+  parser fallback status; reason table emitted.
+bootstrap: paired unit, base-task cluster, and hierarchical family/base-task
+  bootstrap over task/model/seed paired system differences, 2,000 resamples.
+CEGAR: reduced abstract-state hash collision audit; reports only omitted fields
+  that actually collapse distinct full states into different verifier labels.
+guard_tie: paired PROJ_GUARD/EFFECTGUARD action/effect/verdict audit.
+aggregate: paper-facing CSV tables, PNG/PDF figures, and a lite source-linked
+  claim registry.
+```
+
+Key Stage 3 outputs:
+
+```text
+effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet
+effectbench_omega/outputs/main_mc_postfix_all_local/kernel/frontiers.parquet
+effectbench_omega/outputs/main_mc_postfix_all_local/kernel/prune_log.parquet
+effectbench_omega/outputs/main_mc_postfix_all_local/kernel/rejected_abstractions.parquet
+effectbench_omega/tables/no_oracle_main_mc_postfix_all_local.csv
+effectbench_omega/tables/projection_loss_main_mc_postfix_all_local.csv
+effectbench_omega/tables/projection_loss_main_mc_postfix_all_local_reasons.csv
+effectbench_omega/tables/cegar_rejections_main_mc_postfix_all_local.csv
+effectbench_omega/tables/cegar_label_changes_main_mc_postfix_all_local.csv
+effectbench_omega/tables/lattice_sensitivity_main_mc_postfix_all_local.csv
+effectbench_omega/tables/uncertainty_main_mc_postfix_all_local.csv
+effectbench_omega/tables/guard_tie_main_mc_postfix_all_local.csv
+effectbench_omega/tables/guard_tie_main_mc_postfix_all_local_details.csv
+effectbench_omega/tables/guard_tie_main_mc_postfix_all_local.md
+effectbench_omega/tables/main_mc_postfix_all_local/main_family_results.csv
+effectbench_omega/tables/main_mc_postfix_all_local/online_control_main.csv
+effectbench_omega/figures/main_mc_postfix_all_local/online_control_outcomes.{png,pdf}
+effectbench_omega/figures/main_mc_postfix_all_local/projection_loss.{png,pdf}
+effectbench_omega/figures/main_mc_postfix_all_local/strict_excess_family_regime.{png,pdf}
+effectbench_omega/witness_bundles/main_mc_postfix_all_local/
+effectbench_omega/reports/certificate_replay_main_mc_postfix_all_local.md
+effectbench_omega/reports/main_mc_postfix_all_local_cost.md
+effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv
+```
+
+Main aggregate sanity from current scaffolded tables:
+
+```text
+overall_strict_excess_rate: 5,149 / 21,504 = 23.94 percent
+BASE strict_excess_rate: 57.00 percent
+PROJ_GUARD strict_excess_rate: 7.44 percent
+EFFECTGUARD strict_excess_rate: 7.39 percent
+raw_success: 100 percent for all systems in current local adapters
+```
+
+Hardened uncertainty summary:
+
+```text
+BASE raw-minus-kernel gap: 0.5700
+  paired 95% CI: [0.5586, 0.5815]
+  task-cluster 95% CI: [0.5515, 0.5872]
+  hierarchical 95% CI: [0.4823, 0.6183]
+BASE strict minus PROJ_GUARD strict: 0.4957
+  paired 95% CI: [0.4813, 0.5103]
+  task-cluster 95% CI: [0.4700, 0.5207]
+  hierarchical 95% CI: [0.3703, 0.5699]
+PROJ_GUARD strict minus EFFECTGUARD strict: 0.000419
+  paired 95% CI: [0.0000, 0.00098]
+  task-cluster 95% CI: [0.0000, 0.00112]
+  hierarchical 95% CI: [0.0000, 0.00144]
+```
+
+Hardened projection summary:
+
+```text
+FINAL_STATE residual strict excess: 23.94 percent of accepted successes
+CORE_DFA residual strict excess: 23.94 percent
+MINISCOPE_PERMISSION residual strict excess: 21.29 percent
+CONTRACT_MENU_CMTF residual strict excess: 21.68 percent
+REVISABILITY residual strict excess: 21.29 percent
+MODERNSTACK_PROJECTION residual strict excess: 21.88 percent
+KERNEL_FULL residual strict excess: 0 percent
+```
+
+Hardened CEGAR summary:
+
+```text
+outbox omission: 95 label-changing reduced-state collisions, 4,618 affected rows
+memory_cache omission: 146 collisions, 10,713 affected rows
+user_visible_exposure omission: 213 collisions, 19,084 affected rows
+policy_obligation, contract_artifact_hash, virtual_clock, and
+compensation_or_payment_hold produced no label-changing collisions under the
+currently available local scaffold fields.
+```
+
+This is a conservative-audit strength when written carefully: the checker only
+rejects omitted fields when the current scaffold shows label-changing
+reduced-state collisions. It should not be written as proof that zero-collision
+fields are universally irrelevant.
+
+PROJ_GUARD vs EFFECTGUARD tie audit:
+
+```text
+paired_units: 7,168
+same_effect_vector_rate: 99.958 percent
+same_verdict_rate: 99.958 percent
+verdict_diff_units: 3
+proj_strict_rate: 7.4358 percent
+effect_strict_rate: 7.3940 percent
+proj_minus_effect_strict_rate: 0.0419 percentage points
+```
+
+The only verdict differences are three Mistral telecom
+`shared_agent_confirmation` / `confirm_target_before_write` units where
+PROJ_GUARD executed `commit_high` and EFFECTGUARD substituted `commit_low` or
+`draft_change -> commit_low`. The near-tie is therefore implementation-driven:
+the current PROJ_GUARD already contains most of the same one-step lower-effect
+substitutions, and EFFECTGUARD's extra suffix-feasibility logic only has room
+to improve a tiny set of cases in this local scaffold.
+
+Historical explicit command sequence, equivalent to the driver:
+
+```bash
+.venv/bin/python effectbench_omega/effectbench/kernel/verifier.py \
+  --traces effectbench_omega/outputs/main_mc_postfix_all_local/traces.parquet \
+  --schemas effectbench_omega/schemas \
+  --out effectbench_omega/outputs/main_mc_postfix_all_local/kernel
+
+.venv/bin/python effectbench_omega/effectbench/audit/no_oracle_report.py \
+  --runtime-logs effectbench_omega/outputs/main_mc_postfix_all_local/runtime_logs.parquet \
+  --out effectbench_omega/tables/no_oracle_main_mc_postfix_all_local.csv
+
+.venv/bin/python effectbench_omega/effectbench/baselines/project.py \
+  --traces effectbench_omega/outputs/main_mc_postfix_all_local/traces.parquet \
+  --certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet \
+  --baselines FINAL_STATE CORE_DFA MINISCOPE_PERMISSION CONTRACT_MENU_CMTF REVISABILITY MODERNSTACK_PROJECTION KERNEL_FULL \
+  --out effectbench_omega/tables/projection_loss_main_mc_postfix_all_local.csv
+
+.venv/bin/python effectbench_omega/effectbench/audit/cegar.py \
+  --traces effectbench_omega/outputs/main_mc_postfix_all_local/traces.parquet \
+  --schemas effectbench_omega/schemas \
+  --omit-fields outbox policy_obligation contract_artifact_hash virtual_clock memory_cache user_visible_exposure compensation_or_payment_hold \
+  --out effectbench_omega/tables/cegar_rejections_main_mc_postfix_all_local.csv \
+  --label-changes effectbench_omega/tables/cegar_label_changes_main_mc_postfix_all_local.csv
+
+.venv/bin/python effectbench_omega/effectbench/metrics/lattice_sensitivity.py \
+  --certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet \
+  --lattices effectbench_omega/configs/lattices \
+  --out effectbench_omega/tables/lattice_sensitivity_main_mc_postfix_all_local.csv
+
+.venv/bin/python effectbench_omega/effectbench/metrics/bootstrap.py \
+  --certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet \
+  --group-by task_id model seed family \
+  --methods paired_bootstrap task_cluster hierarchical \
+  --out effectbench_omega/tables/uncertainty_main_mc_postfix_all_local.csv \
+  --n-bootstrap 2000 \
+  --seed 13
+
+.venv/bin/python effectbench_omega/effectbench/audit/guard_tie.py \
+  --traces effectbench_omega/outputs/main_mc_postfix_all_local/traces.parquet \
+  --certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet \
+  --out effectbench_omega/tables/guard_tie_main_mc_postfix_all_local.csv \
+  --details-out effectbench_omega/tables/guard_tie_main_mc_postfix_all_local_details.csv
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_bundles.py \
+  --certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet \
+  --traces effectbench_omega/outputs/main_mc_postfix_all_local/traces.parquet \
+  --sample strict_excess=100 minimal=60 incomparable=60 necessary_high=30 \
+  --out effectbench_omega/witness_bundles/main_mc_postfix_all_local
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/main_mc_postfix_all_local \
+  --out effectbench_omega/reports/certificate_replay_main_mc_postfix_all_local.md \
+  --strict
+
+.venv/bin/python effectbench_omega/effectbench/metrics/cost_audit.py \
+  --logs effectbench_omega/outputs/main_mc_postfix_all_local/api_logs.jsonl \
+  --out effectbench_omega/reports/main_mc_postfix_all_local_cost.md \
+  --final
+
+.venv/bin/python effectbench_omega/effectbench/metrics/aggregate.py \
+  --main-certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel/certificates.parquet \
+  --projection-loss effectbench_omega/tables/projection_loss_main_mc_postfix_all_local.csv \
+  --cost-logs effectbench_omega/outputs/main_mc_postfix_all_local/api_logs.jsonl \
+  --out-tables effectbench_omega/tables/main_mc_postfix_all_local \
+  --out-figures effectbench_omega/figures/main_mc_postfix_all_local \
+  --claim-registry effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv
+```
+
+Stage 3 caveat/strength boundary: the projection/bootstrap/CEGAR modules are
+now data-derived and replayable over the merged certificates. They are still
+simulator-local audits, not external human audits. The CEGAR audit can only test
+fields represented in the current local trace abstraction, so no-collision
+fields should be read as "not exercised by this scaffold" rather than "never
+future-relevant."
+
+Stage 3 checklist:
 
 ```text
 kernel verifier
@@ -456,7 +749,7 @@ lattice sensitivity
 bootstrap uncertainty
 certificate replay bundles
 aggregate tables/figures
-claim registry check
+claim registry check, currently 50 rows
 ```
 
 ## Paper Claim
