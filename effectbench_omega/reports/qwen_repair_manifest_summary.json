@@ -1,0 +1,20 @@
+{
+  "affected_rows": 168,
+  "manifest_out": "effectbench_omega/manifests/qwen_repair_rows.csv",
+  "model": "qwen3_6_35b_a3b_local",
+  "regimes": {
+    "ADV_EFFECT": 18,
+    "CONCAT": 22,
+    "FULL": 12,
+    "MEMORY_REVISE": 42,
+    "REVISE": 40,
+    "SNOWBALL": 34
+  },
+  "repair_fallback_rows": 42,
+  "systems": {
+    "BASE": 42,
+    "EFFECTGUARD": 70,
+    "PROJ_GUARD": 56
+  },
+  "text_scan_rows": 126
+}

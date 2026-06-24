@@ -1,0 +1,14 @@
+{
+  "api_log_count": 14,
+  "certificate_count": 14,
+  "failure_count": 0,
+  "minimal_count": 14,
+  "model": "qwen3_6_35b_a3b_local",
+  "out_dir": "effectbench_omega/outputs/stage3_v2_smoke_qwen3_6_35b_a3b_local",
+  "parse_status_counts": {
+    "json": 14
+  },
+  "repair_nonempty_rows": 0,
+  "strict_excess_count": 0,
+  "trace_count": 14
+}

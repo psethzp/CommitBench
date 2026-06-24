@@ -10,7 +10,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 
 ## Current Status
 
-- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit is complete; Stage 2 corrected-guard implementation is complete and awaits approval for Stage 3.
+- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit, Stage 2 corrected-guard implementation, and Stage 3 V2 live smokes/Qwen sensitivity are complete. Stage 4 awaits approval.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -35,12 +35,14 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - EACL rescue V2 Stage 0: **complete**. Sanity/import check passed, required local model caches are ready, no-oracle pytest passed (`9 passed`), claim registry check passed with 50 rows, and placeholder scan passed.
 - EACL rescue V2 Stage 1: **complete, gate failed**. The enumerated-frontier audit relabeled 21,504 successful traces across 7,168 groups, found 4,089 strict-excess labels versus 5,149 old generated-trace labels, strictness agreement 95.0707%, exact label agreement 92.9315%, and 0 unexplained mismatches. Paper-grade labels need enumerated-frontier semantics or a repaired verifier.
 - EACL rescue V2 Stage 2: **complete**. Added `PROJ_GUARD_V2` and `EFFECTGUARD_V2`, a 14,336-row V2 guard manifest, V2 guard tests, and a 14-row balanced dry smoke with 0 failures and 100% no-oracle pass rate.
+- EACL rescue V2 Stage 3: **complete**. Four-model V2 live smokes passed with 14 traces/model, 0 failures/model, JSON proposals 14/14 for every model, empty repair logs for every model, no-oracle 100%, and local cost $0. Qwen same-prompt repair sensitivity reran 168 affected rows with 0 proposal/effect/verdict changes and 0.0 pp strict-rate delta.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
 ## Current Caveats
 
 - Qwen full slice has `42/5,376` audited repaired-fallback proposals. The primary run remains frozen; any same-prompt rerun of those rows should be reported as a sensitivity/ablation, not silently substituted.
+- V2 Stage 3 same-prompt Qwen sensitivity reproduced the same 42 repair-fallback parses and changed no proposal/effect/verdict/headline metric. This downgrades the Qwen issue from volatility risk to audit-disclosed parse-status caveat.
 - V2 Stage 1 found 1,060 old strict-excess labels whose old generated-trace witness is not admissible under enumerated-frontier rules. This is a validation blocker for old strict-excess counts, not a model-run failure.
 - Stage 3 projection/bootstrap/CEGAR are now replayable data-derived local audits. They are still simulator-local, not external human audits. CEGAR no-collision fields are a conservative-audit strength: the checker does not reject omissions without observed label-changing collisions; that means "not exercised by this scaffold," not "never future-relevant."
 - PROJ_GUARD and EFFECTGUARD are effectively tied in this local implementation: only `3/7,168` paired units differ in verifier verdict, all Mistral telecom confirm-target cases.
@@ -65,9 +67,11 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Stage 2b model-controlled queue | Complete | `main_mc_postfix`; four local model slices complete, 21,504 total traces, 0 failures. |
 | Stage 3 merge helper | Complete | `effectbench_omega/scripts/merge_local_open_slices.py`; merged output is `effectbench_omega/outputs/main_mc_postfix_all_local/`. |
 | Stage 3 hardened offline suite | Complete | `effectbench_omega/scripts/run_stage3_offline.sh`; hardened projection/bootstrap/CEGAR/guard-tie outputs generated for `main_mc_postfix_all_local`. |
-| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 1 complete with failed validation gate, Stage 2 complete. |
+| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 1 complete with failed validation gate, Stage 2 and Stage 3 complete. |
 | Enumerated frontier audit | Working, gate failed | `effectbench_omega/scripts/run_frontier_completeness.py`; outputs under `effectbench_omega/outputs/frontier_audit_main_mc_postfix_all_local/`. |
 | Corrected guard V2 systems | Working | `PROJ_GUARD_V2` is projection-only; `EFFECTGUARD_V2` performs current-state admissible lower-effect substitution. |
+| V2 live smokes | Passed | `effectbench_omega/scripts/run_stage3_v2_smoke_queue.sh`; four locked models, 56 total live V2 traces, 0 failures. |
+| Qwen repair sensitivity | Passed | 168 affected rows rerun same-prompt; 0 proposal/effect/verdict changes; 0.0 pp strict-rate delta. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
@@ -104,6 +108,11 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - V2 guard manifest: `effectbench_omega/manifests/tasks_guard_v2_local.csv`
 - V2 dry smoke output: `effectbench_omega/outputs/guard_v2_dry_smoke/`
 - V2 dry no-oracle table: `effectbench_omega/tables/no_oracle_guard_v2_dry_smoke.csv`
+- V2 Stage 3 job: `effectbench_omega/jobs/stage3_v2_smoke_20260624T143808Z/`
+- V2 Stage 3 smoke outputs: `effectbench_omega/outputs/stage3_v2_smoke_<model>/`
+- Qwen repair rows manifest: `effectbench_omega/manifests/qwen_repair_rows.csv`
+- Qwen repair sensitivity report: `effectbench_omega/reports/qwen_repair_sensitivity.md`
+- Qwen repair sensitivity table: `effectbench_omega/tables/qwen_repair_sensitivity.csv`
 - Live Qwen14 smoke outputs: `effectbench_omega/outputs/local_runner_qwen14_smoke/`
 - Selected-four smoke certificates: `effectbench_omega/outputs/smoke_<model>/kernel/certificates.parquet`
 - Native source audit: `effectbench_omega/reports/native_source_audit.md`

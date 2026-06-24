@@ -24,8 +24,8 @@ Hard boundaries:
 |---|---|---:|---|
 | 0 | Freeze and preflight | Complete | Approved for Stage 1 |
 | 1 | Enumerated frontier completeness audit | Complete, gate failed | Approved to start Stage 2 repair/implementation |
-| 2 | Corrected guards V2 implementation | Complete | Awaiting approval for Stage 3 |
-| 3 | V2 smoke and Qwen repair sensitivity | Pending | Requires Stage 2 approval |
+| 2 | Corrected guards V2 implementation | Complete | Approved for Stage 3 |
+| 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
 | 4 | Full corrected-guard local run | Pending | Requires Stage 3 approval |
 | 5 | Native-fidelity subset | Pending | Requires Stage 4 approval |
 | 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 approval |
@@ -278,4 +278,102 @@ Stage 2 conclusion:
 Corrected guard systems are implemented and work through the normal online
 runner in dry mode. The next stage should run V2 live/local smokes and the Qwen
 repair-sensitivity slice without overwriting the frozen split.
+```
+
+## Stage 3 Plan: V2 Smoke And Qwen Repair Sensitivity
+
+Operator approval received via "Go".
+
+Stage 3 scope:
+
+1. Run V2 live local smoke for all four locked models with TP=4.
+2. Use `PROJ_GUARD_V2` and `EFFECTGUARD_V2` only for V2 smoke rows.
+3. Rerun only the affected Qwen rows from the frozen split where
+   `model_proposal_repair_log != []`.
+4. Keep the Qwen rerun same-prompt/same-settings:
+   `model_controls_policy`, `model_proposal_mode=actions`, temperature `0`,
+   same logical rows, and original Qwen split trace IDs.
+5. Build a merged Qwen sensitivity split and compare proposal/effect/verdict
+   deltas against the frozen split.
+
+Implementation added:
+
+```text
+effectbench_omega/scripts/run_stage3_v2_smoke_queue.sh
+effectbench_omega/scripts/qwen_repair_sensitivity.py
+effectbench_omega/manifests/qwen_repair_rows.csv
+```
+
+Main command:
+
+```bash
+JOB_ID=stage3_v2_smoke_20260624T143808Z \
+  bash effectbench_omega/scripts/run_stage3_v2_smoke_queue.sh
+```
+
+Job:
+
+```text
+effectbench_omega/jobs/stage3_v2_smoke_20260624T143808Z/
+effectbench_omega/jobs/stage3_v2_latest -> stage3_v2_smoke_20260624T143808Z
+```
+
+V2 smoke results:
+
+| Model | Load wait | Traces | Failures | Parse status | Repair logs | No-oracle | Cost |
+|---|---:|---:|---:|---|---:|---:|---:|
+| `mistral_small_3_2_24b_local` | 60s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+| `qwen3_6_35b_a3b_local` | 110s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+| `llama3_3_70b_awq_local` | 90s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+| `gemma3_27b_it_local` | 130s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+
+All four smoke runs used `CUDA_VISIBLE_DEVICES=0,1,2,3` and TP=4. GPU samples
+showed full-model residency across all four cards, and active generation
+samples reached ~98-100% utilization.
+
+Qwen repair sensitivity:
+
+| Metric | Value |
+|---|---:|
+| Affected Qwen rows rerun | 168 |
+| Original non-empty repair-log rows | 168 |
+| Original repair-fallback rows | 42 |
+| Rerun non-empty repair-log rows | 168 |
+| Rerun repair-fallback rows | 42 |
+| Proposal changed rows | 0 |
+| Effect-vector changed rows | 0 |
+| Verifier verdict changed rows | 0 |
+| Overall strict-rate delta | 0.000000 pp |
+| Qwen strict-rate delta | 0.000000 pp |
+| Qwen rerun failures | 0 |
+| Qwen rerun no-oracle pass rate | 100% |
+| Qwen rerun local cost | $0 |
+
+Qwen sensitivity outputs:
+
+```text
+effectbench_omega/outputs/qwen_repair_sensitivity_rerun/
+effectbench_omega/outputs/qwen_repair_sensitivity_merged/
+effectbench_omega/tables/qwen_repair_sensitivity.csv
+effectbench_omega/reports/qwen_repair_sensitivity.md
+```
+
+Stage 3 conclusion:
+
+```text
+Corrected V2 systems are live-call smoke-clean for all four locked local
+models. Qwen repaired rows are stable under same-prompt rerun: the rerun exactly
+reproduced the prior proposal/effect/verdict behavior and changed no headline
+strict-rate metric. The Qwen parse-status caveat remains an audit disclosure
+because the same 42 repair-fallback parses reproduced, but it is not a
+volatility/headline-sensitivity issue in this rerun.
+```
+
+Next stage:
+
+```text
+Stage 4 should run the full corrected-guard local split:
+128 tasks x 7 regimes x 2 seeds x 4 models x 2 V2 systems = 14,336
+trajectories. Reuse the frozen BASE split; do not rerun BASE unless a code bug
+requires it.
 ```

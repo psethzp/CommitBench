@@ -110,6 +110,57 @@ pending Stage 3/4.
 | V2 dry smoke output | `effectbench_omega/outputs/guard_v2_dry_smoke/` |
 | V2 no-oracle smoke table | `effectbench_omega/tables/no_oracle_guard_v2_dry_smoke.csv` |
 
+## V2 Rescue Stage 3
+
+Stage 3 V2 live smokes and Qwen repair sensitivity completed on branch
+`eacl-rescue-v2` on 2026-06-24 UTC.
+
+Four-model V2 live smoke:
+
+| Model | Load wait | Smoke time | Traces | Failures | Parse status | Repair logs | No-oracle | Cost |
+|---|---:|---:|---:|---:|---|---:|---:|---:|
+| `mistral_small_3_2_24b_local` | 60 s | 64 s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+| `qwen3_6_35b_a3b_local` | 110 s | 42 s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+| `llama3_3_70b_awq_local` | 90 s | 158 s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+| `gemma3_27b_it_local` | 130 s | 60 s | 14 | 0 | `json`: 14 | 0 | 100% | $0 |
+
+All four smokes used TP=4 with `CUDA_VISIBLE_DEVICES=0,1,2,3`, the hardened
+local-only V2 path, `--model-controls-policy`, and
+`--model-proposal-mode actions`. Each smoke produced 14 certificates, all
+minimal in the smoke subset, with zero online failures.
+
+Qwen repair sensitivity:
+
+| Metric | Value |
+|---|---:|
+| Affected rows rerun | 168 |
+| Original repair-fallback rows | 42 |
+| Rerun repair-fallback rows | 42 |
+| Rerun parse statuses | `text_scan`: 126; `unparsed:repair_fallback`: 42 |
+| Proposal-changed rows | 0 |
+| Effect-vector-changed rows | 0 |
+| Verifier-verdict-changed rows | 0 |
+| Overall strict-rate delta | 0.000000 pp |
+| Qwen strict-rate delta | 0.000000 pp |
+| No-oracle pass rate | 100% |
+| Local cost | $0 |
+
+Stage 3 interpretation: the corrected V2 live path is clean across all four
+models on smoke coverage. The old Qwen parse caveat is stable rather than
+volatile: rerunning the same affected rows with the same prompt path reproduced
+the same 42 fallback parses and changed no proposals, effect vectors, verifier
+verdicts, or headline strict-excess rates. This does not erase the parse-status
+caveat; it makes it auditable and non-sensitive for the current frozen split.
+
+| Artifact | Path |
+|---|---|
+| Stage 3 job | `effectbench_omega/jobs/stage3_v2_smoke_20260624T143808Z/` |
+| Latest Stage 3 symlink | `effectbench_omega/jobs/stage3_v2_latest` |
+| V2 smoke outputs | `effectbench_omega/outputs/stage3_v2_smoke_<model>/` |
+| Qwen repair manifest | `effectbench_omega/manifests/qwen_repair_rows.csv` |
+| Qwen repair sensitivity table | `effectbench_omega/tables/qwen_repair_sensitivity.csv` |
+| Qwen repair sensitivity report | `effectbench_omega/reports/qwen_repair_sensitivity.md` |
+
 ## Run Artifacts
 
 | Artifact | Path |
