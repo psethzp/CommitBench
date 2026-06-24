@@ -10,6 +10,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 
 ## Current Status
 
+- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 0 preflight is complete; Stage 1 must wait for operator approval.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -31,6 +32,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Stage 3 hardened offline suite: **complete** as `stage3_hardened_main_mc_postfix_all_local_20260623T220316Z`; 21,504 certificates, 5,149 strict-excess certificates, 0 unresolved abstraction warnings, no-oracle aggregate pass, 160 replay bundles checked with 0 failures.
 - Hardened metrics: **complete**. Projection baselines are data-derived, bootstrap uses paired/task-cluster/hierarchical resampling with 2,000 draws, CEGAR uses reduced abstract-state collision checks, and `guard_tie` explains PROJ_GUARD vs EFFECTGUARD.
 - Stage 3 figures and lite claim registry: **complete**. Aggregate writes PNG/PDF figures under `effectbench_omega/figures/main_mc_postfix_all_local/` and a 50-row computed registry at `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local.csv`.
+- EACL rescue V2 Stage 0: **complete**. Sanity/import check passed, required local model caches are ready, no-oracle pytest passed (`9 passed`), claim registry check passed with 50 rows, and placeholder scan passed.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
@@ -40,6 +42,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Stage 3 projection/bootstrap/CEGAR are now replayable data-derived local audits. They are still simulator-local, not external human audits. CEGAR no-collision fields are a conservative-audit strength: the checker does not reject omissions without observed label-changing collisions; that means "not exercised by this scaffold," not "never future-relevant."
 - PROJ_GUARD and EFFECTGUARD are effectively tied in this local implementation: only `3/7,168` paired units differ in verifier verdict, all Mistral telecom confirm-target cases.
 - Active claims are local/open-weight only. Do not claim Bedrock/frontier leaderboard coverage from this run.
+- V2 rescue work must not overwrite `effectbench_omega/outputs/main_mc_postfix_all_local/`; all new outputs need new split names.
 
 ## Implemented Features
 
@@ -59,11 +62,13 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Stage 2b model-controlled queue | Complete | `main_mc_postfix`; four local model slices complete, 21,504 total traces, 0 failures. |
 | Stage 3 merge helper | Complete | `effectbench_omega/scripts/merge_local_open_slices.py`; merged output is `effectbench_omega/outputs/main_mc_postfix_all_local/`. |
 | Stage 3 hardened offline suite | Complete | `effectbench_omega/scripts/run_stage3_offline.sh`; hardened projection/bootstrap/CEGAR/guard-tie outputs generated for `main_mc_postfix_all_local`. |
+| EACL rescue V2 runbook | Active | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`; Stage 0 complete, Stage 1 pending approval. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
 
 - Active runbook/checkpoint tracker: `effectbench_omega/RUNBOOK_LOCAL_ONLY.md`
+- EACL rescue V2 runbook: `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md`
 - Archived Bedrock-era runbook: `effectbench_omega/RUNBOOK.md`
 - Local-open model cache report: `effectbench_omega/artifacts/local_open_model_cache.json`
 - Local Qwen cache report: `effectbench_omega/artifacts/local_qwen_cache.json`

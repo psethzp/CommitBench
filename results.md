@@ -16,6 +16,22 @@ checks passed, and local cost was zero. The strongest result is the large
 BASE raw-vs-kernel gap and the large reduction from BASE to guarded systems.
 The weakest result is that `EFFECTGUARD` and `PROJ_GUARD` are essentially tied.
 
+## V2 Rescue Stage 0
+
+Stage 0 preflight completed on branch `eacl-rescue-v2` on 2026-06-24 UTC.
+
+| Check | Status | Result |
+|---|---:|---|
+| Environment sanity/imports | Pass | Python `3.11.15`; required modules imported; 4 x NVIDIA L40S visible |
+| Required local model caches | Pass | Mistral, Qwen3.6-35B-A3B, Llama 3.3 70B AWQ, Gemma 3 27B IT ready |
+| No-oracle pytest | Pass | `9 passed, 1 warning` |
+| Claim registry | Pass | 50 rows |
+| Placeholder scan | Pass | `effectbench_omega/reports/no_red_placeholders.md` reports PASS |
+| Bedrock/API usage | Pass | None launched |
+| Frozen split status | Preserved | No Stage 0 experiment reruns |
+
+Next approved stage should be the offline enumerated-frontier completeness audit.
+
 ## Run Artifacts
 
 | Artifact | Path |
