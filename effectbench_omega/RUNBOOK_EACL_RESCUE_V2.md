@@ -28,9 +28,9 @@ Hard boundaries:
 | 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
 | 3.5 | Canonical verifier hardening | Complete | Stage 4 ready |
 | 4 | Full corrected-guard local run | Complete | Approved for Stage 5 |
-| 5 | Native-fidelity subset | Complete | Awaiting approval for Stage 6 |
-| 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 review/approval |
-| 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 approval |
+| 5 | Native-fidelity subset | Complete | Approved for Stage 6 |
+| 6 | Full replay and targeted CEGAR stress | Complete | Awaiting approval for Stage 7 |
+| 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 review/approval |
 
 ## Stage 0: Freeze And Preflight
 
@@ -627,6 +627,124 @@ scaffold caveat for a validation block: terminal failures are possible and
 counted, state-delta ledgers drive effects, and native replay passes. The
 subset remains a compact native-style wrapper over pinned upstream records, not
 a full upstream benchmark server re-host.
+```
+
+## Stage 6: Full Replay And Targeted CEGAR Stress
+
+Operator approval received via "Do Stage 6 now."
+
+Implementation updates:
+
+```text
+effectbench_omega/effectbench/audit/replay_bundles.py now supports
+strict_excess=all plus explicit minimal/incomparable/necessary-high selectors.
+
+effectbench_omega/effectbench/audit/cegar.py now supports
+--inject-targeted-cases and --stress-targets for deterministic CEGAR stress
+pairs.
+```
+
+Smoke checks:
+
+```text
+py_compile: pass
+targeted CEGAR smoke: pass; all seven fields had label-changing collisions
+replay smoke: 4 native bundles checked, 4 native replays, 0 failures
+no-oracle pytest: 9 passed, 1 warning
+```
+
+Full replay commands:
+
+```bash
+.venv/bin/python effectbench_omega/effectbench/audit/replay_bundles.py \
+  --certificates effectbench_omega/outputs/main_mc_postfix_all_local/kernel_canonical/certificates_enumerated.parquet \
+  --traces effectbench_omega/outputs/main_mc_postfix_all_local/traces.parquet \
+  --sample strict_excess=all minimal=500 incomparable=all necessary_high=all \
+  --out effectbench_omega/witness_bundles/full_replay_main_mc_postfix_all_local_canonical
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/full_replay_main_mc_postfix_all_local_canonical \
+  --out effectbench_omega/reports/certificate_replay_full_main_mc_postfix_all_local_canonical.md \
+  --strict
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_bundles.py \
+  --certificates effectbench_omega/outputs/guard_v2_main_with_base_all_local/kernel_canonical/certificates_enumerated.parquet \
+  --traces effectbench_omega/outputs/guard_v2_main_with_base_all_local/traces.parquet \
+  --sample strict_excess=all minimal=500 incomparable=all necessary_high=all \
+  --out effectbench_omega/witness_bundles/full_replay_guard_v2_main_with_base_all_local_canonical
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/full_replay_guard_v2_main_with_base_all_local_canonical \
+  --out effectbench_omega/reports/certificate_replay_full_guard_v2_main_with_base_all_local_canonical.md \
+  --strict
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_bundles.py \
+  --certificates effectbench_omega/outputs/native_subset_v1_all_local/kernel_canonical/certificates_enumerated.parquet \
+  --traces effectbench_omega/outputs/native_subset_v1_all_local/traces.parquet \
+  --sample strict_excess=all minimal=500 incomparable=all necessary_high=all \
+  --out effectbench_omega/witness_bundles/full_replay_native_subset_v1_all_local_canonical
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/full_replay_native_subset_v1_all_local_canonical \
+  --out effectbench_omega/reports/certificate_replay_full_native_subset_v1_all_local_canonical.md \
+  --strict
+```
+
+Full replay results:
+
+| Split | Bundles checked | Native replays | Failures |
+|---|---:|---:|---:|
+| `main_mc_postfix_all_local_canonical` | 4,819 | 0 | 0 |
+| `guard_v2_main_with_base_all_local_canonical` | 5,341 | 0 | 0 |
+| `native_subset_v1_all_local_canonical` | 1,348 | 1,348 | 0 |
+| **Total** | **11,508** | **1,348** | **0** |
+
+Generated full replay bundle directories:
+
+```text
+effectbench_omega/witness_bundles/full_replay_main_mc_postfix_all_local_canonical/ (41M)
+effectbench_omega/witness_bundles/full_replay_guard_v2_main_with_base_all_local_canonical/ (46M)
+effectbench_omega/witness_bundles/full_replay_native_subset_v1_all_local_canonical/ (15M)
+```
+
+Note: these full JSON bundle directories are generated artifacts and are not
+tracked in git. The replay reports and summary tables are tracked.
+
+Targeted CEGAR stress command:
+
+```bash
+.venv/bin/python effectbench_omega/effectbench/audit/cegar.py \
+  --traces effectbench_omega/outputs/native_subset_v1_all_local/traces.parquet \
+  --certificates effectbench_omega/outputs/native_subset_v1_all_local/kernel_canonical/certificates_enumerated.parquet \
+  --schemas effectbench_omega/schemas \
+  --omit-fields outbox policy_obligation contract_artifact_hash virtual_clock memory_cache user_visible_exposure compensation_or_payment_hold \
+  --inject-targeted-cases \
+  --stress-targets outbox policy_obligation contract_artifact_hash virtual_clock memory_cache user_visible_exposure compensation_or_payment_hold \
+  --out effectbench_omega/tables/cegar_rejections_stage6_targeted_stress.csv \
+  --label-changes effectbench_omega/tables/cegar_label_changes_stage6_targeted_stress.csv
+```
+
+Targeted CEGAR stress results:
+
+| Omitted field | Label-change groups | Rejected abstractions | Affected rows |
+|---|---:|---:|---:|
+| `outbox` | 29 | 29 | 834 |
+| `policy_obligation` | 1 | 1 | 2 |
+| `contract_artifact_hash` | 1 | 1 | 2 |
+| `virtual_clock` | 1 | 1 | 2 |
+| `memory_cache` | 103 | 103 | 2,682 |
+| `user_visible_exposure` | 83 | 83 | 3,822 |
+| `compensation_or_payment_hold` | 1 | 1 | 2 |
+
+Interpretation:
+
+```text
+Stage 6 completes the full replay/CEGAR repair step. All full replay bundles
+pass, including all native strict-excess bundles. Targeted stress rows now
+exercise every future-relevant CEGAR field, including fields that were quiet in
+the ordinary scaffold. The correct paper framing is that earlier no-collision
+fields were not exercised there; Stage 6 demonstrates they are relevant under
+targeted counterexamples.
 ```
 
 Monitor:

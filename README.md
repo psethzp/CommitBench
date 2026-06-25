@@ -40,6 +40,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - EACL rescue canonical scoring: **complete**. `run_stage3_offline.sh` defaults to `CANONICAL_CERT_MODE=enumerated`; projection, bootstrap, CEGAR, lattice, guard-tie, replay, aggregate figures, and claim registry consume `kernel_canonical/certificates_enumerated.parquet`.
 - EACL rescue V2 Stage 4: **complete**. The guard-only queue ran `PROJ_GUARD_V2` and `EFFECTGUARD_V2` with `SLICE_LIMIT=3584` per model, TP=4 on GPUs `0,1,2,3`, model order Mistral, Qwen, Llama, Gemma. All four slices finished with 14,336 V2 guard traces, 0 failures, and local cost $0. Combined canonical scoring with frozen `BASE` produced 21,504 trajectories, canonical gate pass, 4,611 canonical strict-excess labels, 1,010 spurious legacy witnesses, 0 unexplained mismatches, and replay 160/160 pass.
 - EACL rescue V2 Stage 5: **complete**. Native-fidelity subset implementation is complete and the live local queue `local_open_native_subset_v1_20260625T085816Z` finished all four models with 4,608 traces, 0 runner failures, and local cost $0. Merged canonical scoring in `stage5_canonical_native_subset_v1_20260625T191826Z` passed: 4,217 native successes, 391 native terminal failures, 848 canonical strict-excess labels, 0 unexplained mismatches, 160/160 native replay bundles passed, and no-oracle 100%.
+- EACL rescue V2 Stage 6: **complete**. Full replay checked 11,508 bundles across the controlled, corrected-guard, and native canonical splits with 0 failures; 1,348 native bundles replayed in the native wrappers. Targeted CEGAR stress now produces label-changing collisions for all seven future-relevant fields, including `policy_obligation`, `contract_artifact_hash`, `virtual_clock`, and `compensation_or_payment_hold`.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
@@ -79,6 +80,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Qwen repair sensitivity | Passed | 168 affected rows rerun same-prompt; 0 proposal/effect/verdict changes; 0.0 pp strict-rate delta. |
 | Stage 4 merge/scoring path | Complete | `local_open_guard_v2_main_20260624T200115Z` finished all four V2 guard slices; `build_guard_v2_main_split.py` combined frozen `BASE` with V2 guard rows; canonical scoring completed as `stage3_canonical_guard_v2_main_with_base_20260625T082959Z`. |
 | Stage 5 native-fidelity subset | Complete | Native wrappers, manifest, full live queue, merge, canonical scoring, and native replay passed. |
+| Stage 6 full replay and CEGAR stress | Complete | 11,508 full replay bundles passed; targeted CEGAR stress exercises all seven future-relevant fields. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
@@ -134,6 +136,9 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - V2 Stage 5 canonical job: `effectbench_omega/jobs/stage5_canonical_native_subset_v1_20260625T191826Z/`
 - V2 Stage 5 canonical tables: `effectbench_omega/tables/native_subset_v1_all_local_canonical/`
 - V2 Stage 5 dry native outputs: `effectbench_omega/outputs/native_subset_v1_dry_all/`
+- V2 Stage 6 summary report: `effectbench_omega/reports/stage6_full_replay_cegar.md`
+- V2 Stage 6 replay summary: `effectbench_omega/tables/stage6_full_replay_summary.csv`
+- V2 Stage 6 targeted CEGAR stress: `effectbench_omega/tables/cegar_rejections_stage6_targeted_stress.csv`
 - Qwen repair rows manifest: `effectbench_omega/manifests/qwen_repair_rows.csv`
 - Qwen repair sensitivity report: `effectbench_omega/reports/qwen_repair_sensitivity.md`
 - Qwen repair sensitivity table: `effectbench_omega/tables/qwen_repair_sensitivity.csv`

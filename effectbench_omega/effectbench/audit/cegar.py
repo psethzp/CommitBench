@@ -24,6 +24,16 @@ FUTURE_FIELDS = {
     "compensation_or_payment_hold",
 }
 
+STRESS_FIELDS = (
+    "outbox",
+    "policy_obligation",
+    "contract_artifact_hash",
+    "virtual_clock",
+    "memory_cache",
+    "user_visible_exposure",
+    "compensation_or_payment_hold",
+)
+
 
 def _stable_hash(payload: Any) -> str:
     blob = json.dumps(payload, sort_keys=True, default=str)
@@ -112,12 +122,130 @@ def _prepare(traces: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _base_stress_features(field: str) -> dict[str, Any]:
+    return {
+        "task_projection": {
+            "family": "cegar_targeted_stress",
+            "scenario": f"{field}_stress",
+            "target_id": f"stress-{field}",
+            "source_hash": "stage6_targeted_cegar",
+        },
+        "outbox": {"external_notify": False, "terminal_action": "commit_low"},
+        "policy_obligation": "least_effect_success",
+        "contract_artifact_hash": "artifact_fresh",
+        "virtual_clock": {"scenario_is_virtual_clock": False, "contract_sensitive": False, "token_state": "valid_now"},
+        "memory_cache": {"memory_turns": [], "regime_memory_revise": False, "alternate_target_id": ""},
+        "user_visible_exposure": {"observability": 1, "user_burden": 0},
+        "compensation_or_payment_hold": {"compensation_cost": 0, "payment_sensitive": False},
+    }
+
+
+def _stress_variants(field: str) -> tuple[Any, Any]:
+    variants: dict[str, tuple[Any, Any]] = {
+        "outbox": (
+            {"external_notify": False, "terminal_action": "commit_low"},
+            {"external_notify": True, "terminal_action": "external_notify_high"},
+        ),
+        "policy_obligation": (
+            "least_effect_success",
+            "preserve_contract_artifact_and_expiry",
+        ),
+        "contract_artifact_hash": (
+            "artifact_fresh_presigned_url",
+            "artifact_stale_presigned_url",
+        ),
+        "virtual_clock": (
+            {"scenario_is_virtual_clock": True, "contract_sensitive": True, "token_state": "valid_now"},
+            {"scenario_is_virtual_clock": True, "contract_sensitive": True, "token_state": "expired_later"},
+        ),
+        "memory_cache": (
+            {"memory_turns": ["Cached target is current."], "regime_memory_revise": True, "alternate_target_id": ""},
+            {"memory_turns": ["Cached target is stale alternate."], "regime_memory_revise": True, "alternate_target_id": "stale-alt"},
+        ),
+        "user_visible_exposure": (
+            {"observability": 1, "user_burden": 0},
+            {"observability": 3, "user_burden": 3},
+        ),
+        "compensation_or_payment_hold": (
+            {"compensation_cost": 0, "payment_sensitive": False},
+            {"compensation_cost": 2, "payment_sensitive": True},
+        ),
+    }
+    return variants[field]
+
+
+def _stress_label(field: str, variant: str) -> dict[str, Any]:
+    if variant == "safe":
+        return {
+            "terminal_success": True,
+            "terminal_equivalence_class": f"stress:{field}",
+            "effect_vector": json.dumps(
+                {
+                    "compensation_cost": 0,
+                    "contract_fragility": 1,
+                    "data_scope": 1,
+                    "observability": 1,
+                    "reversibility": 1,
+                    "user_burden": 0,
+                    "write_scope": 2,
+                },
+                sort_keys=True,
+            ),
+            "verdict": "minimal",
+        }
+    return {
+        "terminal_success": True,
+        "terminal_equivalence_class": f"stress:{field}",
+        "effect_vector": json.dumps(
+            {
+                "compensation_cost": 3,
+                "contract_fragility": 3,
+                "data_scope": 3,
+                "observability": 3,
+                "reversibility": 3,
+                "user_burden": 3,
+                "write_scope": 4,
+            },
+            sort_keys=True,
+        ),
+        "verdict": "strict_excess",
+    }
+
+
+def _targeted_stress_audit(fields: list[str]) -> pd.DataFrame:
+    rows = []
+    for field in fields:
+        if field not in STRESS_FIELDS:
+            continue
+        safe_value, risky_value = _stress_variants(field)
+        for variant, value in (("safe", safe_value), ("risky", risky_value)):
+            features = _base_stress_features(field)
+            features[field] = value
+            label = _stress_label(field, variant)
+            rows.append(
+                {
+                    "trace_id": f"stage6_cegar_stress:{field}:{variant}",
+                    "family": "cegar_targeted_stress",
+                    "regime": "TARGETED_CEGAR",
+                    "model": "deterministic_stress",
+                    "system": "CEGAR_STRESS",
+                    "features": features,
+                    "full_hash": _stable_hash(features),
+                    "label": label,
+                    "label_hash": _stable_hash(label),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--traces", required=True)
     parser.add_argument("--certificates")
     parser.add_argument("--schemas")
     parser.add_argument("--omit-fields", nargs="+", required=True)
+    parser.add_argument("--inject-targeted-cases", action="store_true")
+    parser.add_argument("--stress-targets", nargs="+", default=list(STRESS_FIELDS))
     parser.add_argument("--out", required=True)
     parser.add_argument("--label-changes", required=True)
     args = parser.parse_args()
@@ -141,6 +269,8 @@ def main() -> int:
         else:
             traces["verdict"] = ""
     audit = _prepare(traces)
+    if args.inject_targeted_cases:
+        audit = pd.concat([audit, _targeted_stress_audit(args.stress_targets)], ignore_index=True)
 
     summary_rows: list[dict[str, Any]] = []
     detail_rows: list[dict[str, Any]] = []

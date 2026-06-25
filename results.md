@@ -21,6 +21,10 @@ must be reported separately from the controlled headline split, but it now has
 live local queue results, canonical certificates, native replay, and counted
 native terminal failures.
 
+V2 Stage 6 full replay and targeted CEGAR stress is complete: 11,508 replay
+bundles passed with 0 failures, and targeted stress rows now exercise all
+future-relevant CEGAR fields.
+
 ## V2 Rescue Stage 0
 
 Stage 0 preflight completed on branch `eacl-rescue-v2` on 2026-06-24 UTC.
@@ -636,6 +640,36 @@ all-success-scaffold caveat for this validation block. It is a compact
 native-style wrapper over pinned upstream records, not a full upstream server
 re-host.
 
+## V2 Rescue Stage 6 Full Replay And CEGAR Stress
+
+Stage 6 completed on 2026-06-25 UTC.
+
+Full certificate replay:
+
+| Split | Bundles checked | Native replays | Failures |
+|---|---:|---:|---:|
+| `main_mc_postfix_all_local_canonical` | 4,819 | 0 | 0 |
+| `guard_v2_main_with_base_all_local_canonical` | 5,341 | 0 | 0 |
+| `native_subset_v1_all_local_canonical` | 1,348 | 1,348 | 0 |
+| **Total** | **11,508** | **1,348** | **0** |
+
+Targeted CEGAR stress:
+
+| Omitted field | Label-change groups | Rejected abstractions | Affected rows |
+|---|---:|---:|---:|
+| `outbox` | 29 | 29 | 834 |
+| `policy_obligation` | 1 | 1 | 2 |
+| `contract_artifact_hash` | 1 | 1 | 2 |
+| `virtual_clock` | 1 | 1 | 2 |
+| `memory_cache` | 103 | 103 | 2,682 |
+| `user_visible_exposure` | 83 | 83 | 3,822 |
+| `compensation_or_payment_hold` | 1 | 1 | 2 |
+
+Stage 6 interpretation: all full replay bundles pass, including all native
+strict-excess bundles. The targeted CEGAR rows fix the earlier caveat around
+quiet fields: fields with no ordinary-scaffold collisions were not irrelevant,
+just not exercised as label-changing there.
+
 ## Result Caveats
 
 | Caveat | Consequence |
@@ -646,7 +680,7 @@ re-host.
 | Raw success is 100% for all systems | Results should focus on least-effect certification, not raw task success differences. |
 | Stage 5 native subset is a separate validation block | Do not pool it into the 21,504-row controlled headline split. |
 | Stage 5 native wrappers are compact native-style transitions | Use as native-fidelity validation, not as a claim that every upstream benchmark server was fully re-hosted. |
-| CEGAR no-collision fields are conservative-audit evidence | Strength: the audit avoids rejecting omissions without observed label-changing collisions. Boundary: no-collision means not exercised as label-changing here, not globally irrelevant. |
+| CEGAR no-collision fields are conservative-audit evidence | Stage 6 targeted stress now exercises every future-relevant field; ordinary no-collision means not exercised as label-changing there, not globally irrelevant. |
 | Projection and CEGAR are deterministic local audits | They are replayable, but not a substitute for external human evaluation. |
 | Figures | Fixed; review which generated figures enter the paper. |
 | Claim registry | Lite fixed; expand only if the manuscript adds more numeric claims. |

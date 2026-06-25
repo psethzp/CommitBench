@@ -6,16 +6,47 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
 
-def _parse_sample(values: list[str]) -> dict[str, int]:
-    result: dict[str, int] = {}
+def _parse_sample(values: list[str]) -> dict[str, int | None]:
+    result: dict[str, int | None] = {}
     for value in values:
         key, count = value.split("=", 1)
-        result[key] = int(count)
+        result[key] = None if count == "all" else int(count)
     return result
+
+
+def _subset(certs: pd.DataFrame, selector: str) -> pd.DataFrame:
+    verdict = certs["verdict"].astype(str)
+    if "strict_excess" in selector:
+        return certs[verdict.eq("strict_excess")]
+    if "incomparable" in selector:
+        reason = certs.get("incomparability_reason")
+        if reason is None:
+            return certs[verdict.str.contains("incomparable", regex=False)]
+        return certs[verdict.str.contains("incomparable", regex=False) | reason.astype(str).ne("")]
+    if "necessary_high" in selector:
+        reason = certs.get("necessary_high_reason")
+        if reason is None:
+            return certs.head(0)
+        return certs[reason.astype(str).ne("")]
+    if "minimal" in selector:
+        return certs[verdict.str.startswith("minimal")]
+    return certs[verdict.str.contains(selector, regex=False)]
+
+
+def _select_records(certs: pd.DataFrame, sample: dict[str, int | None]) -> list[dict[str, Any]]:
+    selected: dict[str, dict[str, Any]] = {}
+    for selector, count in sample.items():
+        subset = _subset(certs, selector)
+        if count is not None:
+            subset = subset.head(count)
+        for record in subset.to_dict("records"):
+            selected.setdefault(str(record["trace_id"]), record)
+    return list(selected.values())
 
 
 def main() -> int:
@@ -32,11 +63,7 @@ def main() -> int:
     certs = pd.read_parquet(args.certificates)
     traces = pd.read_parquet(args.traces).set_index("trace_id", drop=False)
     sample = _parse_sample(args.sample)
-    selected = []
-    for verdict, count in sample.items():
-        key = "strict_excess" if "strict_excess" in verdict else "minimal"
-        subset = certs[certs["verdict"].str.contains(key, regex=False)].head(count)
-        selected.extend(subset.to_dict("records"))
+    selected = _select_records(certs, sample)
 
     index_rows = []
     for record in selected:
