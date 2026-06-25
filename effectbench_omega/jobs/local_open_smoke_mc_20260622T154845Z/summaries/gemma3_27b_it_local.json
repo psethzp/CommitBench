@@ -1,12 +1,3 @@
-{
-  "api_log_count": 12,
-  "certificate_count": 12,
-  "failure_count": 0,
-  "minimal_count": 12,
-  "model": "gemma3_27b_it_local",
-  "out_dir": "effectbench_omega/outputs/smoke_mc_gemma3_27b_it_local",
-  "strict_excess_count": 0,
-  "trace_count": 12,
-  "unresolved_abstraction_warnings": 0,
-  "verifier_p95_latency_ms": 1.0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6eb8bf03ba73cde537f86b494217645867a938100bfda59d57be6b06e18fad31
+size 325

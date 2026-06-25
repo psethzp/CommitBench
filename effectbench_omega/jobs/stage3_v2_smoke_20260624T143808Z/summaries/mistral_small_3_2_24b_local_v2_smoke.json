@@ -1,14 +1,3 @@
-{
-  "api_log_count": 14,
-  "certificate_count": 14,
-  "failure_count": 0,
-  "minimal_count": 14,
-  "model": "mistral_small_3_2_24b_local",
-  "out_dir": "effectbench_omega/outputs/stage3_v2_smoke_mistral_small_3_2_24b_local",
-  "parse_status_counts": {
-    "json": 14
-  },
-  "repair_nonempty_rows": 0,
-  "strict_excess_count": 0,
-  "trace_count": 14
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3b6cbb92bc32f6c2a97c0a77af3ae36c5e98a238f881f7586489c21249d5bafa
+size 350

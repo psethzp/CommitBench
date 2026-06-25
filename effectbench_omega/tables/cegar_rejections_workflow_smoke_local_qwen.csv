@@ -1,0 +1,8 @@
+omitted_field,rejected_abstractions,reason
+outbox,3,future_relevant_field
+policy_obligation,3,future_relevant_field
+contract_artifact_hash,3,future_relevant_field
+virtual_clock,3,future_relevant_field
+memory_cache,3,future_relevant_field
+user_visible_exposure,3,future_relevant_field
+compensation_or_payment_hold,3,future_relevant_field

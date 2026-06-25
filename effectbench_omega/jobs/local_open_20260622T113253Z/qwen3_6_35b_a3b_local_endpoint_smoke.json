@@ -1,7 +1,3 @@
-{
-  "content": "Here's a thinking process:\n\n1",
-  "latency_s": 0.839,
-  "model": "qwen3_6_35b_a3b_local",
-  "response_id": "chatcmpl-8c27c976103cfd42",
-  "status": "ok"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:89c71313a873e6dc23cbf99247c02e1afb24432b577faf61d814be3d2efdb809
+size 172

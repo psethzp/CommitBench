@@ -1,12 +1,3 @@
-{
-  "api_log_count": 12,
-  "certificate_count": 12,
-  "failure_count": 0,
-  "minimal_count": 8,
-  "model": "llama3_3_70b_awq_local",
-  "out_dir": "effectbench_omega/outputs/smoke_mc_llama3_3_70b_awq_local",
-  "strict_excess_count": 4,
-  "trace_count": 12,
-  "unresolved_abstraction_warnings": 0,
-  "verifier_p95_latency_ms": 1.0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:47cf77cc5a0adf04caa9688717979bca0ab7e69cec0050ad382855016c117693
+size 330

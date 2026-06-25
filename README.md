@@ -10,7 +10,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 
 ## Current Status
 
-- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit, Stage 2 corrected-guard implementation, Stage 3 V2 live smokes/Qwen sensitivity, canonical-verifier hardening, and Stage 4 full corrected-guard local run are complete.
+- Active V2 rescue branch: **`eacl-rescue-v2`**. EACL rescue Stages 0-11 are complete locally: canonical labels, corrected guards, native-fidelity validation, full replay, targeted CEGAR stress, lattice-policy freeze, final claim registry, final reproducibility gate, paper-ready summary, and LFS artifact tracking setup.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -41,6 +41,11 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - EACL rescue V2 Stage 4: **complete**. The guard-only queue ran `PROJ_GUARD_V2` and `EFFECTGUARD_V2` with `SLICE_LIMIT=3584` per model, TP=4 on GPUs `0,1,2,3`, model order Mistral, Qwen, Llama, Gemma. All four slices finished with 14,336 V2 guard traces, 0 failures, and local cost $0. Combined canonical scoring with frozen `BASE` produced 21,504 trajectories, canonical gate pass, 4,611 canonical strict-excess labels, 1,010 spurious legacy witnesses, 0 unexplained mismatches, and replay 160/160 pass.
 - EACL rescue V2 Stage 5: **complete**. Native-fidelity subset implementation is complete and the live local queue `local_open_native_subset_v1_20260625T085816Z` finished all four models with 4,608 traces, 0 runner failures, and local cost $0. Merged canonical scoring in `stage5_canonical_native_subset_v1_20260625T191826Z` passed: 4,217 native successes, 391 native terminal failures, 848 canonical strict-excess labels, 0 unexplained mismatches, 160/160 native replay bundles passed, and no-oracle 100%.
 - EACL rescue V2 Stage 6: **complete**. Full replay checked 11,508 bundles across the controlled, corrected-guard, and native canonical splits with 0 failures; 1,348 native bundles replayed in the native wrappers. Targeted CEGAR stress now produces label-changing collisions for all seven future-relevant fields, including `policy_obligation`, `contract_artifact_hash`, `virtual_clock`, and `compensation_or_payment_hold`.
+- EACL rescue V2 Stage 7: **complete**. Lattice sensitivity is frozen as appendix/diagnostic only; main claims use the fixed declared Pareto lattice.
+- EACL rescue V2 Stage 8: **complete**. Final claim registry has 23 mapped claims at `effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv`.
+- EACL rescue V2 Stage 9: **complete**. Final reproducibility gate passed: no-oracle tests, placeholder scan, claim-registry check, check-only reproducer, cost audit, and full replay checks.
+- EACL rescue V2 Stage 10: **complete**. Paper-ready summary is available at `effectbench_omega/reports/eacl_rescue_paper_ready_summary.md`.
+- EACL rescue V2 Stage 11: **complete locally**. Git LFS is configured for generated traces/logs/bundles/figures and the artifact manifest indexes 13,836 files / 416,877,747 bytes with SHA-256 hashes.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
@@ -54,6 +59,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - Active claims are local/open-weight only. Do not claim Bedrock/frontier leaderboard coverage from this run.
 - V2 rescue work must not overwrite `effectbench_omega/outputs/main_mc_postfix_all_local/`; all new outputs need new split names.
 - Stage 5 native-fidelity subset is a compact native-style validation block over pinned upstream task records, not a full re-host of the upstream benchmark servers. It supports native predicate/state-delta validation; keep the boundary explicit in paper wording.
+- Lattice sensitivity is appendix/diagnostic only. Do not claim robustness across alternate value-governance lattices from the current invariant sensitivity tables.
 
 ## Implemented Features
 
@@ -81,6 +87,11 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Stage 4 merge/scoring path | Complete | `local_open_guard_v2_main_20260624T200115Z` finished all four V2 guard slices; `build_guard_v2_main_split.py` combined frozen `BASE` with V2 guard rows; canonical scoring completed as `stage3_canonical_guard_v2_main_with_base_20260625T082959Z`. |
 | Stage 5 native-fidelity subset | Complete | Native wrappers, manifest, full live queue, merge, canonical scoring, and native replay passed. |
 | Stage 6 full replay and CEGAR stress | Complete | 11,508 full replay bundles passed; targeted CEGAR stress exercises all seven future-relevant fields. |
+| Stage 7 lattice policy freeze | Complete | Main claims use the fixed declared Pareto lattice; lattice sensitivity is appendix/diagnostic only. |
+| Stage 8 final claim registry | Complete | 23 final claim rows map numbers to source artifacts and allowed paper posture. |
+| Stage 9 final reproducibility gate | Complete | No-oracle, replay, cost, placeholder, registry, and check-only gates passed. |
+| Stage 10 paper-ready summary | Complete | `effectbench_omega/reports/eacl_rescue_paper_ready_summary.md`. |
+| Stage 11 artifact tracking | Complete locally | Git LFS configured; artifact manifest indexes generated experiment artifacts. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
@@ -139,6 +150,13 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - V2 Stage 6 summary report: `effectbench_omega/reports/stage6_full_replay_cegar.md`
 - V2 Stage 6 replay summary: `effectbench_omega/tables/stage6_full_replay_summary.csv`
 - V2 Stage 6 targeted CEGAR stress: `effectbench_omega/tables/cegar_rejections_stage6_targeted_stress.csv`
+- V2 Stage 7 lattice policy freeze: `effectbench_omega/reports/stage7_lattice_policy_freeze.md`
+- V2 Stage 8 final claim registry: `effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv`
+- V2 Stage 8 claim audit: `effectbench_omega/reports/stage8_claim_audit.md`
+- V2 Stage 9 final reproducibility gate: `effectbench_omega/reports/final_reproducibility_gate.md`
+- V2 Stage 10 paper-ready summary: `effectbench_omega/reports/eacl_rescue_paper_ready_summary.md`
+- V2 Stage 11 artifact manifest: `effectbench_omega/tables/artifact_manifest.csv`
+- V2 Stage 11 artifact manifest summary: `effectbench_omega/reports/artifact_manifest.md`
 - Qwen repair rows manifest: `effectbench_omega/manifests/qwen_repair_rows.csv`
 - Qwen repair sensitivity report: `effectbench_omega/reports/qwen_repair_sensitivity.md`
 - Qwen repair sensitivity table: `effectbench_omega/tables/qwen_repair_sensitivity.csv`

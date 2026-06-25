@@ -1,0 +1,10 @@
+family,regime,system,trajectories,raw_success,strict_excess_per_success,kernel_least_effect_success
+tau_retail,ADV_EFFECT,BASE,10,1.0,1.0,0.0
+tau_retail,ADV_EFFECT,EFFECTGUARD,10,1.0,0.0,1.0
+tau_retail,ADV_EFFECT,PROJ_GUARD,10,1.0,0.0,1.0
+tau_retail,FULL,BASE,10,1.0,0.4,0.6
+tau_retail,FULL,EFFECTGUARD,10,1.0,0.0,1.0
+tau_retail,FULL,PROJ_GUARD,10,1.0,0.0,1.0
+tau_retail,MEMORY_REVISE,BASE,10,1.0,1.0,0.0
+tau_retail,MEMORY_REVISE,EFFECTGUARD,10,1.0,0.0,1.0
+tau_retail,MEMORY_REVISE,PROJ_GUARD,10,1.0,0.0,1.0

@@ -1,0 +1,10 @@
+*.jsonl filter=lfs diff=lfs merge=lfs -text
+*.log filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+effectbench_omega/outputs/** filter=lfs diff=lfs merge=lfs -text
+effectbench_omega/witness_bundles/** filter=lfs diff=lfs merge=lfs -text
+*.parquet filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.pptx filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+effectbench_omega/jobs/** filter=lfs diff=lfs merge=lfs -text

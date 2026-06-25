@@ -1,7 +1,3 @@
-{
-  "content": "LOW",
-  "latency_s": 1.839,
-  "model": "mistral_small_3_2_24b_local",
-  "response_id": "chatcmpl-9dafacb5e552e10e",
-  "status": "ok"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3337b1fb1d1a482daba71bc2bc31944277f42d55368b40c255438b3d84122132
+size 150

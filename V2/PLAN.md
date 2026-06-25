@@ -381,6 +381,31 @@ Option B: remove lattice sensitivity from the main paper and state that the prim
 
 Recommended under time pressure: **Option B** for main paper, with a small appendix diagnostic only if needed.
 
+Current outcome: **Option B is frozen.** Main claims use the fixed declared
+Pareto lattice. The existing lattice sensitivity tables remain appendix or
+diagnostic artifacts only because they preserve the headline sign but do not
+exercise meaningful dominance/incomparability changes.
+
+Artifact:
+
+```text
+effectbench_omega/reports/stage7_lattice_policy_freeze.md
+```
+
+### R8. Final Claim And Artifact Freeze
+
+Current outcome: complete locally.
+
+- Final claim registry: `effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv`
+- Final reproducibility gate: `effectbench_omega/reports/final_reproducibility_gate.md`
+- Paper-ready summary: `effectbench_omega/reports/eacl_rescue_paper_ready_summary.md`
+- Artifact manifest: `effectbench_omega/tables/artifact_manifest.csv`
+- Artifact manifest summary: `effectbench_omega/reports/artifact_manifest.md`
+
+Git LFS is configured for generated traces, response logs, job logs, figures,
+presentation/PDF binaries, zip files, and witness bundles. Local model caches,
+upstream clones, virtualenvs, and `.env` files remain excluded.
+
 ## Final EACL Paper Structure
 
 Main paper should be 8 pages, not 18.

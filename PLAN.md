@@ -94,6 +94,25 @@ unexplained mismatches: 0
 canonical gate: pass
 ```
 
+## Final EACL rescue freeze after Stages 7-11
+
+The final local-only rescue package is frozen for writing.
+
+```text
+lattice policy: fixed declared Pareto lattice for main claims
+lattice sensitivity: appendix/diagnostic only
+final claim registry: effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv
+paper-ready summary: effectbench_omega/reports/eacl_rescue_paper_ready_summary.md
+final reproducibility gate: effectbench_omega/reports/final_reproducibility_gate.md
+artifact manifest: effectbench_omega/tables/artifact_manifest.csv
+artifact count: 13,836 files / 416,877,747 bytes indexed
+artifact tracking: Git LFS for generated traces/logs/bundles/figures/binary docs
+```
+
+Do not reopen Bedrock/frontier, human-eval, or alternate-lattice robustness
+claims unless new experiments are explicitly launched and logged as a new
+post-freeze stage.
+
 ## Best plan
 
 **Do not chase GPT/Claude/DeepSeek frontier comparisons.** With no Bedrock, the strongest acceptable story is:

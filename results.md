@@ -25,6 +25,12 @@ V2 Stage 6 full replay and targeted CEGAR stress is complete: 11,508 replay
 bundles passed with 0 failures, and targeted stress rows now exercise all
 future-relevant CEGAR fields.
 
+V2 Stages 7-11 are complete locally. The lattice policy is frozen to the fixed
+declared Pareto lattice for main claims, the final claim registry maps 23 claims
+to source artifacts, the final reproducibility gate passed, the paper-ready
+summary is written, and the generated artifact manifest indexes 13,836 files
+with SHA-256 hashes.
+
 ## V2 Rescue Stage 0
 
 Stage 0 preflight completed on branch `eacl-rescue-v2` on 2026-06-24 UTC.
@@ -670,6 +676,98 @@ strict-excess bundles. The targeted CEGAR rows fix the earlier caveat around
 quiet fields: fields with no ordinary-scaffold collisions were not irrelevant,
 just not exercised as label-changing there.
 
+## V2 Rescue Stage 7 Lattice Policy Freeze
+
+Stage 7 completed on 2026-06-25 UTC.
+
+Decision: main claims use the fixed declared Pareto lattice. Current lattice
+sensitivity tables preserve the headline sign but report exactly invariant
+strict-excess rates across configured variants, so they are appendix/diagnostic
+only rather than main-paper robustness evidence.
+
+| Split | Variants | Unique strict-excess rates | Paper treatment |
+|---|---:|---:|---|
+| `main_mc_postfix_all_local_canonical` | 6 | 1 | Appendix/diagnostic only |
+| `guard_v2_main_with_base_all_local_canonical` | 6 | 1 | Appendix/diagnostic only |
+| `native_subset_v1_all_local_canonical` | 6 | 1 | Appendix/diagnostic only |
+
+Artifact: `effectbench_omega/reports/stage7_lattice_policy_freeze.md`.
+
+## V2 Rescue Stage 8 Claim Audit
+
+Stage 8 completed on 2026-06-25 UTC.
+
+| Metric | Value |
+|---|---:|
+| Final claim registry rows | 23 |
+| Main allowed claims | 11 |
+| Validation claims | 5 |
+| Audit/caveat/reproducibility rows | 6 |
+| Archived-only rows | 1 |
+
+Rules enforced: canonical enumerated-frontier labels only for strict-excess
+claims; legacy generated-trace labels archived only; no Bedrock/frontier
+leaderboard claims; native subset reported separately; lattice sensitivity
+appendix/diagnostic only.
+
+Artifacts:
+
+| Artifact | Path |
+|---|---|
+| Final claim registry | `effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv` |
+| Claim audit report | `effectbench_omega/reports/stage8_claim_audit.md` |
+
+## V2 Rescue Stage 9 Final Reproducibility Gate
+
+Stage 9 completed on 2026-06-25 UTC.
+
+| Gate | Result | Detail |
+|---|---:|---|
+| Finalization script compile | Pass | `py_compile effectbench_omega/scripts/finalize_eacl_rescue.py` |
+| No-oracle tests | Pass | `9 passed, 1 warning` |
+| Final claim registry check | Pass | 23 rows |
+| Placeholder scan | Pass | PASS |
+| Check-only reproducer | Pass | Missing required files: none; local endpoint stopped as expected |
+| Cost audit | Pass | 47,616 local request rows, `$0`, 0 unpriced Bedrock rows |
+| Main controlled replay | Pass | 4,819 bundles, 0 failures |
+| Corrected-guard replay | Pass | 5,341 bundles, 0 failures |
+| Native replay | Pass | 1,348 bundles, 1,348 native replays, 0 failures |
+
+Artifact: `effectbench_omega/reports/final_reproducibility_gate.md`.
+
+## V2 Rescue Stage 10 Paper-Ready Summary
+
+Stage 10 completed on 2026-06-25 UTC.
+
+Paper posture: EffectBench-Omega is a local/open-weight, certificate-semantics
+paper. The central claim is that final-state success overstates certified
+least-effect success and that enumerated Effect Kernel certificates make this
+auditable. The paper should not be framed as a frontier-model leaderboard.
+
+Artifact: `effectbench_omega/reports/eacl_rescue_paper_ready_summary.md`.
+
+## V2 Rescue Stage 11 Artifact Tracking
+
+Stage 11 completed locally on 2026-06-25 UTC.
+
+Git LFS is configured for generated traces, JSONL response logs, job logs,
+figures, PDFs/decks, zip files, and witness bundles. The artifact manifest
+indexes generated experiment artifacts while excluding `.env`, local model
+caches, upstream clones, and virtualenvs.
+
+| Metric | Value |
+|---|---:|
+| Artifact files indexed | 13,836 |
+| Artifact bytes indexed | 416,877,747 |
+| LFS patterns configured | `*.parquet`, `*.jsonl`, `*.log`, `*.png`, `*.pdf`, `*.pptx`, `*.zip`, `effectbench_omega/outputs/**`, `effectbench_omega/jobs/**`, `effectbench_omega/witness_bundles/**` |
+
+Artifacts:
+
+| Artifact | Path |
+|---|---|
+| Artifact manifest | `effectbench_omega/tables/artifact_manifest.csv` |
+| Artifact summary | `effectbench_omega/reports/artifact_manifest.md` |
+
 ## Result Caveats
 
 | Caveat | Consequence |
@@ -682,8 +780,9 @@ just not exercised as label-changing there.
 | Stage 5 native wrappers are compact native-style transitions | Use as native-fidelity validation, not as a claim that every upstream benchmark server was fully re-hosted. |
 | CEGAR no-collision fields are conservative-audit evidence | Stage 6 targeted stress now exercises every future-relevant field; ordinary no-collision means not exercised as label-changing there, not globally irrelevant. |
 | Projection and CEGAR are deterministic local audits | They are replayable, but not a substitute for external human evaluation. |
-| Figures | Fixed; review which generated figures enter the paper. |
-| Claim registry | Lite fixed; expand only if the manuscript adds more numeric claims. |
+| Lattice sensitivity | Appendix/diagnostic only; do not claim main robustness across alternate lattices. |
+| Figures | Fixed; generated figures are available, but paper should select only canonical and native validation figures. |
+| Claim registry | Final local registry has 23 mapped claims; expand only if the manuscript adds more numeric claims. |
 
 ## Defensible Claim From Current Results
 

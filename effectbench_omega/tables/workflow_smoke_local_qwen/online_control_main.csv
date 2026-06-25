@@ -1,0 +1,4 @@
+system,trajectories,raw_success,strict_excess_rate,kernel_success
+BASE,1,1.0,1.0,0.0
+EFFECTGUARD,1,1.0,0.0,1.0
+PROJ_GUARD,1,1.0,0.0,1.0

@@ -1,3 +1,3 @@
-timestamp	model	status	detail
-2026-06-22T11:26:25Z	queue	started	ordered run: mistral_small_3_2_24b_local qwen3_6_35b_a3b_local llama3_3_70b_awq_local gemma3_27b_it_local
-2026-06-22T11:26:30Z	mistral_small_3_2_24b_local	launching	starting vLLM with TP=4 on GPUs 0,1,2,3; log effectbench_omega/jobs/local_open_20260622T112621Z/logs/mistral_small_3_2_24b_local_vllm.log
+version https://git-lfs.github.com/spec/v1
+oid sha256:6fea054339426913981b14fabdefb37930529563a269419bbdcedb6a73efb954
+size 368

@@ -1,12 +1,3 @@
-{
-  "api_log_count": 5376,
-  "certificate_count": 5376,
-  "failure_count": 0,
-  "minimal_count": 4472,
-  "model": "gemma3_27b_it_local",
-  "out_dir": "effectbench_omega/outputs/main_gemma3_27b_it_local",
-  "strict_excess_count": 904,
-  "trace_count": 5376,
-  "unresolved_abstraction_warnings": 0,
-  "verifier_p95_latency_ms": 1.0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5d7874b463c839f53f5925b06bd516a2d74bdcb23f7ca840f28c834f12855e3e
+size 331

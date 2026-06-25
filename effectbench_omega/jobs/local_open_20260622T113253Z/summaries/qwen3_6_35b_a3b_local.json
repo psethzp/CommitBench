@@ -1,12 +1,3 @@
-{
-  "api_log_count": 5376,
-  "certificate_count": 5376,
-  "failure_count": 0,
-  "minimal_count": 4472,
-  "model": "qwen3_6_35b_a3b_local",
-  "out_dir": "effectbench_omega/outputs/main_qwen3_6_35b_a3b_local",
-  "strict_excess_count": 904,
-  "trace_count": 5376,
-  "unresolved_abstraction_warnings": 0,
-  "verifier_p95_latency_ms": 1.0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3f3c0a88f4bd864a8ad473e58af118cac1491024c8759f20d63843f408145e3f
+size 335

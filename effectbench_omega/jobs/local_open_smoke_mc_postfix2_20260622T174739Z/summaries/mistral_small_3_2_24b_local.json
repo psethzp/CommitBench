@@ -1,12 +1,3 @@
-{
-  "api_log_count": 21,
-  "certificate_count": 21,
-  "failure_count": 0,
-  "minimal_count": 17,
-  "model": "mistral_small_3_2_24b_local",
-  "out_dir": "effectbench_omega/outputs/smoke_mc_postfix2_mistral_small_3_2_24b_local",
-  "strict_excess_count": 4,
-  "trace_count": 21,
-  "unresolved_abstraction_warnings": 0,
-  "verifier_p95_latency_ms": 1.0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:650b309a0fb9295cc98ceae9b07dc90e82108015b121cc9ff25140ac1b11e139
+size 350

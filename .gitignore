@@ -5,18 +5,12 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
-# Large/generated experiment artifacts.
-effectbench_omega/outputs/
-effectbench_omega/tables/
-effectbench_omega/figures/
-effectbench_omega/witness_bundles/
+# Generated experiment artifacts are tracked for reproducibility.
+# Heavy/binary artifacts are routed through Git LFS via .gitattributes.
 effectbench_omega/models/
 effectbench_omega/upstreams/
-effectbench_omega/reports/*.csv
-effectbench_omega/reports/*.jsonl
 *.egg-info/
 
-# Keep reproducibility metadata trackable, but never commit local caches.
-*.log
+# Keep reproducibility metadata trackable, but never commit local secrets.
 .env
 .env.*

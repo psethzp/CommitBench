@@ -16,7 +16,8 @@ Hard boundaries:
   `effectbench_omega/jobs/stage3_hardened_main_mc_postfix_all_local_20260623T220316Z/`.
 - All new experiment outputs must use new split names.
 - Update this runbook, `README.md`, and `results.md` after each stage.
-- Stop after each stage and wait for operator approval before moving on.
+- Operator approved continuing through final Stages 7-11 in one pass after
+  Stage 6.
 
 ## Stage Status
 
@@ -25,12 +26,16 @@ Hard boundaries:
 | 0 | Freeze and preflight | Complete | Approved for Stage 1 |
 | 1 | Enumerated frontier completeness audit | Complete, gate failed | Approved to start Stage 2 repair/implementation |
 | 2 | Corrected guards V2 implementation | Complete | Approved for Stage 3 |
-| 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
+| 3 | V2 smoke and Qwen repair sensitivity | Complete | Approved for Stage 4 |
 | 3.5 | Canonical verifier hardening | Complete | Stage 4 ready |
 | 4 | Full corrected-guard local run | Complete | Approved for Stage 5 |
 | 5 | Native-fidelity subset | Complete | Approved for Stage 6 |
-| 6 | Full replay and targeted CEGAR stress | Complete | Awaiting approval for Stage 7 |
-| 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 review/approval |
+| 6 | Full replay and targeted CEGAR stress | Complete | Approved for Stage 7 |
+| 7 | Lattice policy and paper freeze | Complete | Option B frozen |
+| 8 | Claim registry and paper-number audit | Complete | 23 final claim rows |
+| 9 | Final reproducibility gate | Complete | All local gates passed |
+| 10 | Paper-ready summary | Complete | Writing package ready |
+| 11 | Artifact tracking with Git LFS | Complete locally | LFS configured; final push pending/pushed per git status |
 
 ## Stage 0: Freeze And Preflight
 
@@ -745,6 +750,185 @@ exercise every future-relevant CEGAR field, including fields that were quiet in
 the ordinary scaffold. The correct paper framing is that earlier no-collision
 fields were not exercised there; Stage 6 demonstrates they are relevant under
 targeted counterexamples.
+```
+
+## Stage 7: Lattice Policy And Paper Freeze
+
+Operator approved the recommended path after Stage 6.
+
+Decision:
+
+```text
+Use the fixed declared Pareto lattice for main claims.
+Move lattice sensitivity to appendix/diagnostic only.
+Do not claim robustness across alternate value-governance lattices from the
+current invariant sensitivity tables.
+```
+
+Result:
+
+| Split | Variants | Unique strict-excess rates | Paper treatment |
+|---|---:|---:|---|
+| `main_mc_postfix_all_local_canonical` | 6 | 1 | Appendix/diagnostic only |
+| `guard_v2_main_with_base_all_local_canonical` | 6 | 1 | Appendix/diagnostic only |
+| `native_subset_v1_all_local_canonical` | 6 | 1 | Appendix/diagnostic only |
+
+Artifact:
+
+```text
+effectbench_omega/reports/stage7_lattice_policy_freeze.md
+```
+
+## Stage 8: Claim Registry And Paper-Number Audit
+
+Final claim registry:
+
+```text
+effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv
+```
+
+Result:
+
+| Metric | Value |
+|---|---:|
+| Final registry rows | 23 |
+| Main allowed claims | 11 |
+| Validation claims | 5 |
+| Audit/caveat/reproducibility rows | 6 |
+| Archived-only rows | 1 |
+
+Audit rules:
+
+```text
+canonical enumerated-frontier labels only for strict-excess claims
+legacy generated-trace labels archived only
+no Bedrock/frontier/commercial leaderboard claims
+native subset reported separately
+lattice sensitivity appendix/diagnostic only
+no human-eval claim
+```
+
+Artifacts:
+
+```text
+effectbench_omega/reports/stage8_claim_audit.md
+effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv
+```
+
+## Stage 9: Final Reproducibility Gate
+
+Commands/checks run:
+
+```bash
+.venv/bin/python -m py_compile effectbench_omega/scripts/finalize_eacl_rescue.py
+.venv/bin/python -m pytest -q effectbench_omega/tests/no_oracle
+.venv/bin/python effectbench_omega/effectbench/metrics/claim_registry_check.py \
+  --registry effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv
+.venv/bin/python effectbench_omega/scripts/no_red_placeholders.py \
+  --root . \
+  --out effectbench_omega/reports/no_red_placeholders.md
+.venv/bin/python effectbench_omega/scripts/reproduce.py --check-only
+.venv/bin/python effectbench_omega/effectbench/metrics/cost_audit.py \
+  --logs effectbench_omega/outputs/main_mc_postfix_all_local/api_logs.jsonl \
+         effectbench_omega/outputs/guard_v2_main_with_base_all_local/api_logs.jsonl \
+         effectbench_omega/outputs/native_subset_v1_all_local/api_logs.jsonl \
+  --final \
+  --out effectbench_omega/reports/final_cost_audit.json
+```
+
+Replay checks:
+
+```bash
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/full_replay_main_mc_postfix_all_local_canonical \
+  --out effectbench_omega/reports/certificate_replay_final_main_mc_postfix_all_local_canonical.md \
+  --strict
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/full_replay_guard_v2_main_with_base_all_local_canonical \
+  --out effectbench_omega/reports/certificate_replay_final_guard_v2_main_with_base_all_local_canonical.md \
+  --strict
+
+.venv/bin/python effectbench_omega/effectbench/audit/replay_certificates.py \
+  --bundle-dir effectbench_omega/witness_bundles/full_replay_native_subset_v1_all_local_canonical \
+  --out effectbench_omega/reports/certificate_replay_final_native_subset_v1_all_local_canonical.md \
+  --strict
+```
+
+Results:
+
+| Gate | Result | Detail |
+|---|---:|---|
+| No-oracle tests | Pass | `9 passed, 1 warning` |
+| Claim registry check | Pass | 23 rows |
+| Placeholder scan | Pass | PASS |
+| Check-only reproducer | Pass | Missing required files: none; local endpoint stopped as expected |
+| Cost audit | Pass | 47,616 local request rows, `$0`, 0 unpriced Bedrock rows |
+| Main controlled replay | Pass | 4,819 bundles, 0 failures |
+| Corrected-guard replay | Pass | 5,341 bundles, 0 failures |
+| Native replay | Pass | 1,348 bundles, 1,348 native replays, 0 failures |
+
+Artifact:
+
+```text
+effectbench_omega/reports/final_reproducibility_gate.md
+```
+
+## Stage 10: Paper-Ready Summary
+
+Paper posture:
+
+```text
+EffectBench-Omega is a local/open-weight certificate-semantics paper.
+The central claim is that final-state success overstates certified
+least-effect success and that enumerated Effect Kernel certificates make this
+auditable.
+```
+
+Artifact:
+
+```text
+effectbench_omega/reports/eacl_rescue_paper_ready_summary.md
+```
+
+## Stage 11: Artifact Tracking With Git LFS
+
+Git LFS patterns configured:
+
+```text
+*.parquet
+*.jsonl
+*.log
+*.png
+*.pdf
+*.pptx
+*.zip
+effectbench_omega/outputs/**
+effectbench_omega/jobs/**
+effectbench_omega/witness_bundles/**
+```
+
+Tracked artifact policy:
+
+```text
+Track generated outputs, response logs, job logs, figures, reports, metrics,
+tables, manifests, and witness bundles.
+Keep .env files, local model caches, upstream clones, and virtualenvs out of
+git.
+```
+
+Artifact manifest:
+
+| Metric | Value |
+|---|---:|
+| Files indexed | 13,836 |
+| Bytes indexed | 416,877,747 |
+
+Artifacts:
+
+```text
+effectbench_omega/tables/artifact_manifest.csv
+effectbench_omega/reports/artifact_manifest.md
 ```
 
 Monitor:

@@ -1,7 +1,3 @@
-{
-  "content": "LOW",
-  "latency_s": 0.576,
-  "model": "gemma3_27b_it_local",
-  "response_id": "chatcmpl-a2cd7cd337a9dd31",
-  "status": "ok"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:0d5802df10914d7214b5ef37c0ff585317e0a48bc69f2803a6bbca25be459557
+size 142

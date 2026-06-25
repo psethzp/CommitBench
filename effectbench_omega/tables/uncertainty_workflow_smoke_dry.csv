@@ -1,0 +1,4 @@
+comparison,method,estimate,ci_low,ci_high
+BASE_raw_vs_kernel_local_smoke,paired_bootstrap,0.3333333333333333,0.2833333333333333,0.3833333333333333
+BASE_raw_vs_kernel_local_smoke,task_cluster,0.3333333333333333,0.2833333333333333,0.3833333333333333
+BASE_raw_vs_kernel_local_smoke,hierarchical,0.3333333333333333,0.2833333333333333,0.3833333333333333

@@ -1,12 +1,3 @@
-{
-  "api_log_count": 1152,
-  "certificate_count": 1152,
-  "failure_count": 0,
-  "minimal_count": 842,
-  "model": "llama3_3_70b_awq_local",
-  "out_dir": "effectbench_omega/outputs/native_subset_v1_llama3_3_70b_awq_local",
-  "strict_excess_count": 310,
-  "trace_count": 1152,
-  "unresolved_abstraction_warnings": 0,
-  "verifier_p95_latency_ms": 1.0
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5b4db8f3a79008f1e1e87ae909a17e65a706136dba9e4fe1e59319eaa8134517
+size 348

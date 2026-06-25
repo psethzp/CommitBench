@@ -23,6 +23,19 @@ diagnostic only. Legacy disagreements are logged as spurious_legacy_witness
 CEGAR/audit rows when the enumerated verifier has unexplained_mismatches=0.
 ```
 
+Final EACL rescue freeze:
+
+```text
+Stages 0-11 are complete locally on branch eacl-rescue-v2.
+Use effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv for paper numbers.
+Use effectbench_omega/reports/eacl_rescue_paper_ready_summary.md for paper posture.
+Use effectbench_omega/reports/final_reproducibility_gate.md for final gate status.
+Use effectbench_omega/tables/artifact_manifest.csv for generated artifact hashes.
+Lattice sensitivity is appendix/diagnostic only; main claims use the fixed declared Pareto lattice.
+Do not claim Bedrock/frontier leaderboard coverage, human eval, or alternate-lattice robustness.
+Git LFS tracks generated traces/logs/bundles/figures/binary docs; .env, model caches, upstream clones, and virtualenvs remain excluded.
+```
+
 Default queue behavior is the hardened Step 2b path:
 
 ```text

@@ -1,0 +1,8 @@
+omitted_field,label_changes,example_trace_id
+outbox,1,dcd01aa676f4876a
+policy_obligation,1,dcd01aa676f4876a
+contract_artifact_hash,1,dcd01aa676f4876a
+virtual_clock,1,dcd01aa676f4876a
+memory_cache,1,dcd01aa676f4876a
+user_visible_exposure,1,dcd01aa676f4876a
+compensation_or_payment_hold,1,dcd01aa676f4876a

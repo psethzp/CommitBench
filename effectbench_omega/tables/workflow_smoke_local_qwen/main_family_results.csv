@@ -1,0 +1,4 @@
+family,regime,system,trajectories,raw_success,strict_excess_per_success,kernel_least_effect_success
+tau_retail,FULL,BASE,1,1.0,1.0,0.0
+tau_retail,FULL,EFFECTGUARD,1,1.0,0.0,1.0
+tau_retail,FULL,PROJ_GUARD,1,1.0,0.0,1.0
