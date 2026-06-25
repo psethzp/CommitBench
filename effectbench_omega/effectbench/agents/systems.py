@@ -9,6 +9,7 @@ from typing import Any
 
 from effectbench.effects import ACTION_LIBRARY, action_effect, dumps, max_effect, strict_lt
 from effectbench.guard.no_oracle import assert_no_oracle
+from effectbench.native import execute_native_episode, is_native_row
 from effectbench.regimes import hazard_flags
 
 
@@ -33,6 +34,7 @@ class EpisodeTrace:
     model_proposed_actions: list[str]
     model_proposal_parse_status: str
     model_proposal_repair_log: list[str]
+    native_metadata: dict[str, Any]
 
     def actions_json(self) -> str:
         return json.dumps([asdict(action) for action in self.actions], sort_keys=True)
@@ -66,13 +68,23 @@ def run_system(row: dict[str, Any], model_advice: str | None = None) -> EpisodeT
         raise ValueError(f"unknown system: {system}")
 
     target = str(row["target_id"])
-    effects = [action_effect(name) for name in names]
+    step_effects = [action_effect(name) for name in names]
+    terminal_success = names[-1] in {"commit_low", "commit_contract_low", "commit_high", "external_notify_high"}
+    terminal_equivalence_class = str(row["terminal_equivalence_hash"])
+    native_metadata: dict[str, Any] = {}
+    if is_native_row(row):
+        native_result = execute_native_episode(row, names)
+        step_effects = native_result.step_effects
+        terminal_success = native_result.terminal_success
+        terminal_equivalence_class = native_result.terminal_equivalence_class
+        native_metadata = native_result.to_metadata()
+
     actions = [
         TraceAction(
             step=index + 1,
             action=name,
             target_id=target,
-            effect_vector=dumps(action_effect(name)),
+            effect_vector=dumps(step_effects[index] if index < len(step_effects) else action_effect(name)),
             rationale=_rationale(system, name, row),
         )
         for index, name in enumerate(names)
@@ -80,15 +92,16 @@ def run_system(row: dict[str, Any], model_advice: str | None = None) -> EpisodeT
     guard_decisions = _guard_decisions(system, names, row, proposal)
     return EpisodeTrace(
         actions=actions,
-        terminal_success=names[-1] in {"commit_low", "commit_contract_low", "commit_high", "external_notify_high"},
-        terminal_equivalence_class=str(row["terminal_equivalence_hash"]),
-        effect_vector=max_effect(effects),
+        terminal_success=terminal_success,
+        terminal_equivalence_class=terminal_equivalence_class,
+        effect_vector=max_effect(step_effects),
         guard_decisions=guard_decisions,
         added_user_turns=sum(1 for name in names if name.startswith("ask_")),
         false_denial=False,
         model_proposed_actions=proposal["actions"],
         model_proposal_parse_status=proposal["status"],
         model_proposal_repair_log=proposal["repair_log"],
+        native_metadata=native_metadata,
     )
 
 

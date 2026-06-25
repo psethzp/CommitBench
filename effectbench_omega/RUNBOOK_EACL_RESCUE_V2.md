@@ -1,6 +1,6 @@
 # EffectBench-Omega EACL Rescue V2 Runbook
 
-Last updated: 2026-06-24 UTC
+Last updated: 2026-06-25 UTC
 
 ## Operating Rules
 
@@ -27,8 +27,8 @@ Hard boundaries:
 | 2 | Corrected guards V2 implementation | Complete | Approved for Stage 3 |
 | 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
 | 3.5 | Canonical verifier hardening | Complete | Stage 4 ready |
-| 4 | Full corrected-guard local run | Complete | Awaiting approval for Stage 5 |
-| 5 | Native-fidelity subset | Pending | Requires Stage 4 review/approval |
+| 4 | Full corrected-guard local run | Complete | Approved for Stage 5 |
+| 5 | Native-fidelity subset | In progress | Operator approved via "Proceed to Stage 5" |
 | 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 approval |
 | 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 approval |
 
@@ -436,6 +436,167 @@ bash -n effectbench_omega/scripts/run_local_open_queue.sh
 
 JOB_ID=stage3_canonical_main_mc_postfix_all_local_20260624T162051Z \
 TABLE_SUFFIX=main_mc_postfix_all_local_canonical \
+CANONICAL_CERT_MODE=enumerated \
+  bash effectbench_omega/scripts/run_stage3_offline.sh
+```
+
+## Stage 5: Native-Fidelity Subset
+
+Operator approval received via "Proceed to Stage 5."
+
+Stage 5 target:
+
+```text
+split: native_subset_v1_all_local
+denominator: 48 native tasks x 4 regimes x 2 seeds x 4 models x 3 systems = 4,608 trajectories
+families: tau_retail_native, tau_airline_native, tau2_telecom_native, toolsandbox_contract_native
+regimes: FULL, SHARDED, MEMORY_REVISE, ADV_EFFECT
+systems: BASE, PROJ_GUARD_V2, EFFECTGUARD_V2
+local cost: $0
+```
+
+Implementation completed before live model launch:
+
+```text
+native package: effectbench_omega/effectbench/native/
+manifest builder: effectbench_omega/effectbench/families/build_native_subset_manifest.py
+online hook: native rows replay the selected actions through the native state machine
+trace audit fields: native state hashes, native success reason, native replay status, and state-delta ledger
+certificate replay: native bundles re-execute model traces and enumerated witness candidates in the same wrapper
+```
+
+Native minimum-requirement status:
+
+| Requirement | Status | Artifact |
+|---|---:|---|
+| Pinned upstream records loaded | Pass | `source_native_id`, `source_path`, `source_hash`, `source_commit` in `effectbench_omega/manifests/tasks_native_subset.csv` |
+| Terminal success from native predicate | Pass | `native_success_reason` in Stage 5 traces |
+| Effect ledger from state deltas | Pass | `native_state_delta_ledger` and per-step `tool_ledgers.parquet` |
+| Terminal failures possible/counted | Pass | dry run recorded native failures |
+| Witness replay in same wrapper | Pass | `effectbench_omega/effectbench/audit/replay_certificates.py` replays native traces/candidates |
+
+Commands run:
+
+```bash
+.venv/bin/python -m py_compile \
+  effectbench_omega/effectbench/native/*.py \
+  effectbench_omega/effectbench/families/build_native_subset_manifest.py \
+  effectbench_omega/effectbench/agents/systems.py \
+  effectbench_omega/scripts/run_online.py \
+  effectbench_omega/effectbench/audit/replay_certificates.py
+
+.venv/bin/python effectbench_omega/effectbench/families/build_native_subset_manifest.py \
+  --out effectbench_omega/manifests/tasks_native_subset.csv \
+  --tau-retail 16 \
+  --tau-airline 16 \
+  --telecom 8 \
+  --toolsandbox-contract 8 \
+  --regimes FULL SHARDED MEMORY_REVISE ADV_EFFECT \
+  --seeds 13 47 \
+  --models mistral_small_3_2_24b_local qwen3_6_35b_a3b_local gemma3_27b_it_local llama3_3_70b_awq_local \
+  --systems BASE PROJ_GUARD_V2 EFFECTGUARD_V2
+```
+
+Manifest check:
+
+| Field | Count |
+|---|---:|
+| Total rows | 4,608 |
+| `tau_retail_native` rows | 1,536 |
+| `tau_airline_native` rows | 1,536 |
+| `tau2_telecom_native` rows | 768 |
+| `toolsandbox_contract_native` rows | 768 |
+| Rows with `native_execution=True` | 4,608 |
+
+Dry smokes completed before live model launch:
+
+| Check | Status | Detail |
+|---|---:|---|
+| 48-row balanced native smoke | Pass | 48 traces, 0 runner failures |
+| 48-row verifier | Pass | 36 certificates, 12 strict-excess, 0 warnings |
+| 48-row canonical frontier | Pass | canonical gate true, unexplained mismatches 0 |
+| 48-row native replay | Pass | 15 bundles checked, 15 native replays, 0 failures |
+| Full 4,608-row dry native pass | Pass | 4,608 traces, 0 runner failures |
+| Full dry verifier | Pass | 3,408 certificates, 720 strict-excess, 0 warnings |
+| Full dry canonical frontier | Pass | canonical gate true, 720 canonical strict-excess, unexplained mismatches 0 |
+| Full dry native replay | Pass | 35 bundles checked, 35 native replays, 0 failures |
+
+Full dry native raw-success shape:
+
+| Family | BASE | PROJ_GUARD_V2 | EFFECTGUARD_V2 |
+|---|---:|---:|---:|
+| `tau_retail_native` | 50.0000% | 78.1250% | 100.0000% |
+| `tau_airline_native` | 50.0000% | 75.0000% | 100.0000% |
+| `tau2_telecom_native` | 50.0000% | 75.0000% | 100.0000% |
+| `toolsandbox_contract_native` | 0.0000% | 100.0000% | 100.0000% |
+
+Interpretation:
+
+```text
+The native dry suite exercises real failure paths rather than the old
+all-success scaffold. It is still a compact native-style wrapper over pinned
+upstream task records, not a full upstream server re-host. Paper language
+should call it a native-fidelity subset/validation block, not a replacement for
+the controlled source-backed headline suite.
+```
+
+Live Stage 5 queue command:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+JOB_ID=local_open_native_subset_v1_$(date -u +%Y%m%dT%H%M%SZ) \
+OUTPUT_PREFIX=native_subset_v1 \
+SPLIT_PREFIX=native_subset_v1 \
+REPORT_PREFIX=native_subset_v1 \
+MANIFEST=effectbench_omega/manifests/tasks_native_subset.csv \
+QUEUE_SYSTEMS="BASE PROJ_GUARD_V2 EFFECTGUARD_V2" \
+QUEUE_REGIMES="FULL SHARDED MEMORY_REVISE ADV_EFFECT" \
+SLICE_LIMIT=1152 \
+MODEL_CONTROLS_POLICY=1 \
+MODEL_PROPOSAL_MODE=actions \
+ROW_SELECTION_STRATEGY=first \
+QUEUE_MODELS="mistral_small_3_2_24b_local qwen3_6_35b_a3b_local gemma3_27b_it_local llama3_3_70b_awq_local" \
+QUEUE_MODEL_TP=4 \
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+  bash effectbench_omega/scripts/run_local_open_queue.sh
+```
+
+Live Stage 5 queue status:
+
+```text
+job_id: local_open_native_subset_v1_20260625T085816Z
+latest_symlink: effectbench_omega/jobs/local_open_latest
+launched: 2026-06-25T08:58:16Z
+first_model: mistral_small_3_2_24b_local
+server_ready: 2026-06-25T08:59:34Z
+running_slice: 2026-06-25T08:59:43Z
+current output: effectbench_omega/outputs/native_subset_v1_mistral_small_3_2_24b_local
+stable GPU sample: all four GPUs at 100% utilization, about 42 GB used each
+```
+
+Monitor:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+tail -f effectbench_omega/jobs/local_open_latest/events.tsv
+bash effectbench_omega/scripts/show_local_open_queue_status.sh
+nvidia-smi dmon -s pucm -d 5
+```
+
+After the live queue completes:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+.venv/bin/python effectbench_omega/scripts/merge_local_open_slices.py \
+  --input-prefix effectbench_omega/outputs/native_subset_v1 \
+  --out effectbench_omega/outputs/native_subset_v1_all_local \
+  --expected-rows-per-model 1152
+
+JOB_ID=stage5_canonical_native_subset_v1_$(date -u +%Y%m%dT%H%M%SZ) \
+SPLIT=native_subset_v1_all_local \
+TABLE_SUFFIX=native_subset_v1_all_local_canonical \
+GUARD_TIE_SYSTEMS="PROJ_GUARD_V2 EFFECTGUARD_V2" \
+BOOTSTRAP_SYSTEMS="BASE PROJ_GUARD_V2 EFFECTGUARD_V2" \
 CANONICAL_CERT_MODE=enumerated \
   bash effectbench_omega/scripts/run_stage3_offline.sh
 ```

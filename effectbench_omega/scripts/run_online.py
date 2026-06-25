@@ -454,6 +454,16 @@ def main() -> int:
                 "model_proposed_actions": json.dumps(episode.model_proposed_actions, sort_keys=True),
                 "model_proposal_parse_status": episode.model_proposal_parse_status,
                 "model_proposal_repair_log": json.dumps(episode.model_proposal_repair_log, sort_keys=True),
+                "native_execution": bool(episode.native_metadata),
+                "native_state_before_hash": episode.native_metadata.get("state_before_hash", ""),
+                "native_state_after_hash": episode.native_metadata.get("state_after_hash", ""),
+                "native_success_reason": episode.native_metadata.get("success_reason", ""),
+                "native_replay_status": episode.native_metadata.get("replay_status", ""),
+                "native_failure_possible": bool(episode.native_metadata.get("failure_possible", False)),
+                "native_state_delta_ledger": json.dumps(
+                    episode.native_metadata.get("state_delta_ledger", []),
+                    sort_keys=True,
+                ),
                 "turns": json.dumps(row["turns"], sort_keys=True),
             }
             traces.append(trace_row)
@@ -466,6 +476,9 @@ def main() -> int:
                     "guard_decisions": episode.guard_json(),
                     "model_proposed_actions": episode.model_proposed_actions,
                     "model_proposal_parse_status": episode.model_proposal_parse_status,
+                    "native_execution": bool(episode.native_metadata),
+                    "native_replay_status": episode.native_metadata.get("replay_status", ""),
+                    "native_success_reason": episode.native_metadata.get("success_reason", ""),
                 }
             )
             for action in episode.actions:
