@@ -609,6 +609,7 @@ Live queue status at launch:
 | GPUs | `CUDA_VISIBLE_DEVICES=0,1,2,3` |
 | First stable event | Mistral `running_slice` at 2026-06-25T08:59:43Z |
 | GPU sample after launch | all four GPUs at 100% utilization, ~42 GB used each |
+| Current live progress | Mistral, Qwen, and Gemma complete with 0 failures; Llama running since 2026-06-25T10:16:22Z |
 
 Stage 5 interpretation so far: the native dry suite fixes the old
 all-success-scaffold caveat for this validation block. It is a compact

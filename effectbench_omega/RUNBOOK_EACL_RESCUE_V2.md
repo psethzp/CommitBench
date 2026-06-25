@@ -574,6 +574,23 @@ current output: effectbench_omega/outputs/native_subset_v1_mistral_small_3_2_24b
 stable GPU sample: all four GPUs at 100% utilization, about 42 GB used each
 ```
 
+Live Stage 5 progress snapshot:
+
+| Model | Status | Trace count | Failures | Legacy strict-excess | Legacy minimal | Notes |
+|---|---:|---:|---:|---:|---:|---|
+| `mistral_small_3_2_24b_local` | Complete | 1,152 | 0 | 273 | 879 | completed 2026-06-25T09:32:01Z |
+| `qwen3_6_35b_a3b_local` | Complete | 1,152 | 0 | 22 | 800 | completed 2026-06-25T09:41:07Z; native terminal failures reduce successful certificates to 822 |
+| `gemma3_27b_it_local` | Complete | 1,152 | 0 | 243 | 848 | completed 2026-06-25T10:14:38Z; native terminal failures reduce successful certificates to 1,091 |
+| `llama3_3_70b_awq_local` | Running | pending | pending | pending | pending | running slice since 2026-06-25T10:16:22Z |
+
+Current interpretation:
+
+```text
+Stage 4 is finished and closed. Stage 5 is active, with three of four native
+model slices complete and the final Llama slice running under TP=4 on all four
+GPUs. Do not merge or canonically score Stage 5 until Llama finishes.
+```
+
 Monitor:
 
 ```bash
