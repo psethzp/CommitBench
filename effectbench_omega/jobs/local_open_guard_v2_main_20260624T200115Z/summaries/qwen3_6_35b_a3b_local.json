@@ -1,0 +1,12 @@
+{
+  "api_log_count": 3584,
+  "certificate_count": 3584,
+  "failure_count": 0,
+  "minimal_count": 3128,
+  "model": "qwen3_6_35b_a3b_local",
+  "out_dir": "effectbench_omega/outputs/guard_v2_main_qwen3_6_35b_a3b_local",
+  "strict_excess_count": 456,
+  "trace_count": 3584,
+  "unresolved_abstraction_warnings": 0,
+  "verifier_p95_latency_ms": 1.0
+}

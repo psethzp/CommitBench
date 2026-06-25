@@ -1,6 +1,6 @@
 # EffectBench-Omega Local Results
 
-Last updated: 2026-06-24 UTC
+Last updated: 2026-06-25 UTC
 
 ## Executive Summary
 
@@ -226,6 +226,85 @@ view.
 | Canonical uncertainty table | `effectbench_omega/tables/uncertainty_main_mc_postfix_all_local_canonical.csv` |
 | Canonical aggregate tables | `effectbench_omega/tables/main_mc_postfix_all_local_canonical/` |
 | Canonical claim registry | `effectbench_omega/metrics/claim_registry_main_mc_postfix_all_local_canonical.csv` |
+
+## V2 Rescue Stage 4
+
+Stage 4 full corrected-guard local run completed on branch `eacl-rescue-v2` on
+2026-06-25 UTC.
+
+Stage 4 ran only the corrected V2 guard systems online:
+
+```text
+128 tasks x 7 regimes x 2 seeds x 4 local models x 2 V2 systems = 14,336 trajectories
+```
+
+The frozen `BASE` split was reused for canonical comparison, yielding:
+
+```text
+128 tasks x 7 regimes x 2 seeds x 4 local models x 3 systems = 21,504 trajectories
+```
+
+Per-model V2 guard queue:
+
+| Model | Slice start | Slice complete | Traces | Failures | Legacy strict excess | Legacy minimal |
+|---|---|---|---:|---:|---:|---:|
+| `mistral_small_3_2_24b_local` | 2026-06-24T20:02:41Z | 2026-06-24T21:37:49Z | 3,584 | 0 | 61 | 3,523 |
+| `qwen3_6_35b_a3b_local` | 2026-06-24T21:39:53Z | 2026-06-24T22:03:56Z | 3,584 | 0 | 456 | 3,128 |
+| `llama3_3_70b_awq_local` | 2026-06-24T22:05:39Z | 2026-06-25T06:14:03Z | 3,584 | 0 | 6 | 3,578 |
+| `gemma3_27b_it_local` | 2026-06-25T06:16:27Z | 2026-06-25T07:56:59Z | 3,584 | 0 | 2 | 3,582 |
+
+Stage 4 merge/combine:
+
+| Output | Rows |
+|---|---:|
+| V2 guard merged traces | 14,336 |
+| V2 guard API logs | 14,336 |
+| V2 guard failure lines | 0 |
+| Frozen BASE traces reused | 7,168 |
+| Combined BASE + V2 traces | 21,504 |
+| Combined systems | `BASE`, `PROJ_GUARD_V2`, `EFFECTGUARD_V2` |
+
+Stage 4 canonical verifier:
+
+| Metric | Value |
+|---|---:|
+| Canonical gate | Pass |
+| Successful traces scored | 21,504 |
+| Groups | 7,168 |
+| Enumerated candidates | 1,205,248 |
+| Frontier candidates | 7,168 |
+| Legacy strict-excess labels | 5,621 |
+| Canonical strict-excess labels | 4,611 |
+| Spurious legacy witnesses | 1,010 |
+| Enumerated new strict labels | 0 |
+| Unexplained mismatches | 0 |
+| Replay bundles checked | 160 |
+| Replay failures | 0 |
+| Local/API cost | $0 |
+
+Canonical Stage 4 online-control table:
+
+| System | Trajectories | Raw success | Canonical strict excess | Canonical kernel success |
+|---|---:|---:|---:|---:|
+| `BASE` | 7,168 | 100.0000% | 57.0033% | 42.9967% |
+| `PROJ_GUARD_V2` | 7,168 | 100.0000% | 7.3242% | 92.6758% |
+| `EFFECTGUARD_V2` | 7,168 | 100.0000% | 0.0000% | 100.0000% |
+
+Stage 4 interpretation: the corrected V2 comparison fixes the earlier
+`PROJ_GUARD`/`EFFECTGUARD` near-tie. `PROJ_GUARD_V2` is now a projection-only
+baseline with nonzero canonical residual strict-excess; `EFFECTGUARD_V2`
+removes canonical strict-excess in this controlled local scaffold while
+retaining raw success.
+
+| Artifact | Path |
+|---|---|
+| Stage 4 queue job | `effectbench_omega/jobs/local_open_guard_v2_main_20260624T200115Z/` |
+| V2 guard merged output | `effectbench_omega/outputs/guard_v2_main_all_local/` |
+| Combined BASE+V2 output | `effectbench_omega/outputs/guard_v2_main_with_base_all_local/` |
+| Stage 4 canonical job | `effectbench_omega/jobs/stage3_canonical_guard_v2_main_with_base_20260625T082959Z/` |
+| Stage 4 canonical certificates | `effectbench_omega/outputs/guard_v2_main_with_base_all_local/kernel_canonical/certificates_enumerated.parquet` |
+| Stage 4 canonical tables | `effectbench_omega/tables/guard_v2_main_with_base_all_local_canonical/` |
+| Stage 4 claim registry | `effectbench_omega/metrics/claim_registry_guard_v2_main_with_base_all_local_canonical.csv` |
 
 ## Run Artifacts
 

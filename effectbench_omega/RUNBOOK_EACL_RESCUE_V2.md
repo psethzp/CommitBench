@@ -27,8 +27,8 @@ Hard boundaries:
 | 2 | Corrected guards V2 implementation | Complete | Approved for Stage 3 |
 | 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
 | 3.5 | Canonical verifier hardening | Complete | Stage 4 ready |
-| 4 | Full corrected-guard local run | Ready, not launched | Requires operator approval |
-| 5 | Native-fidelity subset | Pending | Requires Stage 4 approval |
+| 4 | Full corrected-guard local run | Complete | Awaiting approval for Stage 5 |
+| 5 | Native-fidelity subset | Pending | Requires Stage 4 review/approval |
 | 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 approval |
 | 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 approval |
 
@@ -488,13 +488,85 @@ mismatches, not agreement with the legacy verifier.
 
 ## Stage 4 Ready Commands
 
-Do not launch until operator approval.
+Operator approval received via "Ok, so now launch Stage 4 and lemme know how
+to monitor, once stable."
+
+Live job:
+
+```text
+job_id: local_open_guard_v2_main_20260624T200115Z
+latest_symlink: effectbench_omega/jobs/local_open_latest
+current_model: mistral_small_3_2_24b_local
+current_status: running_slice
+current_detail: writing 3584 trajectories to effectbench_omega/outputs/guard_v2_main_mistral_small_3_2_24b_local
+```
+
+Stable-start check:
+
+```text
+Mistral reached server_ready at 2026-06-24T20:02:32Z.
+The Stage 4 slice started at 2026-06-24T20:02:41Z.
+TP=4 on CUDA_VISIBLE_DEVICES=0,1,2,3.
+GPU sample after slice start showed 100% utilization on all four GPUs.
+```
+
+Final Stage 4 queue result:
+
+| Model | Trace count | Failures | Legacy strict-excess | Legacy minimal | Notes |
+|---|---:|---:|---:|---:|---|
+| `mistral_small_3_2_24b_local` | 3,584 | 0 | 61 | 3,523 | completed 2026-06-24T21:37:49Z |
+| `qwen3_6_35b_a3b_local` | 3,584 | 0 | 456 | 3,128 | completed 2026-06-24T22:03:56Z |
+| `llama3_3_70b_awq_local` | 3,584 | 0 | 6 | 3,578 | completed 2026-06-25T06:14:03Z |
+| `gemma3_27b_it_local` | 3,584 | 0 | 2 | 3,582 | completed 2026-06-25T07:56:59Z |
+
+Stage 4 merge/combine:
+
+```text
+V2 guard merged output: effectbench_omega/outputs/guard_v2_main_all_local/
+V2 guard traces: 14,336
+V2 failure lines: 0
+Combined BASE+V2 output: effectbench_omega/outputs/guard_v2_main_with_base_all_local/
+Combined traces: 21,504
+Combined systems: BASE, PROJ_GUARD_V2, EFFECTGUARD_V2
+```
+
+Stage 4 canonical scoring:
+
+```text
+job_id: stage3_canonical_guard_v2_main_with_base_20260625T082959Z
+canonical certificates: effectbench_omega/outputs/guard_v2_main_with_base_all_local/kernel_canonical/certificates_enumerated.parquet
+canonical gate: pass
+enumerated strict-excess labels: 4,611
+legacy strict-excess labels: 5,621
+spurious legacy witnesses: 1,010
+unexplained mismatches: 0
+replay bundles checked: 160
+replay failures: 0
+local cost: $0
+```
+
+Canonical online-control result:
+
+| System | Trajectories | Raw success | Canonical strict excess | Canonical kernel success |
+|---|---:|---:|---:|---:|
+| `BASE` | 7,168 | 100.0000% | 57.0033% | 42.9967% |
+| `PROJ_GUARD_V2` | 7,168 | 100.0000% | 7.3242% | 92.6758% |
+| `EFFECTGUARD_V2` | 7,168 | 100.0000% | 0.0000% | 100.0000% |
+
+Interpretation:
+
+```text
+Stage 4 fixed the old PROJ_GUARD/EFFECTGUARD near-tie for the corrected V2
+comparison. PROJ_GUARD_V2 remains a projection-only baseline with nonzero
+canonical residual strict-excess, while EFFECTGUARD_V2 reaches zero canonical
+strict-excess in this controlled local scaffold without raw-success loss.
+```
 
 Run the full V2 guard-only queue:
 
 ```bash
 cd /home/ubuntu/nachiket/CommitBench
-JOB_ID=local_open_guard_v2_main_$(date -u +%Y%m%dT%H%M%SZ) \
+JOB_ID=local_open_guard_v2_main_20260624T200115Z \
 OUTPUT_PREFIX=guard_v2_main \
 SPLIT_PREFIX=guard_v2_main \
 REPORT_PREFIX=guard_v2_main \
@@ -506,6 +578,14 @@ MODEL_PROPOSAL_MODE=actions \
 QUEUE_MODEL_TP=4 \
 CUDA_VISIBLE_DEVICES=0,1,2,3 \
   bash effectbench_omega/scripts/run_local_open_queue.sh
+```
+
+Launch note:
+
+```text
+The queue was launched detached with setsid so it survives outside the Codex
+tool session:
+setsid bash -lc '<exports>; exec bash effectbench_omega/scripts/run_local_open_queue.sh' > effectbench_omega/jobs/local_open_guard_v2_main_20260624T200115Z_launch.log 2>&1 < /dev/null &
 ```
 
 Monitor:

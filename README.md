@@ -10,7 +10,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 
 ## Current Status
 
-- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit, Stage 2 corrected-guard implementation, Stage 3 V2 live smokes/Qwen sensitivity, and canonical-verifier hardening are complete. Stage 4 is ready and awaits approval.
+- Active V2 rescue branch: **`eacl-rescue-v2`**. Stage 1 enumerated-frontier audit, Stage 2 corrected-guard implementation, Stage 3 V2 live smokes/Qwen sensitivity, canonical-verifier hardening, and Stage 4 full corrected-guard local run are complete.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -38,6 +38,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - EACL rescue V2 Stage 2: **complete**. Added `PROJ_GUARD_V2` and `EFFECTGUARD_V2`, a 14,336-row V2 guard manifest, V2 guard tests, and a 14-row balanced dry smoke with 0 failures and 100% no-oracle pass rate.
 - EACL rescue V2 Stage 3: **complete**. Four-model V2 live smokes passed with 14 traces/model, 0 failures/model, JSON proposals 14/14 for every model, empty repair logs for every model, no-oracle 100%, and local cost $0. Qwen same-prompt repair sensitivity reran 168 affected rows with 0 proposal/effect/verdict changes and 0.0 pp strict-rate delta.
 - EACL rescue canonical scoring: **complete**. `run_stage3_offline.sh` defaults to `CANONICAL_CERT_MODE=enumerated`; projection, bootstrap, CEGAR, lattice, guard-tie, replay, aggregate figures, and claim registry consume `kernel_canonical/certificates_enumerated.parquet`.
+- EACL rescue V2 Stage 4: **complete**. The guard-only queue ran `PROJ_GUARD_V2` and `EFFECTGUARD_V2` with `SLICE_LIMIT=3584` per model, TP=4 on GPUs `0,1,2,3`, model order Mistral, Qwen, Llama, Gemma. All four slices finished with 14,336 V2 guard traces, 0 failures, and local cost $0. Combined canonical scoring with frozen `BASE` produced 21,504 trajectories, canonical gate pass, 4,611 canonical strict-excess labels, 1,010 spurious legacy witnesses, 0 unexplained mismatches, and replay 160/160 pass.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked**. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
@@ -74,7 +75,7 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 | Corrected guard V2 systems | Working | `PROJ_GUARD_V2` is projection-only; `EFFECTGUARD_V2` performs current-state admissible lower-effect substitution. |
 | V2 live smokes | Passed | `effectbench_omega/scripts/run_stage3_v2_smoke_queue.sh`; four locked models, 56 total live V2 traces, 0 failures. |
 | Qwen repair sensitivity | Passed | 168 affected rows rerun same-prompt; 0 proposal/effect/verdict changes; 0.0 pp strict-rate delta. |
-| Stage 4 merge/scoring path | Ready | `run_local_open_queue.sh` can run the V2 guard-only queue; `build_guard_v2_main_split.py` combines frozen `BASE` with V2 guard rows; `run_stage3_offline.sh` scores the combined split canonically. |
+| Stage 4 merge/scoring path | Complete | `local_open_guard_v2_main_20260624T200115Z` finished all four V2 guard slices; `build_guard_v2_main_split.py` combined frozen `BASE` with V2 guard rows; canonical scoring completed as `stage3_canonical_guard_v2_main_with_base_20260625T082959Z`. |
 | Bedrock | Archived | Not part of the active local-only plan. |
 
 ## Key Outputs
@@ -117,6 +118,12 @@ Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md`
 - V2 dry no-oracle table: `effectbench_omega/tables/no_oracle_guard_v2_dry_smoke.csv`
 - V2 Stage 3 job: `effectbench_omega/jobs/stage3_v2_smoke_20260624T143808Z/`
 - V2 Stage 3 smoke outputs: `effectbench_omega/outputs/stage3_v2_smoke_<model>/`
+- V2 Stage 4 live queue: `effectbench_omega/jobs/local_open_guard_v2_main_20260624T200115Z/`
+- V2 Stage 4 slice outputs: `effectbench_omega/outputs/guard_v2_main_<model>/`
+- V2 Stage 4 merged guard output: `effectbench_omega/outputs/guard_v2_main_all_local/`
+- V2 Stage 4 combined BASE+V2 output: `effectbench_omega/outputs/guard_v2_main_with_base_all_local/`
+- V2 Stage 4 canonical job: `effectbench_omega/jobs/stage3_canonical_guard_v2_main_with_base_20260625T082959Z/`
+- V2 Stage 4 canonical tables: `effectbench_omega/tables/guard_v2_main_with_base_all_local_canonical/`
 - Qwen repair rows manifest: `effectbench_omega/manifests/qwen_repair_rows.csv`
 - Qwen repair sensitivity report: `effectbench_omega/reports/qwen_repair_sensitivity.md`
 - Qwen repair sensitivity table: `effectbench_omega/tables/qwen_repair_sensitivity.csv`

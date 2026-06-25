@@ -1,0 +1,2 @@
+groups,observed_successes,enumerated_candidates,frontier_candidates,old_strict_excess,enumerated_strict_excess,label_agreement,strictness_agreement,strictness_disagreements,unexplained_mismatches,spurious_legacy_witnesses,enumerated_new_strict,legacy_agreement_gate,canonical_gate,gate_mode,pass_gate
+7168,21504,1205248,7168,5621,4611,0.9317336309523809,0.9530319940476191,1010,0,1010,0,False,True,canonical,True

@@ -1,0 +1,7 @@
+{
+  "content": "LOW",
+  "latency_s": 1.76,
+  "model": "mistral_small_3_2_24b_local",
+  "response_id": "chatcmpl-af9614c0fc4c7e1c",
+  "status": "ok"
+}
