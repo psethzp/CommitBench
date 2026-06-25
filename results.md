@@ -16,9 +16,10 @@ checks passed, and local cost was zero. The strongest result is the large
 BASE raw-vs-kernel gap and the large reduction from BASE to guarded systems.
 The weakest result is that `EFFECTGUARD` and `PROJ_GUARD` are essentially tied.
 
-V2 Stage 5 native-fidelity subset is now in progress. Its completed dry checks
-are reported separately below and must not be pooled into the controlled
-headline split until the live local queue and canonical postprocess finish.
+V2 Stage 5 native-fidelity subset is also complete as a validation block. It
+must be reported separately from the controlled headline split, but it now has
+live local queue results, canonical certificates, native replay, and counted
+native terminal failures.
 
 ## V2 Rescue Stage 0
 
@@ -560,7 +561,7 @@ Implementation status:
 | Native success predicate | Complete | `native_success_reason` trace field |
 | State-delta effect ledger | Complete | `native_state_delta_ledger` trace field |
 | Native replay check | Complete | `replay_certificates.py` replays native model traces and witness candidates |
-| Live queue | Running | `effectbench_omega/jobs/local_open_native_subset_v1_20260625T085816Z/` |
+| Live queue | Complete | `effectbench_omega/jobs/local_open_native_subset_v1_20260625T085816Z/` |
 
 Manifest counts:
 
@@ -598,24 +599,42 @@ Full dry raw-success shape:
 | `tau2_telecom_native` | 50.0000% | 75.0000% | 100.0000% |
 | `toolsandbox_contract_native` | 0.0000% | 100.0000% | 100.0000% |
 
-Live queue status at launch:
+Live queue and canonical status:
 
 | Field | Value |
 |---|---|
 | Job ID | `local_open_native_subset_v1_20260625T085816Z` |
+| Canonical job ID | `stage5_canonical_native_subset_v1_20260625T191826Z` |
 | Model order | Mistral, Qwen, Gemma, Llama |
 | Per-model slice limit | 1,152 |
 | Tensor parallelism | TP=4 |
 | GPUs | `CUDA_VISIBLE_DEVICES=0,1,2,3` |
 | First stable event | Mistral `running_slice` at 2026-06-25T08:59:43Z |
 | GPU sample after launch | all four GPUs at 100% utilization, ~42 GB used each |
-| Current live progress | Mistral, Qwen, and Gemma complete with 0 failures; Llama running since 2026-06-25T10:16:22Z |
+| Queue completion | 2026-06-25T12:55:39Z |
+| Merged traces | 4,608 |
+| Runner failures | 0 |
+| Canonical gate | Pass |
+| Native successes | 4,217 |
+| Native terminal failures | 391 |
+| Canonical strict-excess labels | 848 |
+| Unexplained mismatches | 0 |
+| Native replay failures | 0 / 160 bundles |
+| No-oracle pass rate | 100% |
+| Local cost | $0 |
 
-Stage 5 interpretation so far: the native dry suite fixes the old
+Final live native raw-success and canonical strict-excess:
+
+| System | Raw success | Native successes | Strict-excess among successes | Kernel success among successes |
+|---|---:|---:|---:|---:|
+| `BASE` | 81.5755% | 1,253 / 1,536 | 67.6776% | 32.3224% |
+| `PROJ_GUARD_V2` | 92.9688% | 1,428 / 1,536 | 0.0000% | 100.0000% |
+| `EFFECTGUARD_V2` | 100.0000% | 1,536 / 1,536 | 0.0000% | 100.0000% |
+
+Stage 5 interpretation: the native live suite fixes the old
 all-success-scaffold caveat for this validation block. It is a compact
 native-style wrapper over pinned upstream records, not a full upstream server
-re-host. Final claims must wait for the live queue merge and canonical
-postprocess.
+re-host.
 
 ## Result Caveats
 
@@ -625,7 +644,7 @@ postprocess.
 | Qwen has 42 repaired-fallback proposals | Keep as audited caveat; optional same-prompt rerun can be an ablation later. |
 | EffectGuard and PROJ_GUARD are nearly tied | Strong EffectGuard-over-PROJ claim is not defensible from this run. |
 | Raw success is 100% for all systems | Results should focus on least-effect certification, not raw task success differences. |
-| Stage 5 native subset is currently running | Do not cite live native results until `native_subset_v1_all_local` is merged and canonically scored. |
+| Stage 5 native subset is a separate validation block | Do not pool it into the 21,504-row controlled headline split. |
 | Stage 5 native wrappers are compact native-style transitions | Use as native-fidelity validation, not as a claim that every upstream benchmark server was fully re-hosted. |
 | CEGAR no-collision fields are conservative-audit evidence | Strength: the audit avoids rejecting omissions without observed label-changing collisions. Boundary: no-collision means not exercised as label-changing here, not globally irrelevant. |
 | Projection and CEGAR are deterministic local audits | They are replayable, but not a substitute for external human evaluation. |

@@ -1,0 +1,9 @@
+baseline,reason,count,rate_among_successes
+FINAL_STATE,accepted,4217,1.0
+CORE_DFA,accepted,4217,1.0
+MINISCOPE_PERMISSION,accepted,4217,1.0
+CONTRACT_MENU_CMTF,accepted,4217,1.0
+REVISABILITY,accepted,4217,1.0
+MODERNSTACK_PROJECTION,accepted,4217,1.0
+KERNEL_FULL,accepted,3369,0.798909177140147
+KERNEL_FULL,kernel_strict_excess,848,0.20109082285985297

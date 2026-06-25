@@ -1,0 +1,8 @@
+baseline,total_success_count,accepted_success_count,rejected_success_count,accepted_success_rate,residual_strict_excess_count,residual_strict_excess_per_accepted_success,residual_incomparable_count,residual_incomparable_per_accepted_success,coverage,false_denial_if_applicable
+FINAL_STATE,4217,4217,0,1.0,848,0.20109082285985297,0,0.0,1.0,0.0
+CORE_DFA,4217,4217,0,1.0,848,0.20109082285985297,0,0.0,1.0,0.0
+MINISCOPE_PERMISSION,4217,4217,0,1.0,848,0.20109082285985297,0,0.0,1.0,0.0
+CONTRACT_MENU_CMTF,4217,4217,0,1.0,848,0.20109082285985297,0,0.0,1.0,0.0
+REVISABILITY,4217,4217,0,1.0,848,0.20109082285985297,0,0.0,1.0,0.0
+MODERNSTACK_PROJECTION,4217,4217,0,1.0,848,0.20109082285985297,0,0.0,1.0,0.0
+KERNEL_FULL,4217,3369,848,0.798909177140147,0,0.0,0,0.0,1.0,0.20109082285985297

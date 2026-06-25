@@ -28,8 +28,8 @@ Hard boundaries:
 | 3 | V2 smoke and Qwen repair sensitivity | Complete | Awaiting approval for Stage 4 |
 | 3.5 | Canonical verifier hardening | Complete | Stage 4 ready |
 | 4 | Full corrected-guard local run | Complete | Approved for Stage 5 |
-| 5 | Native-fidelity subset | In progress | Operator approved via "Proceed to Stage 5" |
-| 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 approval |
+| 5 | Native-fidelity subset | Complete | Awaiting approval for Stage 6 |
+| 6 | Full replay and targeted CEGAR stress | Pending | Requires Stage 5 review/approval |
 | 7 | Lattice policy and paper freeze | Pending | Requires Stage 6 approval |
 
 ## Stage 0: Freeze And Preflight
@@ -569,26 +569,64 @@ latest_symlink: effectbench_omega/jobs/local_open_latest
 launched: 2026-06-25T08:58:16Z
 first_model: mistral_small_3_2_24b_local
 server_ready: 2026-06-25T08:59:34Z
-running_slice: 2026-06-25T08:59:43Z
-current output: effectbench_omega/outputs/native_subset_v1_mistral_small_3_2_24b_local
-stable GPU sample: all four GPUs at 100% utilization, about 42 GB used each
+first running_slice: 2026-06-25T08:59:43Z
+queue_done: 2026-06-25T12:55:39Z
+stable GPU sample during run: all four GPUs at 100% utilization, about 42 GB used each
 ```
 
-Live Stage 5 progress snapshot:
+Final Stage 5 queue result:
 
-| Model | Status | Trace count | Failures | Legacy strict-excess | Legacy minimal | Notes |
+| Model | Trace count | Native successes | Failures | Legacy strict-excess | Legacy minimal | Notes |
 |---|---:|---:|---:|---:|---:|---|
-| `mistral_small_3_2_24b_local` | Complete | 1,152 | 0 | 273 | 879 | completed 2026-06-25T09:32:01Z |
-| `qwen3_6_35b_a3b_local` | Complete | 1,152 | 0 | 22 | 800 | completed 2026-06-25T09:41:07Z; native terminal failures reduce successful certificates to 822 |
-| `gemma3_27b_it_local` | Complete | 1,152 | 0 | 243 | 848 | completed 2026-06-25T10:14:38Z; native terminal failures reduce successful certificates to 1,091 |
-| `llama3_3_70b_awq_local` | Running | pending | pending | pending | pending | running slice since 2026-06-25T10:16:22Z |
+| `mistral_small_3_2_24b_local` | 1,152 | 1,152 | 0 | 273 | 879 | completed 2026-06-25T09:32:01Z |
+| `qwen3_6_35b_a3b_local` | 1,152 | 822 | 0 | 22 | 800 | completed 2026-06-25T09:41:07Z |
+| `gemma3_27b_it_local` | 1,152 | 1,091 | 0 | 243 | 848 | completed 2026-06-25T10:14:38Z |
+| `llama3_3_70b_awq_local` | 1,152 | 1,152 | 0 | 310 | 842 | completed 2026-06-25T12:55:34Z |
 
-Current interpretation:
+Stage 5 merge:
 
 ```text
-Stage 4 is finished and closed. Stage 5 is active, with three of four native
-model slices complete and the final Llama slice running under TP=4 on all four
-GPUs. Do not merge or canonically score Stage 5 until Llama finishes.
+merged output: effectbench_omega/outputs/native_subset_v1_all_local/
+merged traces: 4,608
+merged api log rows: 4,608
+failure lines: 0
+```
+
+Stage 5 canonical scoring:
+
+```text
+job_id: stage5_canonical_native_subset_v1_20260625T191826Z
+canonical certificates: effectbench_omega/outputs/native_subset_v1_all_local/kernel_canonical/certificates_enumerated.parquet
+canonical gate: pass
+observed native successes: 4,217
+native terminal failures: 391
+enumerated strict-excess labels: 848
+legacy strict-excess labels: 848
+spurious legacy witnesses: 0
+unexplained mismatches: 0
+replay bundles checked: 160
+native replays checked: 160
+replay failures: 0
+no-oracle pass rate: 100%
+local cost: $0
+```
+
+Final Stage 5 raw success and canonical strict-excess:
+
+| System | Raw success | Native successes | Canonical strict-excess among successes | Kernel success among successes |
+|---|---:|---:|---:|---:|
+| `BASE` | 81.5755% | 1,253 / 1,536 | 67.6776% | 32.3224% |
+| `PROJ_GUARD_V2` | 92.9688% | 1,428 / 1,536 | 0.0000% | 100.0000% |
+| `EFFECTGUARD_V2` | 100.0000% | 1,536 / 1,536 | 0.0000% | 100.0000% |
+
+Final interpretation:
+
+```text
+Stage 5 is complete. The native-fidelity subset fixes the old all-success
+scaffold caveat for a validation block: terminal failures are possible and
+counted, state-delta ledgers drive effects, and native replay passes. The
+subset remains a compact native-style wrapper over pinned upstream records, not
+a full upstream benchmark server re-host.
 ```
 
 Monitor:

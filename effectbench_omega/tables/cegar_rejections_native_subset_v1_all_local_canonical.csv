@@ -1,0 +1,8 @@
+omitted_field,total_reduced_groups,collision_groups,label_change_groups,rejected_abstractions,affected_rows,reason
+outbox,282,28,28,28,832,reduced_hash_label_collision
+policy_obligation,310,0,0,0,0,no_label_collision_observed
+contract_artifact_hash,310,0,0,0,0,no_label_collision_observed
+virtual_clock,310,0,0,0,0,no_label_collision_observed
+memory_cache,193,117,102,102,2680,reduced_hash_label_collision
+user_visible_exposure,191,82,82,82,3820,reduced_hash_label_collision
+compensation_or_payment_hold,310,0,0,0,0,no_label_collision_observed

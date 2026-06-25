@@ -64,3 +64,7 @@ timestamp	model	status	detail
 2026-06-25T10:16:14Z	llama3_3_70b_awq_local	server_ready	vLLM ready on http://localhost:8001/v1; TP=4; CUDA_VISIBLE_DEVICES=0,1,2,3
 2026-06-25T10:16:14Z	llama3_3_70b_awq_local	endpoint_smoke	health smoke against http://localhost:8001/v1
 2026-06-25T10:16:22Z	llama3_3_70b_awq_local	running_slice	writing 1152 trajectories to effectbench_omega/outputs/native_subset_v1_llama3_3_70b_awq_local
+2026-06-25T12:54:56Z	llama3_3_70b_awq_local	verifying	run_online finished; running kernel/no-oracle/cost checks
+2026-06-25T12:55:34Z	llama3_3_70b_awq_local	done	slice complete; summary effectbench_omega/jobs/local_open_native_subset_v1_20260625T085816Z/summaries/llama3_3_70b_awq_local.json
+2026-06-25T12:55:34Z	llama3_3_70b_awq_local	stopping_server	stopping vLLM before next model
+2026-06-25T12:55:39Z	queue	done	all model slices complete
