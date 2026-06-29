@@ -1,0 +1,16 @@
+metric,value
+split_trace_count,21504
+group_count,7168
+systems,"[""BASE"", ""EFFECTGUARD_V2"", ""PROJ_GUARD_V2""]"
+expected_shared_rows,21504
+complete_shared_source_groups,7168
+incomplete_shared_source_groups,0
+proposal_actions_equal_groups,7168
+proposal_actions_unequal_groups,0
+failures,0
+parse_counts,"[{""model_proposal_parse_status"": ""json"", ""rows"": 7103, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""low_high_legacy"", ""rows"": 2, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""text_scan"", ""rows"": 49, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""unparsed:repair_fallback"", ""rows"": 14, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""json"", ""rows"": 7103, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""low_high_legacy"", ""rows"": 2, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""text_scan"", ""rows"": 49, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""unparsed:repair_fallback"", ""rows"": 14, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""json"", ""rows"": 7103, ""system"": ""PROJ_GUARD_V2""}, {""model_proposal_parse_status"": ""low_high_legacy"", ""rows"": 2, ""system"": ""PROJ_GUARD_V2""}, {""model_proposal_parse_status"": ""text_scan"", ""rows"": 49, ""system"": ""PROJ_GUARD_V2""}, {""model_proposal_parse_status"": ""unparsed:repair_fallback"", ""rows"": 14, ""system"": ""PROJ_GUARD_V2""}]"
+source_parse_counts,"{""json"": 21309, ""low_high_legacy"": 6, ""text_scan"": 147, ""unparsed:repair_fallback"": 42}"
+gpu_used,False
+new_model_calls,0
+prompt_fix_for_future_runs,run_online.py no longer includes system=... in proposal user content
+residual_caveat,"The audit replays BASE proposals generated before the no-system prompt fix, so it tests guard-comparison proposal sharing rather than the distribution of a fresh no-system prompt."

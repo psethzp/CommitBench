@@ -1,0 +1,22 @@
+{
+  "base_gap_failures": 0,
+  "effectguard_zero_failures": 0,
+  "gate_rows": 49,
+  "metric_rows": 147,
+  "projection_failures_required_slices": 0,
+  "splits": [
+    "corrected_guard_v2",
+    "main_controlled_legacy_guards",
+    "native_validation",
+    "shared_proposal_v2",
+    "shared_proposal_v3_nosystem"
+  ],
+  "stress_summary": {
+    "available": true,
+    "canonical_strict_excess": 0,
+    "incomparable_effectguard_decisions": 320,
+    "minimal_with_incomparables": 960,
+    "necessary_high_effectguard_decisions": 704,
+    "trace_count": 3072
+  }
+}

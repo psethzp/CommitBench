@@ -445,6 +445,416 @@ CANONICAL_CERT_MODE=enumerated \
   bash effectbench_omega/scripts/run_stage3_offline.sh
 ```
 
+## Rebuttal Rescue Stage 1 - Claim Reset
+
+Stage 1 completed on 2026-06-26 UTC.
+
+Reviewer-risk search/checks used:
+
+| Source | Method lesson applied here |
+|---|---|
+| `AI Agents That Matter` / OpenReview | Agent benchmarks need cost-aware, standardized, reproducible evaluation; do not overclaim broad SOTA from narrow artifacts. |
+| `tau-bench` | Tool-agent evaluations should be explicit about dynamic user/tool/policy state and reliability, so the controlled split is framed as least-effect certification over successful traces. |
+| `ToolSandbox` | Stateful tool-use benchmarks motivate trace/state-delta evaluation beyond final-answer correctness. |
+| Common-random-numbers / paired evaluation practice | Shared inputs/proposals reduce comparison variance and remove avoidable between-condition confounds. |
+
+Paper posture after reset:
+
+```text
+local/open-weight certificate-semantics paper
+21,504 controlled trajectories as the headline split
+4,608 native-fidelity validation trajectories reported separately
+canonical enumerated-frontier strict labels only
+no Bedrock/frontier leaderboard claims
+no human-eval claims
+no 204,800-episode framing
+projection baselines are deterministic projections, not faithful SOTA-system reproductions
+```
+
+Code posture after reset:
+
+```text
+effectbench_omega/scripts/run_online.py no longer includes system=... in the
+model proposal user content. Future model-call runs therefore do not expose
+BASE/PROJ_GUARD/EFFECTGUARD labels to the proposing model.
+```
+
+## Rebuttal Rescue Stage 2 - Shared-Proposal V2 Audit
+
+Stage 2 completed on 2026-06-26 UTC.
+
+Purpose:
+
+```text
+Remove the reviewer concern that model proposal distributions differ across
+systems because the model saw the evaluated system label. This audit replays
+BASE, PROJ_GUARD_V2, and EFFECTGUARD_V2 from the exact same frozen BASE
+proposal for each task/model/regime/seed.
+```
+
+Commands:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+
+.venv/bin/python effectbench_omega/scripts/build_shared_proposal_v2_audit.py
+
+.venv/bin/python effectbench_omega/effectbench/kernel/verifier.py \
+  --traces effectbench_omega/outputs/shared_proposal_v2_audit_all_local/traces.parquet \
+  --schemas effectbench_omega/schemas \
+  --out effectbench_omega/outputs/shared_proposal_v2_audit_all_local/kernel_legacy_generated_trace
+
+.venv/bin/python effectbench_omega/effectbench/kernel/enumerate_frontier.py \
+  --traces effectbench_omega/outputs/shared_proposal_v2_audit_all_local/traces.parquet \
+  --certificates effectbench_omega/outputs/shared_proposal_v2_audit_all_local/kernel_legacy_generated_trace/certificates.parquet \
+  --out effectbench_omega/outputs/shared_proposal_v2_audit_all_local/kernel_canonical \
+  --tables-out effectbench_omega/tables/frontier_canonical_shared_proposal_v2_audit_all_local_canonical.csv \
+  --report-out effectbench_omega/reports/frontier_canonical_shared_proposal_v2_audit_all_local_canonical.md \
+  --gate canonical
+
+.venv/bin/python effectbench_omega/effectbench/audit/no_oracle_report.py \
+  --runtime-logs effectbench_omega/outputs/shared_proposal_v2_audit_all_local/runtime_logs.parquet \
+  --out effectbench_omega/tables/no_oracle_shared_proposal_v2_audit_all_local_canonical.csv
+
+.venv/bin/python -m pytest -q effectbench_omega/tests/test_guards_v2.py effectbench_omega/tests/no_oracle
+```
+
+Outputs:
+
+| Artifact | Path |
+|---|---|
+| Shared-proposal split | `effectbench_omega/outputs/shared_proposal_v2_audit_all_local/` |
+| Audit report | `effectbench_omega/reports/shared_proposal_v2_audit.md` |
+| Canonical summary | `effectbench_omega/reports/shared_proposal_v2_audit_canonical_summary.md` |
+| Online-control table | `effectbench_omega/tables/shared_proposal_v2_audit_online_control.csv` |
+| Canonical frontier table | `effectbench_omega/tables/frontier_canonical_shared_proposal_v2_audit_all_local_canonical.csv` |
+| No-oracle table | `effectbench_omega/tables/no_oracle_shared_proposal_v2_audit_all_local_canonical.csv` |
+
+Audit construction:
+
+| Metric | Value |
+|---|---:|
+| Shared groups | 7,168 |
+| Trace rows | 21,504 |
+| Proposal-action equality groups | 7,168 / 7,168 |
+| New model calls | 0 |
+| GPU used | No |
+| Build failures | 0 |
+| No-oracle rows checked | 21,504 |
+| No-oracle failures | 0 |
+| Pytest | 14 passed, 1 warning |
+
+Canonical enumerated-frontier result:
+
+| Metric | Value |
+|---|---:|
+| Canonical gate | Pass |
+| Groups | 7,168 |
+| Observed successes | 21,504 |
+| Enumerated candidates | 1,205,248 |
+| Frontier candidates | 7,168 |
+| Legacy strict-excess labels | 5,803 |
+| Canonical strict-excess labels | 4,743 |
+| Spurious legacy witnesses | 1,060 |
+| Unexplained mismatches | 0 |
+
+Shared-proposal online-control result:
+
+| System | Trajectories | Raw success | Canonical strict excess | Canonical kernel success |
+|---|---:|---:|---:|---:|
+| `BASE` | 7,168 | 100.0000% | 57.0033% | 42.9967% |
+| `PROJ_GUARD_V2` | 7,168 | 100.0000% | 9.1657% | 90.8343% |
+| `EFFECTGUARD_V2` | 7,168 | 100.0000% | 0.0000% | 100.0000% |
+
+Caveat:
+
+```text
+The audit replays frozen BASE proposals generated before the no-system prompt
+fix, so it removes between-system proposal-distribution confounding but is not
+a fresh no-system-prompt model-call rerun. Future runs use the fixed prompt.
+```
+
+## Rebuttal Rescue Stage 3 - Necessary-High / Incomparable Stress Block
+
+Stage 3 launched on 2026-06-26 UTC.
+
+Purpose:
+
+```text
+Address the reviewer concern that EFFECTGUARD_V2 reaches 0% strict-excess only
+because the environment always has an obviously lower-effect alternative. This
+stress block includes necessary-high cases where high-effect escalation is the
+only admissible success path and incomparable tradeoff cases where lower write
+scope requires higher user burden.
+```
+
+Implementation:
+
+| Component | Status | Path |
+|---|---:|---|
+| Stress manifest builder | Implemented | `effectbench_omega/scripts/build_stage3_stress_manifest.py` |
+| Stress manifest | Built | `effectbench_omega/manifests/tasks_stage3_stress.csv` |
+| Stress policy hooks | Implemented | `effectbench_omega/effectbench/regimes.py`, `effectbench_omega/effectbench/agents/systems.py` |
+| Canonical stress frontier hooks | Implemented | `effectbench_omega/effectbench/kernel/enumerate_frontier.py` |
+
+Stress denominator:
+
+```text
+32 stress tasks x 4 regimes x 2 seeds x 4 models x 3 systems = 3,072 trajectories
+models: Mistral, Qwen, Llama, Gemma
+systems: BASE, PROJ_GUARD_V2, EFFECTGUARD_V2
+regimes: FULL, CONCAT, SHARDED, ADV_EFFECT
+stress types: necessary_external, necessary_account_high, incomparable_tradeoff
+```
+
+CPU dry validation:
+
+| Metric | Value |
+|---|---:|
+| Dry traces | 3,072 |
+| Dry failures | 0 |
+| Canonical gate | Pass |
+| Unexplained mismatches | 0 |
+| Necessary-high EFFECTGUARD_V2 decisions | 704 |
+| Incomparable EFFECTGUARD_V2 decisions | 320 |
+| Dry strict-excess labels | 0 |
+
+Dry artifacts:
+
+| Artifact | Path |
+|---|---|
+| Dry output | `effectbench_omega/outputs/stage3_stress_dry_all/` |
+| Dry canonical table | `effectbench_omega/tables/frontier_canonical_stage3_stress_dry_all.csv` |
+| Dry canonical report | `effectbench_omega/reports/frontier_canonical_stage3_stress_dry_all.md` |
+
+Live queue:
+
+```text
+job_id: stage3_stress_live_20260626T162912Z
+queue_pid: 2144235
+postprocess_watcher_pid: 2146656
+output_prefix: stage3_stress
+merged_output: effectbench_omega/outputs/stage3_stress_all_local/
+postprocess_log: effectbench_omega/jobs/stage3_stress_live_20260626T162912Z_postprocess.log
+```
+
+Launch command:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+JOB_ID=stage3_stress_live_20260626T162912Z \
+OUTPUT_PREFIX=stage3_stress \
+SPLIT_PREFIX=stage3_stress \
+REPORT_PREFIX=stage3_stress \
+MANIFEST=effectbench_omega/manifests/tasks_stage3_stress.csv \
+QUEUE_SYSTEMS="BASE PROJ_GUARD_V2 EFFECTGUARD_V2" \
+QUEUE_REGIMES="FULL CONCAT SHARDED ADV_EFFECT" \
+SLICE_LIMIT=768 \
+MODEL_CONTROLS_POLICY=1 \
+MODEL_PROPOSAL_MODE=actions \
+QUEUE_MODEL_TP=4 \
+CUDA_VISIBLE_DEVICES=0,1,2,3 \
+  bash effectbench_omega/scripts/run_local_open_queue.sh
+```
+
+Stable-start status:
+
+```text
+Mistral reached server_ready at 2026-06-26T16:30:29Z.
+The first live slice started at 2026-06-26T16:30:39Z.
+TP=4 on CUDA_VISIBLE_DEVICES=0,1,2,3.
+GPU sample after slice start showed 100% utilization on all four GPUs.
+```
+
+Monitor:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+tail -f effectbench_omega/jobs/stage3_stress_live_20260626T162912Z/events.tsv
+tail -f effectbench_omega/jobs/stage3_stress_live_20260626T162912Z_postprocess.log
+bash effectbench_omega/scripts/show_local_open_queue_status.sh
+nvidia-smi dmon -s pucm -d 5
+```
+
+ETA from prior measured per-model throughput scaled from 3,584-row Stage 4
+slices to 768-row stress slices:
+
+```text
+Mistral slice: about 20-30 min after load
+Qwen slice: about 5-10 min after load
+Llama slice: about 1.5-2.5 h after load
+Gemma slice: about 20-35 min after load
+Total online ETA including model load/stop overhead: about 4-5 h
+Postprocess canonical/offline ETA after queue completion: about 30-60 min
+```
+
+Final Stage 3 result:
+
+```text
+queue_status: complete
+canonical_job: stage3_stress_canonical_20260626T191036Z
+merged_output: effectbench_omega/outputs/stage3_stress_all_local/
+canonical_certificates: effectbench_omega/outputs/stage3_stress_all_local/kernel_canonical/certificates_enumerated.parquet
+```
+
+Live queue timing:
+
+| Model | Slice start | Done | Trace count | Failures |
+|---|---:|---:|---:|---:|
+| `mistral_small_3_2_24b_local` | 2026-06-26T16:30:39Z | 2026-06-26T16:52:27Z | 768 | 0 |
+| `qwen3_6_35b_a3b_local` | 2026-06-26T16:54:31Z | 2026-06-26T16:59:30Z | 768 | 0 |
+| `llama3_3_70b_awq_local` | 2026-06-26T17:01:14Z | 2026-06-26T18:43:42Z | 768 | 0 |
+| `gemma3_27b_it_local` | 2026-06-26T18:46:06Z | 2026-06-26T19:09:15Z | 768 | 0 |
+
+Canonical/offline scoring:
+
+| Metric | Value |
+|---|---:|
+| Merged live traces | 3,072 |
+| Systems | `BASE`, `PROJ_GUARD_V2`, `EFFECTGUARD_V2` |
+| Canonical gate | Pass |
+| Groups | 1,024 |
+| Observed successes | 3,072 |
+| Enumerated candidates | 1,344 |
+| Frontier candidates | 1,344 |
+| Canonical strict-excess labels | 0 |
+| Minimal necessary-high rows | 2,112 |
+| Minimal-with-incomparables rows | 960 |
+| Unexplained mismatches | 0 |
+| No-oracle pytest | Pass |
+| Replay | Pass |
+
+Stress-specific evidence:
+
+| Evidence | Count |
+|---|---:|
+| `EFFECTGUARD_V2` necessary-high decisions | 704 |
+| `EFFECTGUARD_V2` incomparable decisions | 320 |
+| `stress_necessary_high` rows certified minimal | 2,112 |
+| `stress_incomparable` rows certified minimal-with-incomparables | 960 |
+
+Interpretation:
+
+```text
+Stage 3 addresses the "EffectGuard is too perfect/tautological" caveat. The
+stress block demonstrates nonzero necessary-high and incomparable behavior:
+high-effect escalation can be certified minimal when policy requires it, and
+burden/effect tradeoffs can be certified as Pareto-incomparable rather than
+strict-excess. This block should be reported separately from the main headline
+mean.
+```
+
+## Rebuttal Rescue Stage 4 - Leave-One Robustness
+
+Stage 4 completed on 2026-06-26 UTC.
+
+Purpose:
+
+```text
+Check that the main raw-vs-kernel gap and corrected-guard conclusions are not
+carried by a single model or single task family. This is fully offline and uses
+saved traces plus canonical enumerated-frontier certificates.
+```
+
+Command:
+
+```bash
+cd /home/ubuntu/nachiket/CommitBench
+.venv/bin/python effectbench_omega/scripts/run_stage4_robustness.py
+```
+
+Artifacts:
+
+| Artifact | Path |
+|---|---|
+| Script | `effectbench_omega/scripts/run_stage4_robustness.py` |
+| Report | `effectbench_omega/reports/stage4_leave_one_robustness.md` |
+| Gate table | `effectbench_omega/tables/stage4_leave_one_gates.csv` |
+| Metric table | `effectbench_omega/tables/stage4_leave_one_metrics.csv` |
+| JSON summary | `effectbench_omega/reports/stage4_leave_one_robustness.json` |
+
+Results:
+
+| Metric | Value |
+|---|---:|
+| Metric rows | 117 |
+| Gate rows | 39 |
+| Base-gap failures | 0 |
+| Required projection-residual failures | 0 |
+| EffectGuard-zero failures | 0 |
+| Controlled/shared/corrected minimum BASE gap | 53.3110 pp |
+| Native-validation minimum BASE gap | 61.9102 pp |
+| Corrected V2 projection residual range | 1.2835% - 9.7284% |
+| Shared-proposal V2 projection residual range | 1.3207% - 12.2210% |
+| EffectGuard max strict-excess across leave-one slices | 0.0000% |
+
+Interpretation:
+
+```text
+Stage 4 supports robustness: dropping any one model or family does not reverse
+the BASE raw-vs-kernel gap, does not eliminate required V2 projection residual
+strict-excess in corrected/shared-proposal splits, and does not introduce
+strict-excess for EFFECTGUARD_V2.
+```
+
+## Rebuttal Rescue Stage 6 - Final Freeze Addendum
+
+Stage 6 completed on 2026-06-26 UTC.
+
+Scope:
+
+```text
+Refresh the rebuttal-facing docs, claim registry, paper-ready summary, and
+light reproducibility gates after Stages 2-4. Stage 5 native expansion remains
+skipped by operator instruction.
+```
+
+Updated artifacts:
+
+| Artifact | Path |
+|---|---|
+| README | `README.md` |
+| Results summary | `results.md` |
+| Implementation handoff | `implementations.md` |
+| Paper-ready summary | `effectbench_omega/reports/eacl_rescue_paper_ready_summary.md` |
+| Final claim registry | `effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv` |
+| This runbook | `effectbench_omega/RUNBOOK_EACL_RESCUE_V2.md` |
+
+Final light gates:
+
+```text
+py_compile: pass
+pytest: pass
+claim_registry_check: pass
+placeholder scan: pass
+active CommitBench/vLLM jobs: none
+GPU compute apps: none
+```
+
+Paper-proof archive refresh:
+
+```text
+Completed on 2026-06-26 UTC.
+archive: CommitBench_paper_proof_full_20260626.zip
+location: /home/ubuntu/nachiket/CommitBench/
+entries: 14,607
+archive size: about 82 MiB on disk after compression
+scope: code, configs, runbooks, reports, tables, figures, generated outputs,
+logs, manifests, witness bundles, claim registries, and paper-facing PDFs/decks
+for both original local-only evidence and rebuttal Stages 1-4/6.
+excluded: .env, .git, virtualenvs, model caches, cloned upstream repos,
+transient caches, and older zip files.
+integrity: unzip -tq passed
+```
+
+Remaining work:
+
+```text
+No further experiments are required by the rebuttal plan unless the user wants
+a fresh no-system-prompt BASE proposal rerun as an extra ablation. The main
+remaining task is paper writing/rewrite.
+```
+
 ## Stage 5: Native-Fidelity Subset
 
 Operator approval received via "Proceed to Stage 5."
@@ -1136,3 +1546,62 @@ BOOTSTRAP_SYSTEMS="BASE PROJ_GUARD_V2 EFFECTGUARD_V2" \
 CANONICAL_CERT_MODE=enumerated \
   bash effectbench_omega/scripts/run_stage3_offline.sh
 ```
+
+<!-- REBUTTAL2_STATUS_START -->
+# Rebuttal 2 Execution Status
+
+Status: `complete`
+Pipeline job: `rebuttal2_pipeline_20260629T054550Z`
+Queue job: `rebuttal2_base_nosystem_v1_20260629T054550Z`
+
+| Check | Value |
+|---|---:|
+| Full stress replay bundles | 3072 |
+| Full stress replay failures | 0 |
+| Fresh no-system shared traces | 21504 |
+| Fresh no-system complete shared groups | 7168 |
+| Fresh no-system unexplained mismatches | 0 |
+| Stage 4 gate rows | 49 |
+| Stage 4 base-gap failures | 0 |
+| Stage 4 projection failures | 0 |
+| Stage 4 EffectGuard-zero failures | 0 |
+
+## Fresh No-System Online Control
+
+| System | Strict excess / success | Raw success |
+|---|---:|---:|
+| `BASE` | 0.5620814732142857 | 1.0 |
+| `EFFECTGUARD_V2` | 0.0 | 1.0 |
+| `PROJ_GUARD_V2` | 0.0849609375 | 1.0 |
+
+## Artifacts
+
+- Full stress replay: `effectbench_omega/reports/certificate_replay_stage3_stress_all_local_canonical_full.md`
+- Fresh BASE split: `effectbench_omega/outputs/base_nosystem_v1_all_local/`
+- Fresh shared proposal split: `effectbench_omega/outputs/shared_proposal_v3_nosystem_all_local/`
+- Fresh canonical report: `effectbench_omega/reports/frontier_canonical_shared_proposal_v3_nosystem_all_local_canonical.md`
+- Refreshed leave-one robustness: `effectbench_omega/reports/stage4_leave_one_robustness.md`
+<!-- REBUTTAL2_STATUS_END -->
+
+## Final Submission-Facing Package
+
+Completed on 2026-06-29 UTC.
+
+```text
+archive: CommitBench_final_anonymous_artifact_20260629.zip
+paper scaffold: PAPER_EACL2027_REWRITE.md
+status doc: FINAL_SUBMISSION_STATUS.md
+anonymity audit: ARTIFACT_ANONYMITY_AUDIT.md
+```
+
+The final package is a curated anonymous artifact bundle. It includes code,
+configs, scripts, tests, local/open-weight outputs, canonical certificates,
+Rebuttal-2 v3 fresh no-system-prompt audit artifacts, reports, tables, figures,
+metrics, witness bundles, and final Markdown handoff docs. It excludes secrets,
+virtualenvs, model caches, upstream clones, old zip files, the stale historical
+PDF, the presentation deck, archived paid-provider notes, and internal planning
+memos with obsolete or identity-bearing text.
+
+The experiment evidence is frozen. Remaining paper work is manuscript writing
+from `PAPER_EACL2027_REWRITE.md`; no additional GPU experiments are required
+for the current claim.

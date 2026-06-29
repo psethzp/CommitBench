@@ -164,7 +164,6 @@ def _action_proposal_user_content(messages: list[dict[str, str]], row: dict[str,
         "Task context:\n"
         f"family={row.get('family')}\n"
         f"regime={row.get('regime')}\n"
-        f"system={row.get('system')}\n"
         f"target_id={row.get('target_id')}\n"
         f"policy_obligation={row.get('policy_obligation')}\n"
         f"user_goal={row.get('user_goal')}\n"

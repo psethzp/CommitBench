@@ -1,0 +1,16 @@
+metric,value
+split_trace_count,21504
+group_count,7168
+systems,"[""BASE"", ""EFFECTGUARD_V2"", ""PROJ_GUARD_V2""]"
+expected_shared_rows,21504
+complete_shared_source_groups,7168
+incomplete_shared_source_groups,0
+proposal_actions_equal_groups,7168
+proposal_actions_unequal_groups,0
+failures,0
+parse_counts,"[{""model_proposal_parse_status"": ""json"", ""rows"": 7082, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""low_high_legacy"", ""rows"": 8, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""text_scan"", ""rows"": 52, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""unparsed:repair_fallback"", ""rows"": 26, ""system"": ""BASE""}, {""model_proposal_parse_status"": ""json"", ""rows"": 7082, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""low_high_legacy"", ""rows"": 8, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""text_scan"", ""rows"": 52, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""unparsed:repair_fallback"", ""rows"": 26, ""system"": ""EFFECTGUARD_V2""}, {""model_proposal_parse_status"": ""json"", ""rows"": 7082, ""system"": ""PROJ_GUARD_V2""}, {""model_proposal_parse_status"": ""low_high_legacy"", ""rows"": 8, ""system"": ""PROJ_GUARD_V2""}, {""model_proposal_parse_status"": ""text_scan"", ""rows"": 52, ""system"": ""PROJ_GUARD_V2""}, {""model_proposal_parse_status"": ""unparsed:repair_fallback"", ""rows"": 26, ""system"": ""PROJ_GUARD_V2""}]"
+source_parse_counts,"{""json"": 21246, ""low_high_legacy"": 24, ""text_scan"": 156, ""unparsed:repair_fallback"": 78}"
+gpu_used,False
+new_model_calls,0
+prompt_fix_for_future_runs,run_online.py no longer includes system=... in proposal user content
+residual_caveat,"Fresh no-system-prompt BASE proposals are replayed to BASE, PROJ_GUARD_V2, and EFFECTGUARD_V2, removing the prior source-prompt caveat."

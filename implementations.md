@@ -1,14 +1,16 @@
 # EffectBench-Omega Local Implementation Handoff
 
-Last updated: 2026-06-23 UTC
+Last updated: 2026-06-29 UTC
 
 ## Plan Status
 
-The executable local-only plan in `PLAN.md` is complete through Stage 3. There
-are no active queue jobs, no active `run_online.py` processes, and no active
-vLLM server for the local experiment path.
+The executable local-only plan in `PLAN.md` is complete, and the Rebuttal-2
+fresh no-system-prompt audit is complete. There are no active queue jobs, no
+active `run_online.py` processes, and no active vLLM server for the local
+experiment path.
 
-What remains is paper/package work, not core experiment execution:
+What remains is manuscript writing from `PAPER_EACL2027_REWRITE.md`, not core
+experiment execution:
 
 | Area | Status | Notes |
 |---|---:|---|
@@ -19,7 +21,14 @@ What remains is paper/package work, not core experiment execution:
 | Full local Qwen rerun of 42 repaired proposals | Deferred | Can be run later only as a named ablation or sensitivity check, not a silent replacement. |
 | Figures | Done | Aggregate now writes PNG/PDF figures under `effectbench_omega/figures/main_mc_postfix_all_local/`. |
 | Claim registry | Lite fixed | Aggregate now writes 50 computed claim rows; expand only if the manuscript adds more numeric claims. |
-| Paper rewrite | Remaining | Required because the current result supports local/open-weight kernel claims, not frontier SOTA leaderboard claims. |
+| Paper rewrite scaffold | Ready | `PAPER_EACL2027_REWRITE.md`; regenerate a new manuscript PDF from this framing before submission. |
+| Rebuttal Stage 1 claim reset | Done | Docs/code posture now disallow stale frontier/human/SOTA/204,800-episode claims. |
+| Rebuttal Stage 2 shared-proposal audit | Done | CPU-only V2 replay from frozen BASE proposals; canonical gate and no-oracle passed. |
+| Rebuttal Stage 3 stress block | Done | Necessary-high and incomparable stress policies/manifest/live run; canonical gate, no-oracle, replay passed. |
+| Rebuttal Stage 4 robustness | Done | Leave-one model/family robustness audit over canonical artifacts. |
+| Rebuttal Stage 6 freeze addendum | Done | Docs/registry/gates refreshed after rebuttal stages. |
+| Rebuttal 2 v3 audit | Done | Fresh no-system-prompt `BASE` proposals replayed to all V2 systems; 21,504 traces, 7,168 complete groups, 0 unexplained mismatches. |
+| Final anonymous package | Done | `CommitBench_final_anonymous_artifact_20260629.zip`; stale PDF/PPT and identity-bearing planning memos excluded. |
 
 ## Active Experiment Boundary
 
@@ -47,6 +56,8 @@ The active setup is local/open-weight only:
 | Mistral serving fix | Done | `effectbench_omega/scripts/install_mistral_vllm_shim.py`, launcher defaults | Replaced old HF tokenizer/custom template path with Mistral-compatible vLLM serving. |
 | Manifest and local denominator | Done | `effectbench_omega/manifests/tasks_local_open.csv` | 21,504-row local-open manifest for headline run. |
 | Online runner | Done | `effectbench_omega/scripts/run_online.py` | Supports local model calls, balanced smoke selection, model-controlled policies, and per-model outputs. |
+| Proposal prompt system-label removal | Done | `effectbench_omega/scripts/run_online.py` | Future proposal prompts omit `system=...` from task context to avoid exposing the evaluated control condition to the model. |
+| Stage 3 stress manifest | Done | `effectbench_omega/scripts/build_stage3_stress_manifest.py` | Builds 3,072-row necessary-high/incomparable stress block. |
 | Ordered local queue | Done | `effectbench_omega/scripts/run_local_open_queue.sh` | Serializes four local slices, runs verifier/no-oracle/cost checks per slice, fail-stops on failures. |
 | Queue monitor | Done | `effectbench_omega/scripts/show_local_open_queue_status.sh` | Reports queue, current model, summaries, and status files. |
 | Model proposal parser | Done | `effectbench_omega/effectbench/agents/systems.py` | Parses JSON object/list outputs, text-scan action lists, legacy LOW/HIGH outputs, and explicit repaired fallback. |
@@ -79,6 +90,11 @@ The active setup is local/open-weight only:
 | Merged Stage 2b split | Done | `effectbench_omega/outputs/main_mc_postfix_all_local/merge_summary.json` |
 | Hardened Stage 3 offline suite | Done | `effectbench_omega/jobs/stage3_hardened_main_mc_postfix_all_local_20260623T220316Z` |
 | Latest Stage 3 pointer | Done | `effectbench_omega/jobs/stage3_latest` |
+| Rebuttal Stage 2 shared-proposal audit | Done | `effectbench_omega/outputs/shared_proposal_v2_audit_all_local/`; canonical strict-excess: BASE 57.0033%, PROJ_GUARD_V2 9.1657%, EFFECTGUARD_V2 0.0000%. |
+| Rebuttal Stage 3 stress run | Done | `effectbench_omega/outputs/stage3_stress_all_local/`; 704 necessary-high and 320 incomparable `EFFECTGUARD_V2` decisions. |
+| Rebuttal Stage 4 robustness | Done | `effectbench_omega/reports/stage4_leave_one_robustness.md`; 0 gate failures across 39 leave-one rows. |
+| Rebuttal-2 v3 fresh shared-proposal audit | Done | `effectbench_omega/outputs/shared_proposal_v3_nosystem_all_local/`; strict-excess: BASE 56.2081%, PROJ_GUARD_V2 8.4961%, EFFECTGUARD_V2 0.0000%. |
+| Final anonymous package | Done | `CommitBench_final_anonymous_artifact_20260629.zip`; integrity and scrub checks passed. |
 
 ## Important Defaults To Preserve
 
@@ -112,8 +128,9 @@ old custom Mistral chat template
 | Qwen repaired proposals | Logged caveat | 42/5,376 Qwen proposals used `unparsed:repair_fallback`; 168 Qwen traces have nonempty repair logs. Keep visible or rerun later as ablation. |
 | Mistral full post-fix parse | Acceptable | 5,362 JSON/tool-call parses and 14 text-scan parses; 0 repaired fallbacks. |
 | Llama runtime | Expected | Dense 70B AWQ over TP=4 took much longer than other slices; completed successfully. |
-| PROJ_GUARD / EFFECTGUARD tie | Major claim caveat | EffectGuard only beats PROJ_GUARD by 0.0419 percentage points in strict-excess rate. Do not claim strong superiority over PROJ_GUARD. |
+| Legacy PROJ_GUARD / EFFECTGUARD tie | Archived legacy caveat | The old guards remain nearly tied and should not be used for the main superiority claim. The paper-facing comparison is the corrected `PROJ_GUARD_V2` / `EFFECTGUARD_V2` evidence plus the shared-proposal audit. |
 | Current adapters have 100% raw success | Claim caveat | The paper should emphasize least-effect certification, not raw success competition. |
+| Frozen shared-proposal source prompt | Logged caveat | Stage 2 audit shares BASE proposals across systems, but those BASE proposals came from the legacy prompt containing `system=BASE`; future runs use no `system=` field. |
 | CEGAR no-collision fields | Conservative-audit strength with boundary | The audit only rejects omissions when this scaffold shows label-changing collisions. Zero-collision fields mean not exercised as label-changing here, not universally irrelevant. |
 | Projection and CEGAR audits are simulator-local | Claim caveat | They are replayable and data-derived, but not external human audit. |
 | Figures | Fixed | Six figure files exist: three PNG and three PDF. |
@@ -125,9 +142,10 @@ Use:
 
 > Across reproducible open-weight tool agents, final-state success substantially
 > overstates certified least-effect success. Projected safeguards reduce but do
-> not eliminate residual strict excess. EffectGuard is a no-oracle reference
-> controller that matches a strong projection guard and slightly improves a few
-> telecom target-confirmation cases in this implementation.
+> not eliminate residual strict excess. In the corrected V2 and shared-proposal
+> audits, EffectGuard is a no-oracle reference controller that removes the
+> residual strict-excess seen under projection-only guards while preserving raw
+> success in this local certificate scaffold.
 
 Do not use:
 
@@ -136,7 +154,7 @@ state of the art across frontier models
 commercial model coverage
 GPT/Claude/Gemini generality
 largest-model benchmark
-strong EffectGuard-over-PROJ_GUARD superiority
+strong claims based on the archived legacy guard comparison
 guaranteed acceptance
 ```
 

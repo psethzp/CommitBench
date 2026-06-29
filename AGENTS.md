@@ -27,6 +27,14 @@ Final EACL rescue freeze:
 
 ```text
 Stages 0-11 are complete locally on branch eacl-rescue-v2.
+Rebuttal Stage 1 claim reset and Stage 2 shared-proposal audit are complete.
+Rebuttal Stage 3 necessary-high/incomparable stress, Stage 4 leave-one
+robustness, and Stage 6 final freeze addendum are complete.
+Use effectbench_omega/reports/shared_proposal_v2_audit_canonical_summary.md
+for the paired proposal-control audit.
+Use effectbench_omega/reports/stage4_leave_one_robustness.md for robustness.
+Use effectbench_omega/reports/rebuttal_stage6_final_freeze.md for the final
+rebuttal freeze gate.
 Use effectbench_omega/metrics/claim_registry_eacl_rescue_final.csv for paper numbers.
 Use effectbench_omega/reports/eacl_rescue_paper_ready_summary.md for paper posture.
 Use effectbench_omega/reports/final_reproducibility_gate.md for final gate status.
@@ -67,9 +75,23 @@ Prompt fairness invariant:
 ```text
 All four local models receive the same semantic proposal prompt: same system
 instruction, task context, user-turn rendering, action enum, terminal_action
-requirement, temperature, and max token budget. Mistral uses official tool-call
-transport; Qwen/Llama/Gemma use response_format=json_schema. This transport
-difference is serving compatibility, not a different task prompt.
+requirement, temperature, and max token budget. The evaluated control-condition
+label is not exposed in proposal prompt user content. Mistral uses official
+tool-call transport; Qwen/Llama/Gemma use response_format=json_schema. This
+transport difference is serving compatibility, not a different task prompt.
+```
+
+Shared-proposal audit override:
+
+```text
+script: effectbench_omega/scripts/build_shared_proposal_v2_audit.py
+split: effectbench_omega/outputs/shared_proposal_v2_audit_all_local/
+systems: BASE, PROJ_GUARD_V2, EFFECTGUARD_V2
+status: complete, CPU-only, 21,504 traces, 7,168/7,168 shared groups,
+canonical gate pass, no-oracle 100%, 0 new model calls
+caveat: source BASE proposals were generated before the no-system prompt fix;
+the audit removes between-system proposal confounding but is not a fresh
+no-system-prompt model-call rerun.
 ```
 
 Accepted smoke before full Step 2b:

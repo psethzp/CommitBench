@@ -1,0 +1,33 @@
+{
+  "errors": [],
+  "online_control": [
+    {
+      "canonical_kernel_success": 3139,
+      "canonical_kernel_success_rate": 0.4379185267857143,
+      "canonical_strict_excess": 4029,
+      "canonical_strict_excess_rate": 0.5620814732142857,
+      "raw_success_rate": 1.0,
+      "system": "BASE",
+      "trajectories": 7168
+    },
+    {
+      "canonical_kernel_success": 7168,
+      "canonical_kernel_success_rate": 1.0,
+      "canonical_strict_excess": 0,
+      "canonical_strict_excess_rate": 0.0,
+      "raw_success_rate": 1.0,
+      "system": "EFFECTGUARD_V2",
+      "trajectories": 7168
+    },
+    {
+      "canonical_kernel_success": 6559,
+      "canonical_kernel_success_rate": 0.9150390625,
+      "canonical_strict_excess": 609,
+      "canonical_strict_excess_rate": 0.0849609375,
+      "raw_success_rate": 1.0,
+      "system": "PROJ_GUARD_V2",
+      "trajectories": 7168
+    }
+  ],
+  "passed": true
+}

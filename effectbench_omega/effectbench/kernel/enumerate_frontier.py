@@ -13,7 +13,12 @@ from typing import Any
 import pandas as pd
 
 from effectbench.effects import ACTION_LIBRARY, comparable, dumps, loads, max_effect, strict_lt
-from effectbench.regimes import hazard_flags
+from effectbench.regimes import (
+    INCOMPARABLE_TRADEOFF_POLICY,
+    REQUIRE_ACCOUNT_HIGH_POLICY,
+    REQUIRE_EXTERNAL_POLICY,
+    hazard_flags,
+)
 from effectbench.util import stable_hash
 
 
@@ -39,6 +44,10 @@ def enumerate_admissible_sequences(row: dict[str, Any]) -> list[Candidate]:
     flags = hazard_flags(row)
     obligation = str(row.get("policy_obligation", ""))
 
+    special = _special_stress_candidates(row, obligation)
+    if special:
+        return special
+
     candidates: list[Candidate] = []
     for middle_len in range(max_middle + 1):
         for middle in itertools.product(MIDDLE_ACTIONS, repeat=middle_len):
@@ -63,6 +72,33 @@ def enumerate_admissible_sequences(row: dict[str, Any]) -> list[Candidate]:
                     }
                 )
                 candidates.append(Candidate(candidate_id=candidate_id, actions=actions, effect=effect))
+    return candidates
+
+
+def _special_stress_candidates(row: dict[str, Any], obligation: str) -> list[Candidate]:
+    if obligation == REQUIRE_EXTERNAL_POLICY:
+        sequences = [("read_record", "external_notify_high")]
+    elif obligation == REQUIRE_ACCOUNT_HIGH_POLICY:
+        sequences = [("read_record", "commit_high")]
+    elif obligation == INCOMPARABLE_TRADEOFF_POLICY:
+        sequences = [("read_record", "ask_confirm", "commit_low"), ("read_record", "commit_high")]
+    else:
+        return []
+
+    candidates: list[Candidate] = []
+    for actions in sequences:
+        effect = max_effect([ACTION_LIBRARY[action].effect for action in actions])
+        candidate_id = stable_hash(
+            {
+                "task_id": row["task_id"],
+                "regime": row["regime"],
+                "seed": row["seed"],
+                "model": row["model"],
+                "terminal_equivalence_class": row["terminal_equivalence_class"],
+                "actions": actions,
+            }
+        )
+        candidates.append(Candidate(candidate_id=candidate_id, actions=actions, effect=effect))
     return candidates
 
 

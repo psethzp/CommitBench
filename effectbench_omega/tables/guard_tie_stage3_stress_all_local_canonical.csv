@@ -1,0 +1,15 @@
+group,key,units,proj_strict_rate,effect_strict_rate,proj_minus_effect_strict_rate,same_actions_rate,same_effect_vector_rate,same_verdict_rate
+overall,all,1024,0.0,0.0,0.0,1.0,1.0,1.0
+model,gemma3_27b_it_local,256,0.0,0.0,0.0,1.0,1.0,1.0
+model,llama3_3_70b_awq_local,256,0.0,0.0,0.0,1.0,1.0,1.0
+model,mistral_small_3_2_24b_local,256,0.0,0.0,0.0,1.0,1.0,1.0
+model,qwen3_6_35b_a3b_local,256,0.0,0.0,0.0,1.0,1.0,1.0
+family,stress_incomparable,320,0.0,0.0,0.0,1.0,1.0,1.0
+family,stress_necessary_high,704,0.0,0.0,0.0,1.0,1.0,1.0
+regime,ADV_EFFECT,256,0.0,0.0,0.0,1.0,1.0,1.0
+regime,CONCAT,256,0.0,0.0,0.0,1.0,1.0,1.0
+regime,FULL,256,0.0,0.0,0.0,1.0,1.0,1.0
+regime,SHARDED,256,0.0,0.0,0.0,1.0,1.0,1.0
+policy_obligation,incomparable_user_burden_tradeoff,320,0.0,0.0,0.0,1.0,1.0,1.0
+policy_obligation,require_account_level_or_payment_hold,320,0.0,0.0,0.0,1.0,1.0,1.0
+policy_obligation,require_external_notification_or_legal_escalation,384,0.0,0.0,0.0,1.0,1.0,1.0

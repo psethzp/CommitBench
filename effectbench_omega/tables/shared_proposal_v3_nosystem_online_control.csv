@@ -1,0 +1,4 @@
+system,trajectories,raw_success_rate,canonical_strict_excess,canonical_strict_excess_rate,canonical_kernel_success,canonical_kernel_success_rate
+BASE,7168,1.0,4029,0.5620814732142857,3139,0.4379185267857143
+EFFECTGUARD_V2,7168,1.0,0,0.0,7168,1.0
+PROJ_GUARD_V2,7168,1.0,609,0.0849609375,6559,0.9150390625

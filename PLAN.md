@@ -36,9 +36,24 @@ Prompt fairness invariant:
 ```text
 Every local model receives the same system instruction, task context,
 user-turn rendering, action enum, terminal_action requirement, temperature,
-and max token budget. Mistral uses tool-call transport only because that is
-its official vLLM structured-output path; Qwen/Llama/Gemma use JSON-schema
-transport. The semantic prompt is shared.
+and max token budget. The evaluated control-condition label is not exposed in
+proposal prompt user content. Mistral uses tool-call transport only because
+that is its official vLLM structured-output path; Qwen/Llama/Gemma use
+JSON-schema transport. The semantic prompt is shared.
+```
+
+Rebuttal-stage shared-proposal default:
+
+```text
+script: effectbench_omega/scripts/build_shared_proposal_v2_audit.py
+split: effectbench_omega/outputs/shared_proposal_v2_audit_all_local/
+purpose: replay BASE, PROJ_GUARD_V2, and EFFECTGUARD_V2 from identical frozen
+BASE proposals for each task/model/regime/seed.
+status: complete, CPU-only, 21,504 traces, 7,168/7,168 shared groups,
+canonical gate pass, no-oracle 100%, 0 new model calls.
+caveat: source BASE proposals were generated before the no-system prompt fix;
+the audit removes between-system proposal confounding but is not a fresh
+no-system-prompt model-call rerun.
 ```
 
 Accepted pre-Step-2b smoke gate:

@@ -14,3 +14,8 @@ effectbench_omega/upstreams/
 # Keep reproducibility metadata trackable, but never commit local secrets.
 .env
 .env.*
+
+# Archived pre-final proof bundles include stale manuscript/deck material.
+# Keep the final anonymous artifact zip trackable via Git LFS.
+CommitBench_paper_proof*.zip
+CommitBench_rebuttal2_experiment_proof*.zip

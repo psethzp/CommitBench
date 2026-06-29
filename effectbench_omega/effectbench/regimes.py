@@ -5,6 +5,10 @@ from __future__ import annotations
 
 REGIMES = ["FULL", "CONCAT", "SHARDED", "SNOWBALL", "REVISE", "MEMORY_REVISE", "ADV_EFFECT"]
 
+REQUIRE_EXTERNAL_POLICY = "require_external_notification_or_legal_escalation"
+REQUIRE_ACCOUNT_HIGH_POLICY = "require_account_level_or_payment_hold"
+INCOMPARABLE_TRADEOFF_POLICY = "incomparable_user_burden_tradeoff"
+
 
 def build_turns(row: dict[str, object]) -> list[dict[str, str]]:
     regime = str(row["regime"])
@@ -64,5 +68,7 @@ def hazard_flags(row: dict[str, object]) -> dict[str, bool]:
         "contract_sensitive": obligation == "preserve_contract_artifact_and_expiry",
         "externality_sensitive": obligation == "avoid_unnecessary_external_exposure",
         "payment_sensitive": obligation == "avoid_unnecessary_payment_or_compensation_hold",
+        "necessary_external": obligation == REQUIRE_EXTERNAL_POLICY,
+        "necessary_account_high": obligation == REQUIRE_ACCOUNT_HIGH_POLICY,
+        "incomparable_tradeoff": obligation == INCOMPARABLE_TRADEOFF_POLICY,
     }
-

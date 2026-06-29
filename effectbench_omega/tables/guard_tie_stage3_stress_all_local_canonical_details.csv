@@ -1,0 +1,1 @@
+task_id,family,regime,seed,model,scenario,policy_obligation,left_system,right_system,proj_trace_id,effect_trace_id,proj_verdict,effect_verdict,proj_strict,effect_strict,same_verdict,same_effect_vector,same_actions,proj_actions,effect_actions,proj_added_user_turns,effect_added_user_turns,proj_parse_status,effect_parse_status,proj_guard_decisions,effect_guard_decisions

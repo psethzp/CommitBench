@@ -2,6 +2,26 @@
 
 Last updated: 2026-06-24
 
+2026-06-26 rebuttal addendum: Rebuttal Stage 1 claim reset and Stage 2
+shared-proposal audit are complete. Future proposal prompts omit `system=...`
+from user content. The shared-proposal audit replays `BASE`, `PROJ_GUARD_V2`,
+and `EFFECTGUARD_V2` from identical frozen `BASE` proposals for every
+task/model/regime/seed; it is CPU-only, uses 0 new model calls, passes the
+canonical enumerated-frontier gate with 0 unexplained mismatches, and reports
+canonical strict-excess rates BASE 57.0033%, PROJ_GUARD_V2 9.1657%,
+EFFECTGUARD_V2 0.0000%. Caveat: the frozen BASE proposals came from the
+legacy prompt that included `system=BASE`, so this audit removes
+between-system proposal confounding but is not a fresh no-system-prompt rerun.
+
+2026-06-26 final rebuttal addendum: Rebuttal Stage 3 stress, Stage 4
+leave-one robustness, and Stage 6 final freeze addendum are complete. Stage 3
+adds 3,072 necessary-high/incomparable stress trajectories with 0 failures, 0
+unexplained mismatches, 704 EffectGuard necessary-high decisions, and 320
+EffectGuard incomparable decisions. Stage 4 adds 39 leave-one gate rows with 0
+base-gap failures, 0 required projection-residual failures, and 0
+EffectGuard-zero failures. Stage 6 light gates pass with 18 tests, claim
+registry check, placeholder scan, and no active GPU jobs.
+
 ## Decision
 
 Do **not** submit the current 21,504-row run as the final EACL main-paper evidence package.

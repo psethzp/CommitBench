@@ -803,3 +803,187 @@ strong EffectGuard superiority over PROJ_GUARD
 human-eval claims
 universal abstraction-field irrelevance for fields with zero CEGAR collisions
 ```
+
+## Rebuttal Stage 1/2 Results - Claim Reset and Shared-Proposal Audit
+
+Completed on 2026-06-26 UTC.
+
+Stage 1 reset the paper posture to local/open-weight certificate semantics only.
+The stale PDF framing must be replaced: no 204,800-episode claim, no
+Bedrock/frontier leaderboard, no human-eval table, and no broad SOTA-system
+reproduction claim. Projection baselines should be described as deterministic
+projections of final-state/path/permission/contract/revisability predicates.
+
+Stage 2 fixed the major guard-comparison confound by replaying all three V2
+systems from identical frozen `BASE` proposals within each paired
+task/model/regime/seed group.
+
+| Stage 2 artifact | Path |
+|---|---|
+| Shared-proposal split | `effectbench_omega/outputs/shared_proposal_v2_audit_all_local/` |
+| Audit report | `effectbench_omega/reports/shared_proposal_v2_audit.md` |
+| Canonical summary | `effectbench_omega/reports/shared_proposal_v2_audit_canonical_summary.md` |
+| Canonical certificates | `effectbench_omega/outputs/shared_proposal_v2_audit_all_local/kernel_canonical/certificates_enumerated.parquet` |
+| Canonical frontier table | `effectbench_omega/tables/frontier_canonical_shared_proposal_v2_audit_all_local_canonical.csv` |
+| Online-control table | `effectbench_omega/tables/shared_proposal_v2_audit_online_control.csv` |
+| No-oracle table | `effectbench_omega/tables/no_oracle_shared_proposal_v2_audit_all_local_canonical.csv` |
+
+| Audit metric | Value |
+|---|---:|
+| Shared groups | 7,168 |
+| Trace rows | 21,504 |
+| Proposal-action equality groups | 7,168 / 7,168 |
+| New model calls | 0 |
+| GPU used | No |
+| Build failures | 0 |
+| No-oracle rows checked | 21,504 |
+| No-oracle failures | 0 |
+| Canonical gate | Pass |
+| Enumerated candidates | 1,205,248 |
+| Unexplained mismatches | 0 |
+| Pytest | 14 passed, 1 warning |
+
+| System | Trajectories | Raw success | Canonical strict excess | Canonical kernel success |
+|---|---:|---:|---:|---:|
+| `BASE` | 7,168 | 100.0000% | 57.0033% (4,086) | 42.9967% (3,082) |
+| `PROJ_GUARD_V2` | 7,168 | 100.0000% | 9.1657% (657) | 90.8343% (6,511) |
+| `EFFECTGUARD_V2` | 7,168 | 100.0000% | 0.0000% (0) | 100.0000% (7,168) |
+
+Caveat: this is a paired offline audit over frozen `BASE` proposals generated
+before the 2026-06-26 no-`system=` prompt fix. It removes between-system
+proposal-distribution confounding for the guard comparison, but it is not a
+fresh no-system-prompt model-call rerun.
+
+## Rebuttal Stage 3 Results - Necessary-High / Incomparable Stress
+
+Completed on 2026-06-26 UTC.
+
+| Artifact | Path |
+|---|---|
+| Live queue job | `effectbench_omega/jobs/stage3_stress_live_20260626T162912Z/` |
+| Merged output | `effectbench_omega/outputs/stage3_stress_all_local/` |
+| Canonical job | `effectbench_omega/jobs/stage3_stress_canonical_20260626T191036Z/` |
+| Canonical certificates | `effectbench_omega/outputs/stage3_stress_all_local/kernel_canonical/certificates_enumerated.parquet` |
+| Canonical table | `effectbench_omega/tables/frontier_canonical_stage3_stress_all_local_canonical.csv` |
+
+| Metric | Value |
+|---|---:|
+| Live traces | 3,072 |
+| Failures | 0 |
+| Canonical gate | Pass |
+| Unexplained mismatches | 0 |
+| Canonical strict-excess labels | 0 |
+| `EFFECTGUARD_V2` necessary-high decisions | 704 |
+| `EFFECTGUARD_V2` incomparable decisions | 320 |
+| `stress_necessary_high` rows certified minimal | 2,112 |
+| `stress_incomparable` rows certified minimal-with-incomparables | 960 |
+
+Interpretation: Stage 3 fixes the "EffectGuard just always picks low effect"
+caveat. It shows high-effect escalation can be certified minimal when policy
+requires it, and burden/effect tradeoffs can be certified as incomparable
+rather than strict-excess.
+
+## Rebuttal Stage 4 Results - Leave-One Robustness
+
+Completed on 2026-06-26 UTC.
+
+| Artifact | Path |
+|---|---|
+| Report | `effectbench_omega/reports/stage4_leave_one_robustness.md` |
+| Gate table | `effectbench_omega/tables/stage4_leave_one_gates.csv` |
+| Metric table | `effectbench_omega/tables/stage4_leave_one_metrics.csv` |
+
+| Metric | Value |
+|---|---:|
+| Metric rows | 117 |
+| Gate rows | 39 |
+| Base-gap failures | 0 |
+| Required projection-residual failures | 0 |
+| EffectGuard-zero failures | 0 |
+| Controlled/shared/corrected minimum BASE gap | 53.3110 pp |
+| Native-validation minimum BASE gap | 61.9102 pp |
+| Corrected V2 projection residual range | 1.2835% - 9.7284% |
+| Shared-proposal V2 projection residual range | 1.3207% - 12.2210% |
+| EffectGuard max strict-excess across leave-one slices | 0.0000% |
+
+Interpretation: dropping any single model or family preserves the BASE
+raw-vs-kernel gap, preserves nonzero projection residual strict-excess in the
+required V2 comparison splits, and keeps `EFFECTGUARD_V2` at zero strict-excess.
+
+## Rebuttal Stage 6 Results - Final Freeze Addendum
+
+Completed on 2026-06-26 UTC.
+
+The final rebuttal-facing docs and claim registry now include Stage 2
+shared-proposal fairness, Stage 3 necessary-high/incomparable stress, and Stage
+4 leave-one robustness. Stage 5 native expansion remains skipped by instruction.
+
+| Gate | Result |
+|---|---:|
+| py_compile | Pass |
+| pytest | Pass |
+| claim registry check | Pass |
+| placeholder scan | Pass |
+| active jobs / GPU compute apps | None |
+
+Paper-proof archive refresh: complete on 2026-06-26 UTC as
+`CommitBench_paper_proof_full_20260626.zip` in the repo root. The refreshed zip
+bundles the local-only code, runbooks, configs, reports, results tables,
+figures, generated outputs, logs, manifests, witness bundles, claim registries,
+and paper-facing PDFs/decks needed to audit the old and new paper evidence. It
+contains 14,607 entries and is about 82 MiB on disk after compression. It
+excludes secrets (`.env`), `.git`, virtualenvs, model caches, cloned upstream
+repos, transient caches, and older zip files.
+
+## Final Anonymous Artifact Package
+
+Completed on 2026-06-29 UTC.
+
+The final submission-facing artifact package is
+`CommitBench_final_anonymous_artifact_20260629.zip`. It is a curated anonymous
+artifact bundle, not a raw working-tree dump. It includes code, configs,
+scripts, tests, local/open-weight outputs, canonical certificates, Rebuttal-2
+v3 fresh no-system-prompt audit artifacts, reports, tables, figures, metrics,
+witness bundles, and final Markdown handoff docs. It excludes local secrets,
+virtualenvs, model caches, upstream clones, old zip files, the stale historical
+PDF, the presentation deck, and historical planning memos with obsolete
+internal notes.
+
+Use `PAPER_EACL2027_REWRITE.md` as the paper rewrite scaffold. Do not use the
+historical PDF for submission.
+
+<!-- REBUTTAL2_STATUS_START -->
+# Rebuttal 2 Execution Status
+
+Status: `complete`
+Pipeline job: `rebuttal2_pipeline_20260629T054550Z`
+Queue job: `rebuttal2_base_nosystem_v1_20260629T054550Z`
+
+| Check | Value |
+|---|---:|
+| Full stress replay bundles | 3072 |
+| Full stress replay failures | 0 |
+| Fresh no-system shared traces | 21504 |
+| Fresh no-system complete shared groups | 7168 |
+| Fresh no-system unexplained mismatches | 0 |
+| Stage 4 gate rows | 49 |
+| Stage 4 base-gap failures | 0 |
+| Stage 4 projection failures | 0 |
+| Stage 4 EffectGuard-zero failures | 0 |
+
+## Fresh No-System Online Control
+
+| System | Strict excess / success | Raw success |
+|---|---:|---:|
+| `BASE` | 0.5620814732142857 | 1.0 |
+| `EFFECTGUARD_V2` | 0.0 | 1.0 |
+| `PROJ_GUARD_V2` | 0.0849609375 | 1.0 |
+
+## Artifacts
+
+- Full stress replay: `effectbench_omega/reports/certificate_replay_stage3_stress_all_local_canonical_full.md`
+- Fresh BASE split: `effectbench_omega/outputs/base_nosystem_v1_all_local/`
+- Fresh shared proposal split: `effectbench_omega/outputs/shared_proposal_v3_nosystem_all_local/`
+- Fresh canonical report: `effectbench_omega/reports/frontier_canonical_shared_proposal_v3_nosystem_all_local_canonical.md`
+- Refreshed leave-one robustness: `effectbench_omega/reports/stage4_leave_one_robustness.md`
+<!-- REBUTTAL2_STATUS_END -->
