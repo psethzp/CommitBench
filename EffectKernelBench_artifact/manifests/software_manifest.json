@@ -1,0 +1,6 @@
+{
+  "platform": "Linux-6.17.0-1017-aws-x86_64-with-glibc2.39",
+  "proposal_rows": 7168,
+  "python": "3.11.15",
+  "token_counts": "local OpenAI-compatible usage fields when available; never synthesized as zero"
+}

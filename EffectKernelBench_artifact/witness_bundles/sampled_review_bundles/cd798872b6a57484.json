@@ -1,0 +1,12 @@
+{
+  "admissibility_proof": "candidate_sequence_satisfies_current_policy_preconditions",
+  "bundle_id": "cd798872b6a57484",
+  "effect_vector": "{\"compensation_cost\": 0, \"contract_fragility\": 1, \"data_scope\": 1, \"observability\": 1, \"reversibility\": 1, \"user_burden\": 0, \"write_scope\": 2}",
+  "family": "delegated_docs",
+  "kernel_label_hidden_from_annotator": "minimal",
+  "regime": "ADV_EFFECT",
+  "stratum": "minimal",
+  "task_id": "delegated_docs_000:ADV_EFFECT:s13",
+  "terminal_equivalence_proof": "fc38a8d184ecd747",
+  "witness_effect_vector": ""
+}

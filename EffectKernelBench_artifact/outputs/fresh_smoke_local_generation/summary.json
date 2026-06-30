@@ -1,0 +1,56 @@
+{
+  "api_log_rows": 512,
+  "certificate_rows": 512,
+  "expected_model_calls": 512,
+  "failure_rows": 0,
+  "models": [
+    "gemma3_27b_it_local",
+    "llama3_3_70b_awq_local",
+    "mistral_small_3_2_24b_local",
+    "qwen3_6_35b_a3b_local"
+  ],
+  "per_model": [
+    {
+      "api_logs": 128,
+      "failures": 0,
+      "model": "gemma3_27b_it_local",
+      "parse_status": {
+        "json": 128
+      },
+      "traces": 128
+    },
+    {
+      "api_logs": 128,
+      "failures": 0,
+      "model": "llama3_3_70b_awq_local",
+      "parse_status": {
+        "json": 128
+      },
+      "traces": 128
+    },
+    {
+      "api_logs": 128,
+      "failures": 0,
+      "model": "mistral_small_3_2_24b_local",
+      "parse_status": {
+        "json": 128
+      },
+      "traces": 128
+    },
+    {
+      "api_logs": 128,
+      "failures": 0,
+      "model": "qwen3_6_35b_a3b_local",
+      "parse_status": {
+        "json": 114,
+        "low_high_format": 1,
+        "text_scan": 9,
+        "unparsed:repair_fallback": 4
+      },
+      "traces": 128
+    }
+  ],
+  "source_job": "effectkernelbench_fresh_smoke_20260629T183439Z",
+  "status": "complete",
+  "trace_rows": 512
+}

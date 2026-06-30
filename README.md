@@ -1,4 +1,8 @@
-# CommitBench
+# EffectKernelBench / CommitBench Rescue Workspace
+
+Public submission name for the rescued paper/artifact should be
+**EffectKernelBench**. `CommitBench` remains only the repository/workspace
+name and should not be used as the final paper title.
 
 Local handoff/setup repo for the EffectBench-Ω minimal-plus experiment suite.
 
@@ -6,16 +10,29 @@ Current active plan: **local/open-weight only**. Bedrock/API runs are archived a
 
 Historical Bedrock smoke notes exist in older runbooks, but the active `PLAN.md` path does not require Bedrock access.
 
-Final submission-facing artifact status: **experiments are frozen after
-Rebuttal-2**. Use the fresh no-system-prompt shared-proposal v3 audit, full
-stress replay, canonical enumerated-frontier certificates, native validation,
-and leave-one robustness as the paper evidence. The stale historical
-`CommitBench.pdf` and presentation deck are excluded from the final anonymous
-artifact bundle; use `PAPER_EACL2027_REWRITE.md` as the paper rewrite scaffold.
+Review-rescue artifact status: **EffectKernelBench artifact is built**.
+The clean review-facing artifact is generated at `EffectKernelBench_artifact/`
+and zipped as `EffectKernelBench_artifact.zip`. It exposes one canonical split,
+`final_paired_control`, plus normalized raw model-proposal provenance,
+deterministic close-method projection baselines, uncertainty tables,
+no-oracle reports, a completed 512-call fresh local smoke, a 300-bundle
+optional annotation package, and a final Markdown paper draft.
+
+Final review-rescue zip:
+
+```text
+EffectKernelBench_artifact.zip
+size: 4.0 MiB
+sha256: cd1ad054d2552dcd8a4e6971f11348f82dfe67ea3e9f797dd9a1e5f39dc6d73a
+```
+
+The stale historical `CommitBench.pdf`, presentation deck, old proof zips,
+development split labels, model caches, and upstream clones are excluded from
+the review-facing artifact.
 
 ## Current Status
 
-- Active V2 rescue branch: **`eacl-rescue-v2`**. EACL rescue Stages 0-11 are complete locally: canonical labels, corrected guards, native-fidelity validation, full replay, targeted CEGAR stress, lattice-policy freeze, final claim registry, final reproducibility gate, paper-ready summary, and LFS artifact tracking setup.
+- Historical V2 rescue branch: **`eacl-rescue-v2`**. Current review-rescue work is on **`effectkernelbench-review-rescue`**. EACL rescue Stages 0-11 are complete locally: canonical labels, corrected guards, native-fidelity validation, full replay, targeted CEGAR stress, lattice-policy freeze, final claim registry, final reproducibility gate, paper-ready summary, and LFS artifact tracking setup.
 - Main Bedrock experiments: **not run**.
 - Full local Qwen experiment grid: **not run by request**.
 - Local-open 21,504-row manifest: **built** at `effectbench_omega/manifests/tasks_local_open.csv`.
@@ -59,6 +76,7 @@ artifact bundle; use `PAPER_EACL2027_REWRITE.md` as the paper rewrite scaffold.
 - Paper-proof archive refresh: **complete** as `CommitBench_paper_proof_full_20260626.zip` in the repo root. It contains 14,607 entries and is about 82 MiB on disk after compression; integrity check passed and the exclusion audit found 0 sensitive/cache entries.
 - Rebuttal-2 fresh no-system-prompt audit: **complete**. The BASE-only TP=4 queue finished across all four local models; the v3 shared-proposal audit has 21,504 traces, 7,168 complete paired groups, 0 unexplained canonical mismatches, no-oracle 100%, full stress replay 3,072/3,072 pass, and Stage 4 leave-one robustness 49/49 gates pass.
 - Final anonymous artifact package: **ready**. The final package excludes secrets, virtualenvs, model caches, upstream clones, old zip files, stale PDF/PPT binaries, and historical planning memos that contain identity-bearing or obsolete claims.
+- EffectKernelBench review-rescue artifact: **ready for the no-human-eval scope**. It includes 7,168 normalized real local BASE proposal logs, the 21,504-row `final_paired_control` split, direct projection baselines, uncertainty/no-oracle audits, 300 optional blinded annotation bundles, a completed 512-call fresh smoke, and `PAPER_EFFECTKERNELBENCH_FINAL.md`. Human validation is explicitly skipped and not claimed.
 - Queue defaults: **Step 2b hardened path**. `run_local_open_queue.sh` now defaults to `main_mc_postfix`, `MODEL_CONTROLS_POLICY=1`, `MODEL_PROPOSAL_MODE=actions`, TP=4 on GPUs `0,1,2,3`.
 - Prompt fairness: **locked for future runs**. `run_online.py` no longer exposes the evaluated system label in proposal prompt user content. All four local models receive the same system instruction, task context, user-turn rendering, action enum, `terminal_action` requirement, temperature, and max token budget; only the structured-output transport differs by serving support.
 
@@ -71,6 +89,8 @@ artifact bundle; use `PAPER_EACL2027_REWRITE.md` as the paper rewrite scaffold.
 - Stage 3 projection/bootstrap/CEGAR are now replayable data-derived local audits. They are still simulator-local, not external human audits. CEGAR no-collision fields are a conservative-audit strength: the checker does not reject omissions without observed label-changing collisions; that means "not exercised by this scaffold," not "never future-relevant."
 - Legacy `PROJ_GUARD` and `EFFECTGUARD` are effectively tied in this local implementation: only `3/7,168` paired units differ in verifier verdict, all Mistral telecom confirm-target cases. Corrected `PROJ_GUARD_V2`/`EFFECTGUARD_V2` and the shared-proposal audit support the V2 comparison instead.
 - Active claims are local/open-weight only. Do not claim commercial/frontier leaderboard coverage from this run.
+- EffectKernelBench human-validation caveat: human validation is skipped for this freeze. The annotation package exists, but the paper must not claim human agreement, kappa/alpha, human preference, or human-audited correctness unless 2-3 annotators complete the 300 blinded bundles later.
+- Fresh smoke parse caveat: 498/512 proposals parsed as JSON. Qwen accounts for the non-JSON rows: 9 text-scan, 1 low/high-format, and 4 repaired fallbacks. All rows completed runner, verifier, no-oracle, and cost checks; the parse audit is included in the artifact.
 - The historical `CommitBench.pdf` is stale and is excluded from the final anonymous artifact package. Use `PAPER_EACL2027_REWRITE.md` as the current paper rewrite scaffold.
 - V2 rescue work must not overwrite `effectbench_omega/outputs/main_mc_postfix_all_local/`; all new outputs need new split names.
 - Stage 5 native-fidelity subset is a compact native-style validation block over pinned upstream task records, not a full re-host of the upstream benchmark servers. It supports native predicate/state-delta validation; keep the boundary explicit in paper wording.

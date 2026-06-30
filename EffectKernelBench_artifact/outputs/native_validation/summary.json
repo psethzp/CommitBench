@@ -1,0 +1,18 @@
+{
+  "certificate_rows": 4217,
+  "models": [
+    "gemma3_27b_it_local",
+    "llama3_3_70b_awq_local",
+    "mistral_small_3_2_24b_local",
+    "qwen3_6_35b_a3b_local"
+  ],
+  "rows": 4608,
+  "split": "native_validation",
+  "strict_excess": 848,
+  "systems": [
+    "BASE",
+    "EFFECTGUARD_REF",
+    "PROJ_GUARD"
+  ],
+  "terminal_success_rate": 1.0
+}

@@ -4,6 +4,11 @@ This is the submission-facing rewrite scaffold. It replaces the stale historical
 PDF framing and should be used as the source of truth for the next manuscript
 draft.
 
+Final draft status: use `PAPER_EFFECTKERNELBENCH_FINAL.md` for the current
+paper-facing Markdown draft. Human/domain validation is intentionally skipped in
+this freeze, so the paper must not claim human agreement, kappa/alpha, human
+preference, or human-audited correctness.
+
 ## Abstract Draft
 
 Tool-agent evaluations usually ask whether an agent reached a correct final
@@ -94,7 +99,9 @@ Avoid:
   agent policy.
 - Main claims use the declared Pareto lattice; alternate lattices are appendix
   diagnostics only.
-- Deterministic replay replaces human audit in this version.
+- Deterministic replay replaces human audit in this version. A 300-bundle
+  annotation package exists for optional follow-up, but human validation is
+  skipped and not claimed in the final artifact.
 
 ## Final Packaging Notes
 

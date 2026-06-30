@@ -1,0 +1,164 @@
+# rescue_config.yaml — canonical configuration after critical review
+project:
+  public_name: EffectKernelBench
+  old_name_to_avoid: CommitBench
+  target_venue: ARR_August_2026_for_EACL_2027
+  paper_claim: complete_trace_pareto_effect_certification_with_replayable_witnesses
+
+hardware:
+  gpus: 4
+  gpu_type: NVIDIA_L40
+  api_budget_usd: 0
+  allowed_backends: [vllm, sglang, transformers]
+  forbidden_backends: [bedrock, openai_api, anthropic_api, google_api]
+
+canonical_split:
+  name: final_paired_control
+  expose_only_this_name_in_paper: true
+  tasks: 128
+  regimes: [FULL, CONCAT, SHARDED, SNOWBALL, REVISE, MEMORY_REVISE, ADV_EFFECT]
+  seeds: [0, 1]
+  models:
+    - id: mistral_small_3_2_24b_local
+      role: non_qwen_tool_calling_mid_model
+      required_revision_file: manifests/model_revisions.csv
+    - id: qwen3_6_35b_a3b_local
+      role: modern_qwen_moe
+      required_revision_file: manifests/model_revisions.csv
+    - id: gemma_3_27b_it_local
+      role: non_qwen_google_family_open_model
+      required_revision_file: manifests/model_revisions.csv
+    - id: llama_3_3_70b_awq_local
+      role: large_dense_non_qwen_control
+      required_revision_file: manifests/model_revisions.csv
+  proposal_stage:
+    system: BASE_PROPOSAL_NO_SYSTEM_LABEL
+    model_calls_required: 7168
+    save_raw_outputs: true
+    save_prompts: true
+    save_token_counts: true
+    save_timestamps: true
+    save_parse_failures: true
+    save_inference_server_logs: true
+  replayed_systems:
+    - BASE
+    - PROJ_GUARD
+    - EFFECTGUARD_REF
+  total_scored_rows: 21504
+
+fresh_smoke:
+  purpose: prove_model_generation_pipeline_from_clean_checkout
+  tasks: 32
+  regimes: [FULL, MEMORY_REVISE, ADV_EFFECT, SNOWBALL]
+  seeds: [0]
+  models: [mistral_small_3_2_24b_local, qwen3_6_35b_a3b_local, gemma_3_27b_it_local, llama_3_3_70b_awq_local]
+  systems: [BASE_PROPOSAL_NO_SYSTEM_LABEL]
+  expected_model_calls: 512
+  output_dir: outputs/fresh_smoke_local_generation
+
+native_validation:
+  use_existing: true
+  expand: false
+  rows: 4608
+  purpose: show_terminal_success_can_fail_and_wrapper_is_not_success_only
+  paper_framing: validation_not_headline
+
+stress_validation:
+  use_existing: true
+  rows: 3072
+  required_labels: [necessary_high, incomparable]
+  full_replay_required: true
+  paper_framing: effect_kernel_does_not_punish_all_high_effect_behavior
+
+baselines:
+  run_over_split: final_paired_control
+  official_reimplementations: false
+  label_all_as: deterministic_projection_or_faithful_approximation
+  systems:
+    - FINAL_STATE
+    - PROGENT_DSL_LITE
+    - CMTF_CONTRACT
+    - RACG_LITE
+    - TOOLPRIV_DETECTOR
+    - CORDON_LITE
+    - REVISABILITY_ONLY
+    - MODERN_PROJECTION_STACK
+    - KERNEL_FULL
+  metrics:
+    - accepted_successes
+    - residual_strict_excess
+    - false_denial
+    - raw_success_retention
+    - added_turns_p50
+    - added_turns_p95
+
+human_validation:
+  required: true
+  bundles: 300
+  strata:
+    strict_excess: 75
+    minimal: 75
+    necessary_high: 50
+    incomparable: 50
+    projection_residual: 50
+  annotators_min: 2
+  annotators_target: 3
+  blind_to_model_and_system: true
+  metrics:
+    - terminal_equivalence_agreement
+    - witness_admissibility_agreement
+    - effect_dimension_alpha
+    - strict_excess_kappa
+    - witness_preference_rate
+  acceptance_gates:
+    human_kernel_label_agreement_min: 0.80
+    witness_preferable_rate_strict_excess_min: 0.85
+    terminal_equivalence_agreement_min: 0.90
+    admissibility_agreement_min: 0.85
+    kappa_preferred_min: 0.60
+    kappa_min_with_caveat: 0.50
+
+uncertainty:
+  bootstrap_samples: 10000
+  paired_unit: task_id
+  cluster_units: [family, regime, model]
+  leave_one: [model, family, regime]
+  report_ci_for:
+    - base_strict_excess
+    - raw_kernel_gap
+    - baseline_residual_strict_excess
+    - effectguard_residual_strict_excess
+    - native_success
+    - human_agreement
+
+artifact:
+  final_zip_name: EffectKernelBench_artifact.zip
+  banned_public_labels: [v1, v2, v3, legacy, minimal_plus, workflow_smoke, bedrock, api_frontier]
+  required_commands:
+    - python -m zipfile -t EffectKernelBench_artifact.zip
+    - unzip -t EffectKernelBench_artifact.zip
+    - python scripts/reproduce.py --check-only
+    - python scripts/reproduce.py --tables
+    - python scripts/run_online.py --help
+    - python scripts/run_fresh_smoke.py --config configs/fresh_smoke.yaml
+    - pytest -q tests
+    - python scripts/verify_claim_registry.py --registry metrics/claim_registry.csv
+
+paper:
+  max_content_pages: 8
+  required_sections:
+    - Introduction
+    - Effect_Kernel_Certificates
+    - Relation_to_Prior_Tool_Safety_Work
+    - Experimental_Setup
+    - Main_Results
+    - Direct_Projection_Baselines
+    - Human_and_Reproducibility_Audits
+    - Limitations
+  effectguard_framing: reference_controller_constructive_upper_bound
+  forbidden_claims:
+    - guaranteed_acceptance
+    - faithful_sota_reimplementation
+    - commercial_frontier_model_results
+    - first_least_effect_benchmark_without_qualification
+    - universal_optimal_controller

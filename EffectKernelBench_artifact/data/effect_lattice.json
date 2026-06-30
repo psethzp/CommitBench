@@ -1,0 +1,11 @@
+{
+  "dimensions": [
+    "data_scope",
+    "write_scope",
+    "reversibility",
+    "observability",
+    "compensation_cost",
+    "user_burden",
+    "contract_fragility"
+  ]
+}

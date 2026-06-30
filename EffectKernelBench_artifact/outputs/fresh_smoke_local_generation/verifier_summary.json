@@ -1,0 +1,9 @@
+{
+  "certificate_count": 512,
+  "minimal_count": 512,
+  "strict_excess_count": 0,
+  "trace_count": 512,
+  "unresolved_abstraction_warnings": 0,
+  "verifier_latency_s": 5.03192400932312,
+  "verifier_p95_latency_ms": 1.0
+}

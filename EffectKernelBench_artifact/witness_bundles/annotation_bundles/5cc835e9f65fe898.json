@@ -1,0 +1,12 @@
+{
+  "admissibility_proof": "candidate_sequence_satisfies_current_policy_preconditions",
+  "bundle_id": "5cc835e9f65fe898",
+  "effect_vector": "{\"compensation_cost\": 0, \"contract_fragility\": 1, \"data_scope\": 1, \"observability\": 1, \"reversibility\": 1, \"user_burden\": 1, \"write_scope\": 2}",
+  "family": "delegated_docs",
+  "kernel_label_hidden_from_annotator": "strict_excess",
+  "regime": "CONCAT",
+  "stratum": "strict_excess",
+  "task_id": "delegated_docs_001:CONCAT:s13",
+  "terminal_equivalence_proof": "d58cd679207807af",
+  "witness_effect_vector": "{\"compensation_cost\": 0, \"contract_fragility\": 1, \"data_scope\": 1, \"observability\": 1, \"reversibility\": 1, \"user_burden\": 0, \"write_scope\": 2}"
+}

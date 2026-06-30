@@ -6,14 +6,16 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 import time
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from effectbench.agents.systems import run_system
-from effectbench.clients.bedrock import converse_text
 from effectbench.effects import dumps
 from effectbench.families.build_manifest import build_rows, write_manifest
 from effectbench.regimes import build_turns
@@ -283,6 +285,8 @@ def _bedrock_model_advice(
     proposal_mode: str,
     row: dict[str, Any],
 ) -> tuple[str | None, dict[str, Any] | None]:
+    from effectbench.clients.bedrock import converse_text
+
     rendered_turns = "\n".join(f"{turn['role']}: {turn['content']}" for turn in messages if turn["role"] != "memory")
     if proposal_mode == "actions":
         prompt = f"{_action_proposal_system_content()}\n\n{_action_proposal_user_content(messages, row)}"

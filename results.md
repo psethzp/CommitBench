@@ -1,6 +1,49 @@
 # EffectBench-Omega Local Results
 
-Last updated: 2026-06-25 UTC
+Last updated: 2026-06-30 UTC
+
+## EffectKernelBench Review-Rescue Artifact
+
+The review-facing artifact has been rebuilt as:
+
+```text
+EffectKernelBench_artifact/
+EffectKernelBench_artifact.zip
+```
+
+Key generated evidence:
+
+| Block | Status | Detail |
+|---|---:|---|
+| Raw local model proposals | Complete | 7,168 local vLLM BASE calls normalized with raw outputs, token counts, timestamps, request IDs, latency, model revisions, and prompt hashes. |
+| Final paired control | Complete | 21,504 canonical replay/certificate rows exposed as `final_paired_control`. |
+| Direct baselines | Complete | FINAL_STATE, PROGENT_DSL_LITE, CMTF_CONTRACT, RACG_LITE, TOOLPRIV_DETECTOR, CORDON_LITE, REVISABILITY_ONLY, MODERN_PROJECTION_STACK, KERNEL_FULL. |
+| Uncertainty | Complete | Paired bootstrap and leave-one robustness tables generated. |
+| No-oracle | Complete | Static/sentinel audit reports generated for the review-facing artifact. |
+| Human validation | Skipped/reported | 300 blinded bundles sampled for optional follow-up; no human-eval metric is claimed. |
+| Fresh smoke | Complete | 512 local calls across four models, 0 failures, 512 merged certificates, no-oracle 100%, local cost $0. |
+| Paper draft | Complete | `PAPER_EFFECTKERNELBENCH_FINAL.md` added and copied into the final artifact. |
+
+Final package:
+
+| Item | Value |
+|---|---|
+| Zip | `EffectKernelBench_artifact.zip` |
+| Zip size | 4.0 MiB |
+| Artifact directory size | 16 MiB |
+| File count | 690 |
+| SHA-256 | `cd1ad054d2552dcd8a4e6971f11348f82dfe67ea3e9f797dd9a1e5f39dc6d73a` |
+
+Fresh smoke parse audit:
+
+| Model | JSON | Other parser paths | Failures |
+|---|---:|---:|---:|
+| `mistral_small_3_2_24b_local` | 128/128 | 0 | 0 |
+| `qwen3_6_35b_a3b_local` | 114/128 | 9 text-scan, 1 low/high-format, 4 repaired fallback | 0 |
+| `llama3_3_70b_awq_local` | 128/128 | 0 | 0 |
+| `gemma3_27b_it_local` | 128/128 | 0 | 0 |
+
+Strict final submission gate status: automated artifact/provenance/baseline/no-oracle/zip/test gates pass for the no-human-eval scope. Human/domain validation is skipped and reported as a limitation; do not claim human agreement, kappa/alpha, human preference, or human-audited correctness.
 
 ## Executive Summary
 

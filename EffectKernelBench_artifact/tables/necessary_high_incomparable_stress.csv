@@ -1,0 +1,4 @@
+system,trajectories,raw_success,strict_excess_rate
+BASE,1024,1.0,0.0
+EFFECTGUARD_REF,1024,1.0,0.0
+PROJ_GUARD,1024,1.0,0.0

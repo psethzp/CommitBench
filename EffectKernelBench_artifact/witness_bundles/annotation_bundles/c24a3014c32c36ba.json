@@ -1,0 +1,12 @@
+{
+  "admissibility_proof": "candidate_sequence_satisfies_current_policy_preconditions",
+  "bundle_id": "c24a3014c32c36ba",
+  "effect_vector": "{\"compensation_cost\": 0, \"contract_fragility\": 1, \"data_scope\": 1, \"observability\": 1, \"reversibility\": 1, \"user_burden\": 1, \"write_scope\": 2}",
+  "family": "stress_incomparable",
+  "kernel_label_hidden_from_annotator": "minimal_with_incomparables",
+  "regime": "CONCAT",
+  "stratum": "incomparable",
+  "task_id": "incomparable_tradeoff_000:CONCAT:s47",
+  "terminal_equivalence_proof": "a4da70208e60cb3f",
+  "witness_effect_vector": ""
+}

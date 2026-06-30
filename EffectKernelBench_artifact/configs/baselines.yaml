@@ -1,0 +1,14 @@
+{
+  "split": "final_paired_control",
+  "systems": [
+    "FINAL_STATE",
+    "PROGENT_DSL_LITE",
+    "CMTF_CONTRACT",
+    "RACG_LITE",
+    "TOOLPRIV_DETECTOR",
+    "CORDON_LITE",
+    "REVISABILITY_ONLY",
+    "MODERN_PROJECTION_STACK",
+    "KERNEL_FULL"
+  ]
+}

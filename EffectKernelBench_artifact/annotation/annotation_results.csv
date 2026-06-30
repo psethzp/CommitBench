@@ -1,0 +1,2 @@
+status,bundles_sampled,annotators_completed,required_annotators_per_item,gate,claim_policy
+skipped_reported_claims_weakened,300,0,2,not_required_because_no_human_validation_claim_is_made,The paper may describe the annotation package as future work only; do not report human agreement or preference metrics.

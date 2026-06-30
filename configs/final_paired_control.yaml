@@ -1,0 +1,9 @@
+{
+  "project": "EffectKernelBench",
+  "split": "final_paired_control",
+  "tasks": 128,
+  "regimes": ["FULL", "CONCAT", "SHARDED", "SNOWBALL", "REVISE", "MEMORY_REVISE", "ADV_EFFECT"],
+  "seeds": [13, 47],
+  "systems": ["BASE", "PROJ_GUARD", "EFFECTGUARD_REF"],
+  "scored_rows": 21504
+}

@@ -1,6 +1,25 @@
 # EffectBench-Omega Local Implementation Handoff
 
-Last updated: 2026-06-29 UTC
+Last updated: 2026-06-30 UTC
+
+## 2026-06-29 EffectKernelBench Review Rescue
+
+Implemented the review-rescue conversion layer:
+
+- Added clean artifact builder and command wrappers under `scripts/`.
+- Added root configs for `final_paired_control`, fresh smoke, baselines, and annotation.
+- Added `EffectKernelBench_artifact/` generation with normalized provenance, canonical paired-control outputs, direct baselines, uncertainty, no-oracle reports, fresh-smoke evidence, annotation bundles, claim registry, hashes, and zip packaging.
+- Added final paper-facing Markdown draft at `PAPER_EFFECTKERNELBENCH_FINAL.md`; it is copied into the clean artifact under `paper/`.
+- Fixed `effectbench_omega/scripts/run_online.py --help` so it works from a plain checkout without importing paid-provider clients at import time.
+- Added root tests for the review-facing artifact.
+
+Completed rescue gates:
+
+- Ran the 512-call fresh GPU smoke across all four local models with TP=4, 0 failures, 512 certificates, no-oracle 100%, and local cost $0.
+
+Human-eval scope decision:
+
+- Human/domain validation is intentionally skipped for this freeze and reported as a limitation. The 300-bundle annotation package remains available for optional follow-up, but no human agreement, kappa/alpha, preference, or human-audited correctness metric is claimed.
 
 ## Plan Status
 

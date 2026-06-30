@@ -1,0 +1,16 @@
+# Direct Projection Baselines
+
+All rows are deterministic projections or faithful approximations, not official SOTA reimplementations.
+
+```csv
+system,native_predicate,accepted_successes,total_successes,residual_strict_excess,residual_strict_excess_rate,false_denial,false_denial_rate,raw_success_retention,added_turns_p50,added_turns_p95,notes
+FINAL_STATE,deterministic_projection_or_faithful_approximation,21504,21504,4638,0.21568080357142858,0,0.0,1.0,1.0,2.0,Projection baseline; not an official external-system reproduction.
+PROGENT_DSL_LITE,deterministic_projection_or_faithful_approximation,20230,21504,3370,0.166584280771132,1274,0.059244791666666664,0.9407552083333334,1.0,2.0,Projection baseline; not an official external-system reproduction.
+CMTF_CONTRACT,deterministic_projection_or_faithful_approximation,20122,21504,3616,0.17970380677865022,1382,0.0642671130952381,0.9357328869047619,1.0,2.0,Projection baseline; not an official external-system reproduction.
+RACG_LITE,deterministic_projection_or_faithful_approximation,19870,21504,3370,0.1696024157020634,1634,0.0759858630952381,0.9240141369047619,1.0,2.0,Projection baseline; not an official external-system reproduction.
+TOOLPRIV_DETECTOR,deterministic_projection_or_faithful_approximation,20230,21504,3370,0.166584280771132,1274,0.059244791666666664,0.9407552083333334,1.0,2.0,Projection baseline; not an official external-system reproduction.
+CORDON_LITE,deterministic_projection_or_faithful_approximation,20230,21504,3370,0.166584280771132,1274,0.059244791666666664,0.9407552083333334,1.0,2.0,Projection baseline; not an official external-system reproduction.
+REVISABILITY_ONLY,deterministic_projection_or_faithful_approximation,20373,21504,3507,0.17213959652481226,1131,0.05259486607142857,0.9474051339285714,1.0,2.0,Projection baseline; not an official external-system reproduction.
+MODERN_PROJECTION_STACK,deterministic_projection_or_faithful_approximation,19842,21504,3370,0.1698417498236065,1662,0.07728794642857142,0.9227120535714286,1.0,2.0,Projection baseline; not an official external-system reproduction.
+KERNEL_FULL,deterministic_projection_or_faithful_approximation,16866,21504,0,0.0,4638,0.21568080357142858,0.7843191964285714,0.0,1.0,Projection baseline; not an official external-system reproduction.
+```

@@ -1,0 +1,14 @@
+{
+  "annotators_min": 2,
+  "blind_to_model_and_system": true,
+  "bundles": 300,
+  "paper_claim_policy": "No human/domain-validation metric is claimed; deterministic replay and certificate audit are the validation evidence.",
+  "status": "skipped_reported_claims_weakened",
+  "strata": {
+    "incomparable": 50,
+    "minimal": 75,
+    "necessary_high": 50,
+    "projection_residual": 50,
+    "strict_excess": 75
+  }
+}

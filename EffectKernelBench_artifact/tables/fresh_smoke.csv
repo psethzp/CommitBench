@@ -1,0 +1,5 @@
+model,traces,api_logs,failures,parse_status
+gemma3_27b_it_local,128,128,0,{'json': 128}
+llama3_3_70b_awq_local,128,128,0,{'json': 128}
+mistral_small_3_2_24b_local,128,128,0,{'json': 128}
+qwen3_6_35b_a3b_local,128,128,0,"{'json': 114, 'text_scan': 9, 'unparsed:repair_fallback': 4, 'low_high_format': 1}"

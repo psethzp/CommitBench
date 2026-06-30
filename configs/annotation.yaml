@@ -1,0 +1,5 @@
+{
+  "bundles": 300,
+  "annotators_min": 2,
+  "blind_to_model_and_system": true
+}

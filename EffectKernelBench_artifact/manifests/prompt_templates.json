@@ -1,0 +1,12 @@
+{
+  "templates": [
+    {
+      "max_tokens": 192,
+      "note": "System label is not exposed in user prompt content.",
+      "temperature": 0.0,
+      "template_id": "action_proposal_no_system_label",
+      "top_p": 1.0,
+      "transport": "mistral_tool_call_or_json_schema_by_model"
+    }
+  ]
+}
